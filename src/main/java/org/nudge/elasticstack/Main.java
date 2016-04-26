@@ -1,5 +1,7 @@
 package org.nudge.elasticstack;
 
+import org.nudge.elasticstack.config.Configuration;
+
 /**
  * Entry point for NudgeApm - ElasticStack connector
  */
@@ -12,7 +14,11 @@ public class Main {
 		}
 
 		if ("-startDaemon".equals(args[0])) {
-			Daemon.start();
+			try {
+				Daemon.start(new Configuration());
+			} catch (IllegalStateException ise) {
+				System.err.println("Failed to start daemon: " + ise.getMessage());
+			}
 			return;
 		}
 
@@ -29,8 +35,7 @@ public class Main {
 		}
 
 		if ("-properties".equals(args[0])) {
-			// TODO
-			System.out.println("Not yet implemented");
+			Configuration.displayOptions();
 			return;
 		}
 

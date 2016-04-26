@@ -8,6 +8,12 @@ import java.util.Properties;
 
 public class Configuration {
 
+	public static final String EXPORT_FILE_DIR = "export.file.dir";
+	public static final String METRICS_VALUES = "metrics.values";
+	public static final String NUDGE_URL = "nudge.url";
+	public static final String NUDGE_LOGIN = "nudge.login";
+	public static final String NUDGE_PWD = "nudge.password";
+
 	private Properties props;
 
 	private String exportFileDir;
@@ -25,26 +31,27 @@ public class Configuration {
 		props = new Properties();
 		File propsFile = new File("nudge-elasticstack.properties");
 		if (propsFile.exists()) {
-			try (InputStream propsIS = new FileInputStream("nudge-elasticstack.properties")) {
+			try (InputStream propsIS = new FileInputStream(propsFile)) {
 				props.load(propsIS);
 			} catch (IOException e) {
 				throw new IllegalStateException(e.getMessage(), e);
 			}
 		}
 
-		exportFileDir = getProperty("export.file.dir", ".");
+		exportFileDir = getProperty(EXPORT_FILE_DIR, ".");
 
-		nudgeUrl = getProperty("nudge.url", "https://monitor.nudge-apm.com");
-		nudgeLogin = checkNotNull("nudge.login");
-		nudgePwd = checkNotNull("nudge.password");
+		nudgeUrl = getProperty(NUDGE_URL, "https://monitor.nudge-apm.com");
+		nudgeLogin = checkNotNull(NUDGE_LOGIN);
+		nudgePwd = checkNotNull(NUDGE_PWD);
 
-		String metricsValuesList = checkNotNull("metrics.values");
-		if (metricsValuesList.contains(","))
+		String metricsValuesList = checkNotNull(METRICS_VALUES);
+		if (metricsValuesList.contains(",")) {
 			metrics = metricsValuesList.split(",");
-		else
+		} else {
 			metrics = metricsValuesList.split(";");
-
+		}
 	}
+
 	private String checkNotNull(String key) {
 		String value = getProperty(key);
 		if (value == null) {
@@ -77,6 +84,13 @@ public class Configuration {
 		return getProperty(key, null);
 	}
 
+	/**
+	 * 
+	 * @param key
+	 * @param def
+	 *          default value
+	 * @return the value mathcing the key
+	 */
 	private String getProperty(String key, String def) {
 		String value = System.getProperty("nes." + key);
 		if (value != null) {
@@ -87,5 +101,13 @@ public class Configuration {
 			return value;
 		}
 		return def;
+	}
+
+	public static void displayOptions() {
+		System.out.println(EXPORT_FILE_DIR + " -> Directory where logstash logs should be written");
+		System.out.println(NUDGE_URL + " -> URL that should be used to connect to NudgeAPM");
+		System.out.println(NUDGE_LOGIN + " -> Login that should be used to connect to NudgeAPM");
+		System.out.println(NUDGE_PWD + " -> Password that should be used to connect to NudgeAPM");
+		System.out.println(METRICS_VALUES + " -> Metrics that should be collected from NudgeAPM");
 	}
 }

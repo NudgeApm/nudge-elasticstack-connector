@@ -7,26 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.nudge.elasticstack.config.Configuration;
 
-public class Daemon implements Runnable {
+public class Daemon {
 
-	private Configuration config;
-
-	public Daemon() {
-		config = new Configuration();
-	}
-
-	public void run() {
-		for (String metric : config.getMetrics()) {
-
-			// // TODO request value data from nudge (time shift of 5 mintues to be sure data are computed by Nudge APM)
-			
-			// // TODO map data to logs via the mapper
-			
-			// // TODO write logs
-			
-		}
-	}
-	static public void start() {
+	static public void start(Configuration config) {
 		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
 			public Thread newThread(Runnable runnable) {
 				Thread thread = new Thread(runnable);
@@ -35,7 +18,30 @@ public class Daemon implements Runnable {
 				return thread;
 			}
 		});
-		scheduler.scheduleWithFixedDelay(new Daemon(), 0L, 1L, TimeUnit.SECONDS);
+		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
+	}
+
+	static class DaemonTask implements Runnable {
+
+		private Configuration config;
+
+		public DaemonTask(Configuration config) {
+			this.config = config;
+		}
+
+		@Override
+		public void run() {
+			for (String metric : config.getMetrics()) {
+
+				// // TODO request value data from nudge (time shift of 5 mintues to be sure data are computed by Nudge APM)
+
+				// // TODO convert data to logstash logs
+
+				// // TODO write logs
+
+			}
+		}
+
 	}
 
 }
