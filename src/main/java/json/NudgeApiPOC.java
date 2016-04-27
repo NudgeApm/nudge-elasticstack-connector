@@ -43,12 +43,15 @@ public class NudgeApiPOC {
 		String host = Connection.DEFAULT_URL;
 		if (!NUDGE_HOST.isEmpty()) {
 			host = NUDGE_HOST;
+		} else {
+			host = Connection.DEFAULT_URL;
 		}
-		c = new Connection(NUDGE_HOST);
+		System.out.println("host : " + host);
+		c = new Connection(host);
 		c.login(NUDGE_LOGIN, NUDGE_PWD);
 
-		TIME_FROM = "2016-04-16_09:40";
-		TIME_TO   = "2016-04-18_09:30";
+		TIME_FROM = "2016-04-25_09:40";
+		TIME_TO   = "2016-04-27_09:30";
 
 
 		mapper = new ObjectMapper();
