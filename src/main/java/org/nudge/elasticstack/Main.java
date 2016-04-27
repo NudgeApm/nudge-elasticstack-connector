@@ -15,7 +15,9 @@ public class Main {
 
 		if ("-startDaemon".equals(args[0])) {
 			try {
-				Daemon.start(new Configuration());
+				Configuration conf = new Configuration();
+				conf.loadProperties();
+				Daemon.start(conf);
 			} catch (IllegalStateException ise) {
 				System.err.println("Failed to start daemon: " + ise.getMessage());
 			}

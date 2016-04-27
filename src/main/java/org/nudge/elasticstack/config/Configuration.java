@@ -14,25 +14,24 @@ public class Configuration {
 	public static final String NUDGE_LOGIN = "nudge.login";
 	public static final String NUDGE_PWD = "nudge.password";
 
-	private Properties props;
+	private Properties properties = new Properties();
 
 	private String exportFileDir;
 	private String nudgeUrl;
 	private String nudgeLogin;
 	private String nudgePwd;
-	// TODO remplacer par une structure qui contient : le requêteur de la métrique et le mapper de pojo de l'api
+	// TODO remplacer par une structure qui contient : le requêteur de la
+	// métrique et le mapper de pojo de l'api
 	private String[] metrics;
 
 	public Configuration() {
-		loadProperties();
 	}
 
-	private void loadProperties() {
-		props = new Properties();
+	public void loadProperties() {
 		File propsFile = new File("nudge-elasticstack.properties");
 		if (propsFile.exists()) {
 			try (InputStream propsIS = new FileInputStream(propsFile)) {
-				props.load(propsIS);
+				properties.load(propsIS);
 			} catch (IOException e) {
 				throw new IllegalStateException(e.getMessage(), e);
 			}
@@ -41,6 +40,7 @@ public class Configuration {
 		exportFileDir = getProperty(EXPORT_FILE_DIR, ".");
 
 		nudgeUrl = getProperty(NUDGE_URL, "https://monitor.nudge-apm.com");
+
 		nudgeLogin = checkNotNull(NUDGE_LOGIN);
 		nudgePwd = checkNotNull(NUDGE_PWD);
 
@@ -50,9 +50,10 @@ public class Configuration {
 		} else {
 			metrics = metricsValuesList.split(";");
 		}
+
 	}
 
-	private String checkNotNull(String key) {
+	String checkNotNull(String key) {
 		String value = getProperty(key);
 		if (value == null) {
 			throw new IllegalStateException("You must set the \"" + key + "\" parameter in your properties file.");
@@ -87,20 +88,20 @@ public class Configuration {
 	/**
 	 * 
 	 * @param key
-	 * @param def
-	 *          default value
+	 * @param defaultValue
+	 *            default value
 	 * @return the value mathcing the key
 	 */
-	private String getProperty(String key, String def) {
+	String getProperty(String key, String defaultValue) {
 		String value = System.getProperty("nes." + key);
 		if (value != null) {
 			return value;
 		}
-		value = props.getProperty(key);
+		value = properties.getProperty(key);
 		if (value != null) {
 			return value;
 		}
-		return def;
+		return defaultValue;
 	}
 
 	public static void displayOptions() {
@@ -109,5 +110,9 @@ public class Configuration {
 		System.out.println(NUDGE_LOGIN + " -> Login that should be used to connect to NudgeAPM");
 		System.out.println(NUDGE_PWD + " -> Password that should be used to connect to NudgeAPM");
 		System.out.println(METRICS_VALUES + " -> Metrics that should be collected from NudgeAPM");
+	}
+
+	Properties getProperties() {
+		return properties;
 	}
 }
