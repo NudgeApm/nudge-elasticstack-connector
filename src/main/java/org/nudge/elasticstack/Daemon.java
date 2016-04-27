@@ -1,11 +1,12 @@
 package org.nudge.elasticstack;
 
+import json.NudgeApiPOC;
+import org.nudge.elasticstack.config.Configuration;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-
-import org.nudge.elasticstack.config.Configuration;
 
 public class Daemon {
 
@@ -31,7 +32,7 @@ public class Daemon {
 
 		@Override
 		public void run() {
-			for (String metric : config.getMetrics()) {
+			/*for (String metric : config.getMetrics()) {
 
 				// // TODO request value data from nudge (time shift of 5 mintues to be sure data are computed by Nudge APM)
 
@@ -39,7 +40,13 @@ public class Daemon {
 
 				// // TODO write logs
 
-			}
+			}*/
+
+			System.out.println("XXX start POC ! ");
+
+			// Integration of devoxx poc #5
+			NudgeApiPOC.start(null);
+
 		}
 
 	}
