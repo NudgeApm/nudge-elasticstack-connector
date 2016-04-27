@@ -4,25 +4,26 @@ import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.nudge.elasticstack.config.Configuration;
 
 public class ConfigurationTest {
 
 	@Test
 	public void getProperty_environment_variable() {
-		//given 
+		//given
 		String key = "export_type";
-		String expectedValue = "test"; 
+		String expectedValue = "test";
 		System.setProperty("nes." + key, expectedValue);
 		Configuration conf = new Configuration();
-		
-		//when 
-		String result = conf.getProperty(key, null); 
-		
-		//then 
-        Assert.assertEquals(expectedValue, result);
+
+		//when
+		String result = conf.getProperty(key, null);
+
+		//then
+		Assert.assertEquals(expectedValue, result);
 	}
-	
-	
+
+
 	@Test
 	public void getProperty_props_conf(){
 		//given
@@ -31,23 +32,23 @@ public class ConfigurationTest {
 		String key = "address";
 		String expectedValue = "paris";
 		props.setProperty(key, expectedValue);
-		
+
 		// when
 		String result = conf.getProperty(key, null);
-		
+
 		// then
 		Assert.assertEquals(expectedValue, result);
 	}
 
-	
+
 	@Test(expected = IllegalStateException.class)
 	public void checkNoNull() {
-		//given 
+		//given
 		Configuration conf = new Configuration();
 		String key = "a.key";
-		//when 
+		//when
 		conf.checkNotNull(key);
 	}
-	
-	
+
+
 }
