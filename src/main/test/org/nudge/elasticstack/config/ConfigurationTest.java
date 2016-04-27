@@ -8,7 +8,7 @@ import org.junit.Test;
 public class ConfigurationTest {
 
 	@Test
-	public void getProperty_environnement_variable() {
+	public void getProperty_environment_variable() {
 		//given 
 		String key = "export_type";
 		String expectedValue = "test"; 
@@ -28,7 +28,7 @@ public class ConfigurationTest {
 		//given
 		Configuration conf = new Configuration();
 		Properties props = conf.getProperties();
-		String key = "adress";
+		String key = "address";
 		String expectedValue = "paris";
 		props.setProperty(key, expectedValue);
 		
