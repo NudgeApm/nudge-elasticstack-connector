@@ -48,7 +48,7 @@ public class Daemon {
 
 			// Integration of devoxx poc #5
 			try {
-				NudgeApiPOC.start(null);
+				NudgeApiPOC.start(config);
 			} catch (Throwable t) {
 			t.printStackTrace();
 			}

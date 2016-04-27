@@ -1,10 +1,15 @@
 package org.nudge.elasticstack.config;
 
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Properties;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.nudge.elasticstack.config.Configuration;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class ConfigurationTest {
 
@@ -20,7 +25,7 @@ public class ConfigurationTest {
 		String result = conf.getProperty(key, null);
 
 		//then
-		Assert.assertEquals(expectedValue, result);
+		assertEquals(expectedValue, result);
 	}
 
 
@@ -37,7 +42,7 @@ public class ConfigurationTest {
 		String result = conf.getProperty(key, null);
 
 		// then
-		Assert.assertEquals(expectedValue, result);
+		assertEquals(expectedValue, result);
 	}
 
 
@@ -49,6 +54,38 @@ public class ConfigurationTest {
 		//when
 		conf.checkNotNull(key);
 	}
+
+	@Test
+	public void loadProperties() throws URISyntaxException {
+		// given
+		Configuration conf = new Configuration();
+		URL resource = this.getClass().getClassLoader().getResource(Configuration.CONF_FILE);
+		File confFile = new File(resource.toURI());
+		System.out.println("schema : " + confFile);
+
+		String exportType = "file";
+		String exportFileDir = "./export/nudge-logstash.log";
+		String nudgeUrl = "http://nudgeapm.io";
+		String nudgeLogin = "login-user";
+		String nudgePwd = "password-user";
+		// TODO implement specific test
+		String[] metricsValues = { "" };
+
+		// when
+		conf.loadProperties(resource.getPath());
+
+		// then
+		// test file exists
+		// tester parametres mis dans object Properties
+		assertEquals(exportType, conf.getExportType());
+		assertEquals(exportFileDir, conf.getExportFileDir());
+		assertEquals(nudgeUrl, conf.getNudgeUrl());
+		assertEquals(nudgeLogin, conf.getNudgeLogin());
+		assertEquals(nudgePwd, conf.getNudgePwd());
+		assertArrayEquals(metricsValues, conf.getMetrics());
+	}
+
+
 
 
 }

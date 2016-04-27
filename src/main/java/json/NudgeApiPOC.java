@@ -26,10 +26,6 @@ import java.util.Map;
 public class NudgeApiPOC {
 
 	private static final String NUDGE_HOST = ""; // redefine other env here
-	private static final String NUDGE_LOGIN = "";
-	private static final String NUDGE_PWD = "";
-
-	private static final String APP_ID = "";
 
 	private static String TIME_FROM;
 	private static String TIME_TO;
@@ -37,32 +33,35 @@ public class NudgeApiPOC {
 	private static Connection c;
 	private static ObjectMapper mapper;
 
-	static {
+	public void init(Configuration config) {
+			System.out.println("---POC init....");
+			String host = Connection.DEFAULT_URL;
+			if (!NUDGE_HOST.isEmpty()) {
+				host = NUDGE_HOST;
+			} else {
+				host = Connection.DEFAULT_URL;
+			}
+			System.out.println("host : " + host);
+			c = new Connection(host);
+		System.out.println("Login: " + config.getNudgeLogin());
+		System.out.println("Password: " + config.getNudgePwd());
+			c.login(config.getNudgeLogin(), config.getNudgePwd());
 
-		System.out.println("---POC init....");
-		String host = Connection.DEFAULT_URL;
-		if (!NUDGE_HOST.isEmpty()) {
-			host = NUDGE_HOST;
-		} else {
-			host = Connection.DEFAULT_URL;
-		}
-		System.out.println("host : " + host);
-		c = new Connection(host);
-		c.login(NUDGE_LOGIN, NUDGE_PWD);
-
-		TIME_FROM = "2016-04-25_09:40";
-		TIME_TO   = "2016-04-27_09:30";
+			TIME_FROM = "2016-04-25_09:40";
+			TIME_TO   = "2016-04-27_09:30";
 
 
-		mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-		mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-		mapper.registerModule(new TimeSeriesModule());
+			mapper = new ObjectMapper();
+			mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+			mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+			mapper.registerModule(new TimeSeriesModule());
 	}
 
 
-
 	public static void start(Configuration config) {
+		NudgeApiPOC poc = new NudgeApiPOC();
+		poc.init(config);
+
 		System.out.println("---POC starting");
 		// metrics=time,count,errors&from=2016-04-19T13:22:38Z&to=2016-04-19T14:22:38Z&step=1m
 		Map<String, String> params = new HashMap<>();
@@ -73,7 +72,9 @@ public class NudgeApiPOC {
 
 		Connection.LayerType layerType = Connection.LayerType.JAVA;
 
-		TimeSeries timeSeries = c.requestTimeSeries(APP_ID, params, layerType, mapper);
+		// very dirty !!
+		String appId = System.getProperty("appId");
+		TimeSeries timeSeries = c.requestTimeSeries(appId, params, layerType, mapper);
 
 		extractToCSV(timeSeries, layerType);
 	}
