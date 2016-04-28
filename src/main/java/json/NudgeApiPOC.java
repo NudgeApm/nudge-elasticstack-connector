@@ -15,6 +15,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +29,7 @@ import java.util.Map;
 public class NudgeApiPOC {
 
 	private static final String NUDGE_HOST = ""; // redefine other env here
+
 
 	private static String TIME_FROM;
 	private static String TIME_TO;
@@ -58,15 +62,17 @@ public class NudgeApiPOC {
 	}
 
 
-	public static void start(Configuration config) {
+	public static void start(Configuration config, Duration duration, Instant now) {
 		NudgeApiPOC poc = new NudgeApiPOC();
 		poc.init(config);
 
 		System.out.println("---POC starting");
 		// metrics=time,count,errors&from=2016-04-19T13:22:38Z&to=2016-04-19T14:22:38Z&step=1m
 		Map<String, String> params = new HashMap<>();
-		params.put("from", TIME_FROM);
-		params.put("to", TIME_TO);
+
+		Instant fromInstant = poc.buildFromInstant(duration, now);
+		params.put("from", poc.formatInstantToNudgeDate(fromInstant));
+		params.put("to", poc.formatInstantToNudgeDate(now));
 		params.put("metrics", "time,count,errors");
 		params.put("step", "1m");
 
@@ -112,4 +118,22 @@ public class NudgeApiPOC {
 
 	}
 
+	/**
+	 *
+	 * @param duration
+	 * @param now
+	 * @return
+	 */
+	public Instant buildFromInstant(Duration duration, Instant now) {
+		return now.minusSeconds(duration.getSeconds());
+	}
+
+
+	public String formatInstantToNudgeDate(Instant instant) {
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm")
+//				.withZone(ZoneId.of("Europe/Paris"));
+//				.withZone(ZoneId.systemDefault());
+		DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+		return formatter.format(instant);
+	}
 }
