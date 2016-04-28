@@ -29,11 +29,11 @@ public class NudgeApiPOCTest {
 		assertEquals(expectedInstant, fromInstant);
 	}
 
-
 	@Test
 	public void formatInstantToNudgeDateTestWithLocale() {
 		// given
-		String date = "2014-03-16T12:00:00.000Z";
+		String date = "2014-03-16T12:00:00Z";
+		// String date = "2014-03-16_12:00";
 
 		// when
 		String nudgeDate = nudgeApiPOC.formatInstantToNudgeDate(Instant.parse("2014-03-16T12:00:00.000Z"));

@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -30,7 +32,6 @@ public class NudgeApiPOC {
 
 	private static final String NUDGE_HOST = ""; // redefine other env here
 
-
 	private static String TIME_FROM;
 	private static String TIME_TO;
 
@@ -38,36 +39,31 @@ public class NudgeApiPOC {
 	private static ObjectMapper mapper;
 
 	public void init(Configuration config) {
-			System.out.println("---POC init....");
-			String host = Connection.DEFAULT_URL;
-			if (!NUDGE_HOST.isEmpty()) {
-				host = NUDGE_HOST;
-			} else {
-				host = Connection.DEFAULT_URL;
-			}
-			System.out.println("host : " + host);
-			c = new Connection(host);
+		System.out.println("---POC init....");
+		String host = Connection.DEFAULT_URL;
+		if (!NUDGE_HOST.isEmpty()) {
+			host = NUDGE_HOST;
+		} else {
+			host = Connection.DEFAULT_URL;
+		}
+		System.out.println("host : " + host);
+		c = new Connection(host);
 		System.out.println("Login: " + config.getNudgeLogin());
 		System.out.println("Password: " + config.getNudgePwd());
-			c.login(config.getNudgeLogin(), config.getNudgePwd());
+		c.login(config.getNudgeLogin(), config.getNudgePwd());
 
-			TIME_FROM = "2016-04-25_09:40";
-			TIME_TO   = "2016-04-27_09:30";
-
-
-			mapper = new ObjectMapper();
-			mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-			mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-			mapper.registerModule(new TimeSeriesModule());
+		mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+		mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+		mapper.registerModule(new TimeSeriesModule());
 	}
-
 
 	public static void start(Configuration config, Duration duration, Instant now) {
 		NudgeApiPOC poc = new NudgeApiPOC();
 		poc.init(config);
 
 		System.out.println("---POC starting");
-		// metrics=time,count,errors&from=2016-04-19T13:22:38Z&to=2016-04-19T14:22:38Z&step=1m
+		// metrics=time,count,errors&from=2016-04-19T13:22Z&to=2016-04-19T14:22Z&step=1m
 		Map<String, String> params = new HashMap<>();
 
 		Instant fromInstant = poc.buildFromInstant(duration, now);
@@ -91,16 +87,11 @@ public class NudgeApiPOC {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
 
-
 		for (TimeSerie ts : data.getTimeSeries()) {
 			Calendar calendar = DatatypeConverter.parseDateTime(ts.getDatetime());
 
-
-			output = output.concat(
-					sdf.format(calendar.getTime()).concat(sep)
-					.concat(ts.getTime()).concat(sep)
-					.concat(ts.getCount()).concat(sep)
-					.concat(ts.getErrors()).concat(sep)
+			output = output.concat(sdf.format(calendar.getTime()).concat(sep).concat(ts.getTime()).concat(sep)
+					.concat(ts.getCount()).concat(sep).concat(ts.getErrors()).concat(sep)
 					.concat(layerType.name().toLowerCase()).concat("\n"));
 		}
 
@@ -128,11 +119,7 @@ public class NudgeApiPOC {
 		return now.minusSeconds(duration.getSeconds());
 	}
 
-
 	public String formatInstantToNudgeDate(Instant instant) {
-//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm")
-//				.withZone(ZoneId.of("Europe/Paris"));
-//				.withZone(ZoneId.systemDefault());
 		DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
 		return formatter.format(instant);
 	}

@@ -56,6 +56,9 @@ public class Configuration {
 	 * @param pathFile
 	 * 			path file that define the properties to load
 	 */
+	
+	// on veut que le fichier proporties soit a coté du jar. 
+	// ou variable d'environnement ajouté pour charger le fichier.
 	public void loadProperties(String pathFile) {
 		File propsFile = new File(pathFile);
 		boolean propsFileExists = propsFile.exists();
