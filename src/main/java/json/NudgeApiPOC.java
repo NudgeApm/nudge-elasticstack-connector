@@ -10,19 +10,34 @@ import json.resolver.TimeSeriesModule;
 import org.nudge.elasticstack.config.Configuration;
 
 import javax.xml.bind.DatatypeConverter;
+
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  *
@@ -120,7 +135,10 @@ public class NudgeApiPOC {
 	}
 
 	public String formatInstantToNudgeDate(Instant instant) {
-		DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
-		return formatter.format(instant);
+		 TimeZone tz = TimeZone.getTimeZone("UTC");
+		 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+		 df.setTimeZone(tz);
+		 String nowAsISO = df.format(Date.from(instant));
+		return nowAsISO;
 	}
 }
