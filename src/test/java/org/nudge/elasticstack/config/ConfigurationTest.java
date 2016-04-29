@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ConfigurationTest {
 
+
 	@Test
 	public void getProperty_environment_variable() {
 		//given

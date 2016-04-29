@@ -41,6 +41,11 @@ public class Main {
 			return;
 		}
 
+		//test so can Delete
+		if ("-startRequest".equals(args[0])) {
+			
+		}
+		
 		usage();
 		System.exit(1);
 	}

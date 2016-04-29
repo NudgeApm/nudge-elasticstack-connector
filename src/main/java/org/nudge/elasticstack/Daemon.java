@@ -2,13 +2,16 @@ package org.nudge.elasticstack;
 
 import json.NudgeApiPOC;
 import org.nudge.elasticstack.config.Configuration;
-
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
 
 public class Daemon {
 
@@ -42,7 +45,7 @@ public class Daemon {
 
 		@Override
 		public void run() {
-			Instant instant = Instant.now();
+			Instant instant = Instant.now().minus(10, ChronoUnit.MINUTES);
 
 			/*
 			 * for (String metric : config.getMetrics()) {

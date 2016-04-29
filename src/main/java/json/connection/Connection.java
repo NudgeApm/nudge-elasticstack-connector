@@ -1,13 +1,10 @@
 package json.connection;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import json.bean.TimeSeries;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,9 +12,7 @@ import java.util.Map.Entry;
 public class Connection {
 
 	public static final String DEFAULT_URL = "https://monitor.nudge-apm.com/";
-
 	public static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm";
-
 	private final String url;
 	private String sessionCookie;
 	private boolean logged;
@@ -36,8 +31,8 @@ public class Connection {
 		try {
 			HttpURLConnection con;
 			URL loginUrl = new URL(url + "login/usrpwd");
+			
 			con = (HttpURLConnection) loginUrl.openConnection();
-
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
 			con.setConnectTimeout(1000);
@@ -47,10 +42,12 @@ public class Connection {
 			String params = "id=" + login + "&pwd=" + pwd;
 			con.getOutputStream().write(params.getBytes());
 			getSessionFromCookies(con.getHeaderFields().get("Set-Cookie"));
+			
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
+	
 
 	private void getSessionFromCookies(List<String> cookies) {
 		if (cookies == null || cookies.size() < 1) {
@@ -69,14 +66,12 @@ public class Connection {
 		logged = true;
 	}
 
-
-//	http://dev-nudge.nudge-apm.com:8080/api/apps/c709dba6-bf5d-4a03-b1f3-1ca57e6bde95/metrics/timeSeries?metrics=time,count,errors&from=2016-04-19T13:22:38Z&to=2016-04-19T14:22:38Z&step=1m
-//	http://dev-nudge.nudge-apm.com:8080/api/apps/c709dba6-bf5d-4a03-b1f3-1ca57e6bde95/layers/Cassandra/metrics/timeSeries?metrics=time&from=2016-04-19T13:22:38Z&to=2016-04-19T14:22:38Z&step=1m
-
+	
 	public enum LayerType {
 		JAVA, CASSANDRA
 	}
 
+	
 	public TimeSeries requestTimeSeries(String appId, Map<String, String> params, LayerType layerType, ObjectMapper mapper) {
 		String urlParameter;
 		switch (layerType) {
@@ -108,10 +103,13 @@ public class Connection {
 			con.setRequestProperty("Cookie", sessionCookie);
 
 			return con;
+			
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	
 	private String getData(String completeUrl) {
 		if (!logged) {
 			throw new IllegalStateException("Can't request while not logged in");
@@ -153,24 +151,5 @@ public class Connection {
 		}
 	}
 
-	private static <T> T readValue(String content, Class<T> valueType) {
-		System.out.println(content);
-		try {
-			return new ObjectMapper().setDateFormat(new SimpleDateFormat(DATE_FORMAT))
-					.readValue(content, valueType);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static <T> T readValue(String content, TypeReference<?> valueTypeRef) {
-		System.out.println(content);
-		try {
-			return new ObjectMapper()
-					.readValue(content, valueTypeRef);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 }

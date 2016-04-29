@@ -19,24 +19,22 @@ public class Configuration {
 	public static final String NUDGE_LOGIN = "nudge.login";
 	public static final String NUDGE_PWD = "nudge.password";
 
-
 	private Properties properties = new Properties();
-
 	private String exportFileDir;
 	private String exportType;
 	private String nudgeUrl;
 	private String nudgeLogin;
 	private String nudgePwd;
-	// TODO remplacer par une structure qui contient : le requêteur de la
-	// métrique et le mapper de pojo de l'api
 	private String[] metrics;
-
+	
+	
 	public Configuration() {
 	}
 
 	/**
 	 * Load properties with the default conf file, must be placed next to the jar program.
 	 */
+	
 	public void loadProperties() {
 		try {
 			Path folderJarPath = Paths.get(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
@@ -45,9 +43,6 @@ public class Configuration {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-
-//		jarPath).getParent(), CONF_FILE);
-//		loadProperties(CONF_FILE);
 	}
 
 	/**
@@ -74,7 +69,6 @@ public class Configuration {
 		exportType = getProperty(EXPORT_TYPE, "file");
 		exportFileDir = getProperty(EXPORT_FILE_DIR, ".");
 		nudgeUrl = getProperty(NUDGE_URL, "https://monitor.nudge-apm.com");
-
 		nudgeLogin = checkNotNull(NUDGE_LOGIN);
 		nudgePwd = checkNotNull(NUDGE_PWD);
 
