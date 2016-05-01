@@ -72,7 +72,7 @@ public class Connection {
 	}
 
 	
-	public TimeSeries requestTimeSeries(String appId, Map<String, String> params, LayerType layerType, ObjectMapper mapper) {
+	public TimeSeries requestTimeSeries(String appid, Map<String, String> params, LayerType layerType, ObjectMapper mapper) {
 		String urlParameter;
 		switch (layerType) {
 			case JAVA:
@@ -86,7 +86,7 @@ public class Connection {
 				throw new IllegalArgumentException("Invalid Layer type, choose Java or Cassandra for example");
 		}
 
-		String data = getData(url + "api/apps/" + appId + urlParameter + paramsToQuery(params));
+		String data = getData(url + "api/apps/"  + appid + urlParameter + paramsToQuery(params));
 		return readValue(data, TimeSeries.class, mapper);
 	}
 

@@ -7,17 +7,20 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Properties;
 
 public class Configuration {
 
-	public static final String CONF_FILE = "nudge-logstash.properties";
+    static final String CONF_FILE = "nudge-logstash.properties";
 	public static final String EXPORT_FILE_DIR = "export.file.dir";
 	public static final String EXPORT_TYPE = "export.type";
 	public static final String METRICS_VALUES = "metrics.values";
 	public static final String NUDGE_URL = "nudge.url";
 	public static final String NUDGE_LOGIN = "nudge.login";
 	public static final String NUDGE_PWD = "nudge.password";
+	//ajout app id 
+	public static final String APP_ID = "app.id";
 
 	private Properties properties = new Properties();
 	private String exportFileDir;
@@ -26,7 +29,8 @@ public class Configuration {
 	private String nudgeLogin;
 	private String nudgePwd;
 	private String[] metrics;
-	
+	//ajout app id 
+	private String appid;
 	
 	public Configuration() {
 	}
@@ -71,6 +75,7 @@ public class Configuration {
 		nudgeUrl = getProperty(NUDGE_URL, "https://monitor.nudge-apm.com");
 		nudgeLogin = checkNotNull(NUDGE_LOGIN);
 		nudgePwd = checkNotNull(NUDGE_PWD);
+		setAppid(getProperty(APP_ID, "appid"));
 
 		String metricsValuesList = checkNotNull(METRICS_VALUES);
 		if (metricsValuesList.contains(",")) {
@@ -114,6 +119,7 @@ public class Configuration {
 		System.out.println(NUDGE_LOGIN + " -> Login that should be used to connect to NudgeAPM");
 		System.out.println(NUDGE_PWD + " -> Password that should be used to connect to NudgeAPM");
 		System.out.println(METRICS_VALUES + " -> Metrics that should be collected from NudgeAPM");
+		System.out.println("APP_ID" + " -> ID of your application to request metrics");
 	}
 
 	Properties getProperties() {
@@ -160,11 +166,29 @@ public class Configuration {
 		this.nudgePwd = nudgePwd;
 	}
 
-	public String[] getMetrics() {
+	public String [] getMetrics() {
 		return metrics;
 	}
 
 	public void setMetrics(String[] metrics) {
 		this.metrics = metrics;
 	}
+	
+	// ajout de l'app id
+	public String getAppId(){
+		return getAppid();
+	}
+	
+	public void setAppId(String appid) {
+		this.setAppid(appid);
+	}
+
+	public String getAppid() {
+		return appid;
+	}
+
+	public void setAppid(String appid) {
+		this.appid = appid;
+	}
+	
 }

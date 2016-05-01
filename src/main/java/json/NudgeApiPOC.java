@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -40,14 +41,20 @@ public class NudgeApiPOC {
 	private static Connection c;
 	private static ObjectMapper mapper;
 
+	/**
+	 * 
+	 * @param config
+	 */
 	public void init(Configuration config) {
-		System.out.println("---POC init....");
+
+		System.out.println("----Connexion----....");
 		String host = Connection.DEFAULT_URL;
 		if (!NUDGE_HOST.isEmpty()) {
 			host = NUDGE_HOST;
 		} else {
 			host = Connection.DEFAULT_URL;
 		}
+
 		System.out.println("host : " + host);
 		c = new Connection(host);
 		System.out.println("Login: " + config.getNudgeLogin());
@@ -60,27 +67,36 @@ public class NudgeApiPOC {
 		mapper.registerModule(new TimeSeriesModule());
 	}
 
+	/**
+	 * 
+	 * @param config
+	 * @param duration
+	 * @param now
+	 */
 	public static void start(Configuration config, Duration duration, Instant now) {
 
 		NudgeApiPOC poc = new NudgeApiPOC();
-		poc.init(config);
 
-		System.out.println("---POC starting");
+		poc.init(config);
+		System.out.println("----Plugin is starting----");
 		Map<String, String> params = new HashMap<>();
 		Instant fromInstant = poc.buildFromInstant(duration, now);
 		params.put("from", poc.formatInstantToNudgeDate(fromInstant));
 		params.put("to", poc.formatInstantToNudgeDate(now));
-		params.put("metrics", "time,count,errors");
+		params.put("metrics", "time,count,errors"); // TODO : To permit metrics
+													// can be write on the
+													// config file
 		params.put("step", "1m");
-
 		Connection.LayerType layerType = Connection.LayerType.JAVA;
-
-		// very dirty !!
-		String appId = System.getProperty("appId");
-		TimeSeries timeSeries = c.requestTimeSeries(appId, params, layerType, mapper);
+		TimeSeries timeSeries = c.requestTimeSeries(config.getAppid(), params, layerType, mapper);
 		extractToCSV(timeSeries, layerType);
 	}
 
+	/**
+	 * 
+	 * @param data
+	 * @param layerType
+	 */
 	public static void extractToCSV(TimeSeries data, Connection.LayerType layerType) {
 
 		final String sep = ",";
@@ -96,7 +112,6 @@ public class NudgeApiPOC {
 
 		try {
 			File csvTemp = new File("csvTemp.csv");
-
 			FileWriter fileWriter = new FileWriter(csvTemp, true);
 			BufferedWriter bw = new BufferedWriter(fileWriter);
 			bw.write(output);
@@ -107,16 +122,10 @@ public class NudgeApiPOC {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
-	
-	public void test() {
-		
-		
-	}
 	/**
-	 *
+	 * 
 	 * @param duration
 	 * @param now
 	 * @return
@@ -125,6 +134,12 @@ public class NudgeApiPOC {
 		return now.minusSeconds(duration.getSeconds());
 	}
 
+	
+	/**
+	 * 
+	 * @param instant
+	 * @return
+	 */
 	public String formatInstantToNudgeDate(Instant instant) {
 		TimeZone tz = TimeZone.getTimeZone("UTC");
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");

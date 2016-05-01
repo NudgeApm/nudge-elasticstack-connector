@@ -43,7 +43,7 @@ public class Main {
 
 		//test so can Delete
 		if ("-startRequest".equals(args[0])) {
-			
+			System.out.println("good");
 		}
 		
 		usage();
