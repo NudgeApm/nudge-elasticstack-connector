@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import json.bean.TimeMeasure;
 import json.bean.TimeSerie;
-import json.bean.TimeSeries;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,26 +20,26 @@ public class TimeSeriesModule extends SimpleModule {
 
 	public TimeSeriesModule() {
 		super("timeserieModule", new Version(1, 0, 0, ""));
-		this.addDeserializer(TimeSeries.class, new TimeSeriesDeSerializer());
+		this.addDeserializer(TimeSerie.class, new TimeSeriesDeSerializer());
 	}
 
-	public class TimeSeriesDeSerializer extends JsonDeserializer<TimeSeries> {
+	public class TimeSeriesDeSerializer extends JsonDeserializer<TimeSerie> {
 
 		@Override
-		public TimeSeries deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public TimeSerie deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 
 			JsonNode node = jp.getCodec().readTree(jp);
 //			JsonNode fieldsNode = node.get("fields");
 
-			TimeSeries ts = new TimeSeries();
-			ts.setTimeSeries(new ArrayList<TimeSerie>());
+			TimeSerie ts = new TimeSerie();
+			ts.setTimeSeries(new ArrayList<TimeMeasure>());
 
 			JsonNode dataNode = node.get("data");
 
 			if (dataNode != null) {
 				for (JsonNode value : dataNode) {
 
-					TimeSerie timeSerie = new TimeSerie();
+					TimeMeasure timeSerie = new TimeMeasure();
 
 					String[] subValues = removeFirstLastChar(value.toString()).split(","); // remove [] and split
 

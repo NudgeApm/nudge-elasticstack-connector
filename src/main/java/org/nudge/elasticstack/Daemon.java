@@ -1,83 +1,72 @@
 package org.nudge.elasticstack;
 
-import json.NudgeApiPOC;
+import json.bean.TimeSerie;
+import json.connection.Connection;
+
 import org.nudge.elasticstack.config.Configuration;
-import java.time.Duration;
+import org.nudge.elasticstack.logger.Logger;
+import org.nudge.elasticstack.logger.LogstashFileLogger;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-
 public class Daemon {
 
+	private static ScheduledExecutorService scheduler;
+
 	static public void start(Configuration config) {
-		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+		scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
 			public Thread newThread(Runnable runnable) {
 				Thread thread = new Thread(runnable);
 				thread.setName("nudge-es-daemon");
 				thread.setDaemon(false);
 				return thread;
 			}
-
 		});
 
-		long period = 1L;
-		TimeUnit minutes = TimeUnit.MINUTES;
-		Duration duration = retrieveDuration(period, minutes);
-
-		scheduler.scheduleAtFixedRate(new DaemonTask(config, duration), 0L, period, minutes);
+		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
 	}
 
 	static class DaemonTask implements Runnable {
 
 		private Configuration config;
-		private Duration duration;
+		private Logger logger;
 
-		public DaemonTask(Configuration config, Duration duration) {
+		public DaemonTask(Configuration config) {
 			this.config = config;
-			this.duration = duration;
+			switch (config.getExportType()) {
+			case FILE:
+				logger = new LogstashFileLogger();
+				break;
+			case ELASTIC:
+			default:
+				throw new IllegalArgumentException("Export type " + config.getExportType() + " not yet implemented");
+			}
 		}
 
 		@Override
 		public void run() {
-			Instant instant = Instant.now().minus(10, ChronoUnit.MINUTES);
-
-			/*
-			 * for (String metric : config.getMetrics()) {
-			 * 
-			 * // // TODO request value data from nudge (time shift of 5 mintues
-			 * to be sure data are computed by Nudge APM)
-			 * 
-			 * // // TODO convert data to logstash logs
-			 * 
-			 * // // TODO write logs
-			 * 
-			 * }
-			 */
-
-			// Integration of devoxx poc #5
 			try {
-				NudgeApiPOC.start(config, duration, instant);
+				Connection c = new Connection(config.getNudgeUrl());
+				c.login(config.getNudgeLogin(), config.getNudgePwd());
+
+				// on interroge volontairement les informations avec 5 minutes de retard
+				// pour s'assurer que les informations sont à jour côté Nudge
+				Instant sinceInstant = Instant.now().minus(5, ChronoUnit.MINUTES);
+				Instant untilInstant = sinceInstant.plus(1, ChronoUnit.MINUTES);
+
+				for (String appId : config.getAppIds()) {
+					TimeSerie serie = c.appTimeSerie(appId, sinceInstant, untilInstant, "1m");
+					logger.log(serie);
+				}
 			} catch (Throwable t) {
 				t.printStackTrace();
+				scheduler.shutdown();
 			}
 		}
 	}
-
-	// recupere la durée à requeter, -> demander à boite noire d'extraire en fonction des metrics demandées.
-
-	public static Duration retrieveDuration(long period, TimeUnit timeUnit) {
-		if (timeUnit != null) {
-			long nbOfSnd = TimeUnit.SECONDS.convert(period, timeUnit);
-			return Duration.ofSeconds(nbOfSnd);
-		}
-		return null;
-	}
-
-
 }

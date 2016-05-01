@@ -3,8 +3,8 @@ package json;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import json.bean.TimeMeasure;
 import json.bean.TimeSerie;
-import json.bean.TimeSeries;
 import json.connection.Connection;
 import json.resolver.TimeSeriesModule;
 import org.nudge.elasticstack.config.Configuration;
@@ -77,17 +77,17 @@ public class NudgeApiPOC {
 
 		// very dirty !!
 		String appId = System.getProperty("appId");
-		TimeSeries timeSeries = c.requestTimeSeries(appId, params, layerType, mapper);
+		TimeSerie timeSeries = c.requestTimeSeries(appId, params, layerType, mapper);
 		extractToCSV(timeSeries, layerType);
 	}
 
-	public static void extractToCSV(TimeSeries data, Connection.LayerType layerType) {
+	public static void extractToCSV(TimeSerie data, Connection.LayerType layerType) {
 
 		final String sep = ",";
 		String output = "";
 		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
 
-		for (TimeSerie ts : data.getTimeSeries()) {
+		for (TimeMeasure ts : data.getTimeSeries()) {
 			Calendar calendar = DatatypeConverter.parseDateTime(ts.getDatetime());
 			output = output.concat(sdf.format(calendar.getTime()).concat(sep).concat(ts.getTime()).concat(sep)
 					.concat(ts.getCount()).concat(sep).concat(ts.getErrors()).concat(sep)

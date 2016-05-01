@@ -13,10 +13,10 @@ import java.util.Iterator;
  * @author Frédéric Massart
  */
 @Deprecated
-public class TimeSerieDeserializer extends JsonDeserializer<TimeSerie> {
+public class TimeSerieDeserializer extends JsonDeserializer<TimeMeasure> {
 
 	@Override
-	public TimeSerie deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+	public TimeMeasure deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		JsonNode dataNode = node.get("data");
 		if (dataNode != null) {
@@ -25,7 +25,7 @@ public class TimeSerieDeserializer extends JsonDeserializer<TimeSerie> {
 			System.out.printf("vale" + next);
 		}
 //			System.out.println("dta is " + data);
-		return new TimeSerie();
+		return new TimeMeasure();
 	}
 
 

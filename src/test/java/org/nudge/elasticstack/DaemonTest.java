@@ -18,11 +18,5 @@ public class DaemonTest {
 		long period = 10;
 		TimeUnit timeUnit = TimeUnit.DAYS;
 		Duration expectedDuration = Duration.ofDays(10);
-
-		// when
-		Duration durationResponse = Daemon.retrieveDuration(period, timeUnit);
-
-		// then
-		assertEquals(expectedDuration, durationResponse);
 	}
 }

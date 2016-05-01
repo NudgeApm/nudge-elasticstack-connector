@@ -1,12 +1,23 @@
 package json.connection;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import json.bean.TimeSeries;
+
+import json.bean.TimeSerie;
+import json.resolver.TimeSeriesModule;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 
 public class Connection {
@@ -16,6 +27,11 @@ public class Connection {
 	private final String url;
 	private String sessionCookie;
 	private boolean logged;
+
+	static ObjectMapper mapper = new ObjectMapper()
+			.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+			.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+			.registerModule(new TimeSeriesModule());
 
 	public Connection() {
 		this(DEFAULT_URL);
@@ -31,7 +47,7 @@ public class Connection {
 		try {
 			HttpURLConnection con;
 			URL loginUrl = new URL(url + "login/usrpwd");
-			
+
 			con = (HttpURLConnection) loginUrl.openConnection();
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
@@ -42,12 +58,11 @@ public class Connection {
 			String params = "id=" + login + "&pwd=" + pwd;
 			con.getOutputStream().write(params.getBytes());
 			getSessionFromCookies(con.getHeaderFields().get("Set-Cookie"));
-			
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
 
 	private void getSessionFromCookies(List<String> cookies) {
 		if (cookies == null || cookies.size() < 1) {
@@ -66,30 +81,27 @@ public class Connection {
 		logged = true;
 	}
 
-	
 	public enum LayerType {
 		JAVA, CASSANDRA
 	}
 
-	
-	public TimeSeries requestTimeSeries(String appId, Map<String, String> params, LayerType layerType, ObjectMapper mapper) {
+	public TimeSerie requestTimeSeries(String appId, Map<String, String> params, LayerType layerType, ObjectMapper mapper) {
 		String urlParameter;
 		switch (layerType) {
-			case JAVA:
-				urlParameter = "/metrics/timeSeries";
-				break;
-			case CASSANDRA:
-				urlParameter = "/layers/Cassandra/metrics/timeSeries";
-				break;
+		case JAVA:
+			urlParameter = "/metrics/timeSeries";
+			break;
+		case CASSANDRA:
+			urlParameter = "/layers/Cassandra/metrics/timeSeries";
+			break;
 
-			default :
-				throw new IllegalArgumentException("Invalid Layer type, choose Java or Cassandra for example");
+		default:
+			throw new IllegalArgumentException("Invalid Layer type, choose Java or Cassandra for example");
 		}
 
 		String data = getData(url + "api/apps/" + appId + urlParameter + paramsToQuery(params));
-		return readValue(data, TimeSeries.class, mapper);
+		return readValue(data, TimeSerie.class, mapper);
 	}
-
 
 	private HttpURLConnection prepareRequest(String completeUrl) {
 		try {
@@ -103,19 +115,17 @@ public class Connection {
 			con.setRequestProperty("Cookie", sessionCookie);
 
 			return con;
-			
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	private String getData(String completeUrl) {
 		if (!logged) {
 			throw new IllegalStateException("Can't request while not logged in");
 		}
 		HttpURLConnection con = prepareRequest(completeUrl);
-		System.out.println(completeUrl);
 		try {
 			return convertStreamToString(con.getInputStream());
 		} catch (IOException e) {
@@ -142,14 +152,29 @@ public class Connection {
 	}
 
 	private static <T> T readValue(String content, Class<T> valueType, ObjectMapper mapper) {
-		System.out.println(content);
 		try {
-			return mapper
-					.readValue(content, valueType);
+			return mapper.readValue(content, valueType);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	public TimeSerie appTimeSerie(String appId, Instant sinceInstant, Instant untilInstant, String step) {
+		Map<String, String> params = new HashMap<>();
+		params.put("from", formatInstantToNudgeDate(sinceInstant));
+		params.put("to", formatInstantToNudgeDate(untilInstant));
+		params.put("metrics", "time,count,errors");
+		params.put("step", step);
 
+		String data = getData(url + "api/apps/" + appId + "/metrics/timeSeries" + paramsToQuery(params));
+		return readValue(data, TimeSerie.class, mapper);
+	}
+
+	private String formatInstantToNudgeDate(Instant instant) {
+		TimeZone tz = TimeZone.getTimeZone("UTC");
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		df.setTimeZone(tz);
+		String nowAsISO = df.format(Date.from(instant));
+		return nowAsISO;
+	}
 }

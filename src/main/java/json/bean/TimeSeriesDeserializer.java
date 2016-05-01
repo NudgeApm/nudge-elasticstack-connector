@@ -13,11 +13,11 @@ import java.util.Iterator;
  * @author Frédéric Massart
  */
 @Deprecated
-public class TimeSeriesDeserializer extends JsonDeserializer<TimeSeries> {
+public class TimeSeriesDeserializer extends JsonDeserializer<TimeSerie> {
 
 
 	@Override
-	public TimeSeries deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+	public TimeSerie deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		JsonNode dataNode = node.get("data");
 		if (dataNode != null) {
@@ -26,7 +26,7 @@ public class TimeSeriesDeserializer extends JsonDeserializer<TimeSeries> {
 			System.out.printf("vale" + next);
 		}
 //			System.out.println("dta is " + data);
-		return new TimeSeries();
+		return new TimeSerie();
 	}
 
 

@@ -34,10 +34,10 @@ public class ConfigurationTest {
 	public void getProperty_props_conf(){
 		//given
 		Configuration conf = new Configuration();
-		Properties props = conf.getProperties();
+		//Properties props = conf.getProperties();
 		String key = "address";
 		String expectedValue = "paris";
-		props.setProperty(key, expectedValue);
+		//props.setProperty(key, expectedValue);
 
 		// when
 		String result = conf.getProperty(key, null);

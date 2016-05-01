@@ -1,57 +1,36 @@
 package json.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Frédéric Massart
  */
+//@JsonDeserialize(using = TimeSeriesDeserializer.class)
+
 public class TimeSerie {
 
-	String datetime;
-	String time;
-	String count;
-	String errors;
+	List<TimeMeasure> timeSeries = new ArrayList<TimeMeasure>();
 
 	public TimeSerie() {
 	}
 
-	public String getDatetime() {
-		return datetime;
+	public TimeSerie(List<TimeMeasure> timeSeries) {
+		this.timeSeries = timeSeries;
 	}
 
-	public void setDatetime(String datetime) {
-		this.datetime = datetime;
+	public List<TimeMeasure> getTimeSeries() {
+		return timeSeries;
 	}
 
-	public String getTime() {
-		return time;
-	}
-
-	public void setTime(String time) {
-		this.time = time;
-	}
-
-	public String getCount() {
-		return count;
-	}
-
-	public void setCount(String count) {
-		this.count = count;
-	}
-
-	public String getErrors() {
-		return errors;
-	}
-
-	public void setErrors(String errors) {
-		this.errors = errors;
+	public void setTimeSeries(List<TimeMeasure> timeSeries) {
+		this.timeSeries = timeSeries;
 	}
 
 	@Override
 	public String toString() {
-		return "TimeSerie{" +
-				"datetime='" + datetime + '\'' +
-				", time='" + time + '\'' +
-				", count='" + count + '\'' +
-				", errors='" + errors + '\'' +
+		return "TimeSeries{" +
+				"timeSeries=" + timeSeries +
 				'}';
 	}
 }
