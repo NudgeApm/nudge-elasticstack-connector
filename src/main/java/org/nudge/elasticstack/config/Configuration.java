@@ -39,7 +39,17 @@ public class Configuration {
 		loadProperties();
 	}
 
-	public Configuration(String pathFile) {
+	Configuration(boolean initWithoutLoad) {
+		if (!initWithoutLoad) {
+			loadProperties();
+		}
+	}
+
+	Configuration(Properties props) {
+		this.properties = props;
+	}
+
+	Configuration(String pathFile) {
 		loadProperties(pathFile);
 	}
 
@@ -95,6 +105,7 @@ public class Configuration {
 		nudgePwd = checkNotNull(NUDGE_PWD);
 
 		apps = split(checkNotNull(METRICS_APP_IDS));
+		metrics = split(checkNotNull(METRICS_VALUES));
 	}
 
 	private String[] split(String composite) {
@@ -104,7 +115,7 @@ public class Configuration {
 	String checkNotNull(String key) {
 		String value = getProperty(key, null);
 		if (value == null) {
-			throw new IllegalStateException("You must set the \"" + key + "\" parameter in your properties file.");
+			throw new IllegalArgumentException("You must set the \"" + key + "\" parameter in your properties file.");
 		}
 		return value;
 	}
