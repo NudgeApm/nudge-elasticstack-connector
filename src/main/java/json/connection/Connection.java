@@ -14,6 +14,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -181,7 +182,7 @@ public class Connection {
 
 	public List<String> requestRawdataList(String appId, String string) {
 		// TODO Auto-generated method stub
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	public RawData requestRawdata(String appId, String rawdataFilename) {

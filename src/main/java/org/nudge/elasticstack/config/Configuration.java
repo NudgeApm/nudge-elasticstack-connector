@@ -45,7 +45,7 @@ public class Configuration {
 		}
 	}
 
-	public Configuration(Properties props) {
+	Configuration(Properties props) {
 		this.properties = props;
 	}
 
@@ -105,7 +105,7 @@ public class Configuration {
 		nudgePwd = checkNotNull(NUDGE_PWD);
 
 		apps = split(checkNotNull(METRICS_APP_IDS));
-		metrics = split(checkNotNull(METRICS_VALUES));
+		//metrics = split(checkNotNull(METRICS_VALUES));
 	}
 
 	private String[] split(String composite) {
