@@ -40,6 +40,13 @@
 			<version>1.10.19</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.nudge.apm</groupId>
+			<artifactId>probe-protobuf-java</artifactId>
+			<version>1.11</version>
+		</dependency>
+
 
 		<!--<dependency>-->
 			<!--<groupId>joda-time</groupId>-->

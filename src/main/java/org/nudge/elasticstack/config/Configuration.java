@@ -45,7 +45,7 @@ public class Configuration {
 		}
 	}
 
-	Configuration(Properties props) {
+	public Configuration(Properties props) {
 		this.properties = props;
 	}
 

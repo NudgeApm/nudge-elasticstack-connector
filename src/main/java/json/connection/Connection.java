@@ -3,6 +3,7 @@ package json.connection;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 
 import json.bean.TimeSerie;
 import json.resolver.TimeSeriesModule;
@@ -176,5 +177,15 @@ public class Connection {
 		df.setTimeZone(tz);
 		String nowAsISO = df.format(Date.from(instant));
 		return nowAsISO;
+	}
+
+	public List<String> requestRawdataList(String appId, String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RawData requestRawdata(String appId, String rawdataFilename) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
