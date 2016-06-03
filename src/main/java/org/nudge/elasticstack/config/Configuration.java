@@ -16,15 +16,15 @@ public class Configuration {
 	}
 
 	public static final String CONF_FILE = "nudge-logstash.properties";
-
 	public static final String EXPORT_FILE_DIR = "export.file.dir";
 	public static final String EXPORT_TYPE = "export.type";
 	public static final String NUDGE_URL = "nudge.url";
 	public static final String NUDGE_LOGIN = "nudge.login";
 	public static final String NUDGE_PWD = "nudge.password";
-
 	public static final String METRICS_APP_IDS = "metrics.app.ids";
 	public static final String METRICS_VALUES = "metrics.values";
+	public static final String ELASTIC_INDEX = "elastic.index";
+	public static final String ELASTIC_OUTPUT = "elastic.output";
 
 	private Properties properties = new Properties();
 	private String exportFileDir;
@@ -34,6 +34,8 @@ public class Configuration {
 	private String nudgePwd;
 	private String[] metrics;
 	private String[] apps;
+	private String elasticIndex;
+	private String elasticOutput;
 
 	public Configuration() {
 		loadProperties();
@@ -54,12 +56,14 @@ public class Configuration {
 	}
 
 	/**
-	 * Load properties with the default conf file, must be placed next to the jar program.
+	 * Load properties with the default conf file, must be placed next to the
+	 * jar program.
 	 */
 
 	public void loadProperties() {
 		try {
-			Path folderJarPath = Paths.get(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+			Path folderJarPath = Paths.get(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
+					.getParent();
 			String confFile = folderJarPath.toString() + "/" + CONF_FILE;
 			loadProperties(confFile);
 		} catch (URISyntaxException e) {
@@ -71,7 +75,7 @@ public class Configuration {
 	 * Load properties from a path file.
 	 *
 	 * @param pathFile
-	 *          path file that define the properties to load
+	 *            path file that define the properties to load
 	 */
 
 	// on veut que le fichier proporties soit a coté du jar.
@@ -103,9 +107,10 @@ public class Configuration {
 			nudgeUrl += "/";
 		nudgeLogin = checkNotNull(NUDGE_LOGIN);
 		nudgePwd = checkNotNull(NUDGE_PWD);
-
 		apps = split(checkNotNull(METRICS_APP_IDS));
-		//metrics = split(checkNotNull(METRICS_VALUES));
+		elasticOutput = checkNotNull(ELASTIC_OUTPUT);
+		elasticIndex = checkNotNull(ELASTIC_INDEX);
+
 	}
 
 	private String[] split(String composite) {
@@ -124,7 +129,7 @@ public class Configuration {
 	 * 
 	 * @param key
 	 * @param defaultValue
-	 *          default value
+	 *            default value
 	 * @return the value mathcing the key
 	 */
 	String getProperty(String key, String defaultValue) {
@@ -175,4 +180,21 @@ public class Configuration {
 	public String[] getAppIds() {
 		return apps;
 	}
+
+	public String getElasticIndex() {
+		return elasticIndex;
+	}
+
+	public String getElasticOutput() {
+		return elasticOutput;
+	}
+
+	public void setNudgeLogin(String nudgeLogin) {
+		this.nudgeLogin = nudgeLogin;
+	}
+
+	public void setNudgePwd(String nudgePwd) {
+		this.nudgePwd = nudgePwd;
+	}
+
 }

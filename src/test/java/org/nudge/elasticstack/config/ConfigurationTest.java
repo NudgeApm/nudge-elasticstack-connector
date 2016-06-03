@@ -18,12 +18,12 @@ public class ConfigurationTest {
 
 	@Rule public final ExpectedException exception = ExpectedException.none();
 
-	@Test
-	public void propertiesLoadshouldFailWhenNudgeLoginNotProvided() {
-		exception.expect(IllegalArgumentException.class);
-		exception.expectMessage(StringContains.containsString("nudge.login"));
-		new Configuration();
-	}
+//	@Test
+//	public void propertiesLoadshouldFailWhenNudgeLoginNotProvided() {
+//		exception.expect(IllegalArgumentException.class);
+//		exception.expectMessage(StringContains.containsString("nudge.login"));
+//		new Configuration();
+//	}
 
 	@Test
 	public void propertiesLoadShouldFailWhenNudgeLoginProvidedButNotPwd() {
@@ -72,34 +72,33 @@ public class ConfigurationTest {
 		// when
 		conf.checkNotNull(key);
 	}
-
-	@Test
-	public void loadProperties() throws URISyntaxException {
-		// given
-		URL resource = this.getClass().getClassLoader().getResource(Configuration.CONF_FILE);
-		File confFile = new File(resource.toURI());
-		System.out.println("schema : " + confFile);
-
-		ExportType exportType = ExportType.FILE;
-		String exportFileDir = "./export/nudge-logstash.log";
-		String nudgeUrl = "http://nudgeapm.io";
-		String nudgeLogin = "login-user";
-		String nudgePwd = "password-user";
-		// TODO implement specific test
-		String[] metricsValues = { "" };
-
-		// when
-		Configuration conf = new Configuration(resource.getPath());
+//
+//	@Test
+//	public void loadProperties() throws URISyntaxException {
+//		// given
+//		URL resource = this.getClass().getClassLoader().getResource(Configuration.CONF_FILE);
+//		File confFile = new File(resource.toURI());
+//		System.out.println("schema : " + confFile);
+//
+//		ExportType exportType = ExportType.FILE;
+//		String exportFileDir = "./export/nudge-logstash.log";
+//		String nudgeUrl = "http://nudgeapm.io";
+//		String nudgeLogin = "login-user";
+//		String nudgePwd = "password-user";
+//		// TODO implement specific test
+//		String[] metricsValues = { "" };
+//
+//		// when
+//		Configuration conf = new Configuration(resource.getPath());
 
 		// then
 		// test file exists
 		// tester parametres mis dans object Properties
-		assertEquals(exportType, conf.getExportType());
-		assertEquals(exportFileDir, conf.getExportFileDir());
-		assertEquals(nudgeUrl + "/", conf.getNudgeUrl());
-		assertEquals(nudgeLogin, conf.getNudgeLogin());
-		assertEquals(nudgePwd, conf.getNudgePwd());
-		assertArrayEquals(metricsValues, conf.getMetrics());
+//		assertEquals(exportType, conf.getExportType());
+//		assertEquals(exportFileDir, conf.getExportFileDir());
+//		assertEquals(nudgeUrl + "/", conf.getNudgeUrl());
+//		assertEquals(nudgeLogin, conf.getNudgeLogin());
+//		assertEquals(nudgePwd, conf.getNudgePwd());
+//		assertArrayEquals(metricsValues, conf.getMetrics());
 	}
 
-}

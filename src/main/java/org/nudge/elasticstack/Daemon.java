@@ -1,29 +1,43 @@
 package org.nudge.elasticstack;
 
-import json.bean.TimeSerie;
-import json.connection.Connection;
+/**
+ * Class which permits to send rawdatas to elasticSearch with -startDeamon
+ * @author Sarah Bourgeois
+ */
 
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.config.Configuration.ExportType;
-import org.nudge.elasticstack.logger.Logger;
-import org.nudge.elasticstack.logger.LogstashFileLogger;
-
-import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.config.Configuration.ExportType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
+import json.bean.EventTransaction;
+import json.bean.NudgeEvent;
+import json.connection.Connection;
 
 public class Daemon {
 
 	private static ScheduledExecutorService scheduler;
+	private static final String lineBreak = "\n";
+	private static List<String> analyzedFilenames = new ArrayList<>();
 
+	/**
+	 * Description : Launcher Deamon.
+	 * @param config
+	 */
 	static public void start(Configuration config) {
 		scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
 			public Thread newThread(Runnable runnable) {
@@ -33,22 +47,14 @@ public class Daemon {
 				return thread;
 			}
 		});
-
 		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
 	}
 
 	static class DaemonTask implements Runnable {
-
 		private Configuration config;
-		private Logger logger;
-
 		public DaemonTask(Configuration config) {
 			this.config = config;
-			ExportType t = config.getExportType();
 			switch (config.getExportType()) {
-			case FILE:
-				logger = new LogstashFileLogger();
-				break;
 			case ELASTIC:
 				break;
 			default:
@@ -56,41 +62,31 @@ public class Daemon {
 			}
 		}
 
-		private static List<String> analyzedFilenames = new ArrayList<>();
-
+		/**
+		 * Description : Collect data from Nudge API and push it.
+		 */
 		@Override
 		public void run() {
 			try {
 				Connection c = new Connection(config.getNudgeUrl());
 				c.login(config.getNudgeLogin(), config.getNudgePwd());
-
 				for (String appId : config.getAppIds()) {
-
 					List<String> rawdataList = c.requestRawdataList(appId, "-10m");
-
-					/*
-					 * if(analyzedFilenames.size() == 0) { analyzedFilenames.addAll(rawdataList); break; }
-					 */
-
-					// TODO 2: Comparer la liste obtenue avec les précédents fichiers analysés
+					if (analyzedFilenames.size() == 0) {
+						// analyzedFilenames.addAll(rawdataList);
+					}
+					// analyse files, comparaison and push
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
-							// TODO 3: Intéger dans elastic search les données du rawdata
-
+							List<Transaction> transaction = rawdata.getTransactionsList();
+							List<NudgeEvent> events = buildTransactionEvents(transaction);
+							List<String> jsonEvents = parseJson(events);
+							sendToElastic(jsonEvents);
 						}
 					}
-
 					analyzedFilenames = rawdataList;
 				}
-
-				// on interroge volontairement les informations avec 5 minutes de retard
-				// pour s'assurer que les informations sont à jour côté Nudge
-				/*
-				 * OLD CODE Instant sinceInstant = Instant.now().minus(5, ChronoUnit.MINUTES); Instant untilInstant = sinceInstant.plus(1, ChronoUnit.MINUTES);
-				 * 
-				 * for (String appId : config.getAppIds()) { TimeSerie serie = c.appTimeSerie(appId, sinceInstant, untilInstant, "1m"); logger.log(serie); }
-				 */
 			} catch (Throwable t) {
 				t.printStackTrace();
 				if (null != scheduler) {
@@ -98,15 +94,188 @@ public class Daemon {
 				}
 			}
 		}
-	}
 
-	public static void main(String[] args) {
-		System.setProperty("nes." + Configuration.METRICS_APP_IDS, "c709dba6-bf5d-4a03-b1f3-1ca57e6bde95");
-		System.setProperty("nes." + Configuration.NUDGE_LOGIN, "a@a.aa");
+		/**
+		 * Description : recuperate datas from rawdatas and add it to parse.
+		 * @param transactionList
+		 * @return
+		 * @throws ParseException
+		 * @throws JsonProcessingException
+		 */
+		public List<NudgeEvent> buildTransactionEvents(List<Transaction> transactionList)
+				throws ParseException, JsonProcessingException {
+			List<NudgeEvent> events = new ArrayList<NudgeEvent>();
+			for (Transaction trans : transactionList) {
+				String name = trans.getCode();
+				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				String date = sdfr.format(trans.getStartTime());
+				long response_time = trans.getEndTime() - trans.getStartTime();
+				EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
+				// TortankLayer tortank = new TortankLayer(name, response_time,
+				// date, response_time);
+				events.add(transactionEvent);
+				// events.add(tortank);
+				// handle layers
+				buildLayerEvents(trans.getLayersList(), date, transactionEvent);
+				events.add(transactionEvent);
+			}
+			System.out.println("sum of events which will be send to elastic : " + events.size());
+			return events;
+		}
+
+		/**
+		 * Description : build layer events
+		 * @param rawdataLayers
+		 * @param date
+		 * @param eventTrans
+		 * @throws ParseException
+		 * @throws JsonProcessingException
+		 */
+		public void buildLayerEvents(List<Layer> rawdataLayers, String date, EventTransaction eventTrans)
+				throws ParseException, JsonProcessingException {
+			for (Layer layer : rawdataLayers) {
+				if (layer.getLayerName().equals("SQL")) {
+					eventTrans.setResponseTimeLayerSql(layer.getTime());
+					eventTrans.setLayerCountSql(layer.getCount());
+					eventTrans.setLayerNameSql(layer.getLayerName());
+					if (layer.getLayerName().equals("SQL") && layer.getLayerName() == null) {
+						eventTrans.setLayerCountSql(null);
+						eventTrans.setResponseTimeLayerSql(null);
+						eventTrans.setLayerNameSql(null);
+					}
+				}
+				if (layer.getLayerName().equals("JMS")) {
+					eventTrans.setResponseTimeLayerJms(layer.getTime());
+					eventTrans.setLayerCountJms(layer.getCount());
+					eventTrans.setLayerNameJms(layer.getLayerName());
+					if (layer.getLayerName().equals("JMS") && layer.getLayerName() == null) {
+						eventTrans.setResponseTimeLayerJms(null);
+						eventTrans.setLayerCountJms(null);
+						eventTrans.setLayerNameJms(null);
+					}
+				}
+				if (layer.getLayerName().equals("JAX-WS")) {
+					eventTrans.setResponseTimeLayerJaxws(layer.getTime());
+					eventTrans.setLayerCountJaxws(layer.getCount());
+					eventTrans.setLayerNameJaxws(layer.getLayerName());
+					if (layer.getLayerName().equals("JAX-WS") && layer.getLayerName() == null) {
+						eventTrans.setResponseTimeLayerJaxws(null);
+						eventTrans.setLayerCountJaxws(null);
+						eventTrans.setLayerNameJaxws(null);
+					}
+				}
+				if (layer.getLayerName().equals("JAVA")) {
+					eventTrans.setLayerCountJava(layer.getCount());
+					eventTrans.setLayerNameJava(layer.getLayerName());
+				}
+			}
+
+			// TODO : elvis operator
+			long respTimeJaxws = 0;
+			if (eventTrans.getResponseTimeLayerJaxws() != null) {
+				respTimeJaxws = eventTrans.getResponseTimeLayerJaxws();
+			}
+			long respTimeJms = 0;
+			if (eventTrans.getResponseTimeLayerJms() != null) {
+				respTimeJms = eventTrans.getResponseTimeLayerJms();
+			}
+			long respTimeSql = 0;
+			if (eventTrans.getResponseTimeLayerSql() != null) {
+				respTimeSql = eventTrans.getResponseTimeLayerSql();
+			}
+			long responseTimeJava = eventTrans.getResponseTime() - (respTimeJaxws + respTimeJms + respTimeSql);
+			eventTrans.setResponseTimeLayerJava(responseTimeJava);
+		}
+
+		/**
+		 * 
+		 * Desription : parse datas in Json
+		 * 
+		 * @param eventList
+		 * @return
+		 * @throws Exception
+		 * @Description :
+		 */
+		public List<String> parseJson(List<NudgeEvent> eventList) throws Exception {
+			List<String> jsonEvents = new ArrayList<String>();
+			ObjectMapper parser = new ObjectMapper();
+			for (NudgeEvent event : eventList) {
+				// handle metadata
+				String jsonMetadata = generateMetaData(event.getType());
+				jsonEvents.add(jsonMetadata + lineBreak);
+				// handle data event
+				String jsonEvent = parser.writeValueAsString(event);
+				jsonEvents.add(jsonEvent + lineBreak);
+
+			}
+			System.out.println(jsonEvents);
+			return jsonEvents;
+		}
+
+		/**
+		 * 
+		 * Description : Permits to use API bulk to send huge rawdatas in
+		 * ElasticSearch To use this API it must be to format Json in the Bulk
+		 * Format.
+		 * 
+		 * @param type
+		 * @return
+		 * @throws JsonProcessingException
+		 * 
+		 */
+		public String generateMetaData(String type) throws JsonProcessingException {
+			Configuration conf = new Configuration();
+			ObjectMapper parser = new ObjectMapper();
+			BulkFormat elasticMetaData = new BulkFormat();
+			elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
+			elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
+			elasticMetaData.getIndexElement().setType(type);
+			String metaData = parser.writeValueAsString(elasticMetaData);
+			return metaData;
+		}
+
+		/**
+		 * Description : It permits to index huge rawdatas in elasticSearch with
+		 * HTTP request
+		 * @param jsonEvents
+		 * @throws Exception
+		 */
+		public void sendToElastic(List<String> jsonEvents) throws Exception {
+			Configuration conf = new Configuration();
+			StringBuilder sb = new StringBuilder();
+			long start = System.currentTimeMillis();
+			int count = 0;
+			for (String json : jsonEvents) {
+				sb.append(json);
+				count++;
+				if (count == jsonEvents.size()) {
+					URL URL = new URL(conf.getElasticOutput() + "/_bulk");
+					HttpURLConnection httpCon = (HttpURLConnection) URL.openConnection();
+					httpCon.setDoOutput(true);
+					httpCon.setRequestMethod("PUT");
+					OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
+					out.write(sb.toString());
+					out.close();
+					System.out.println("[INFO] FLUSH 1000 Transactions in BULK insert");
+					System.out.println("[INFO] Response Code : " + httpCon.getResponseCode());
+					System.out.println("[INFO] Response Message : " + httpCon.getResponseMessage());
+					long end = System.currentTimeMillis();
+					long totalTime = end - start;
+					System.out.println("Operation ended in : " + (totalTime / 1000f) + "sec");
+				}
+			}
+		}
+
+	} // end of class
+
+	public static void main(String[] args) throws Exception {
+		System.setProperty("nes." + Configuration.METRICS_APP_IDS, "*********");
+		System.setProperty("nes." + Configuration.NUDGE_LOGIN, "*********");
 		System.setProperty("nes." + Configuration.EXPORT_TYPE, ExportType.ELASTIC.toString());
-		System.setProperty("nes." + Configuration.NUDGE_PWD, "aaaa");
-		System.setProperty("nes." + Configuration.NUDGE_URL, "http://demo.nudge-apm.com:8080");
-
+		System.setProperty("nes." + Configuration.NUDGE_PWD, "*********");
+		System.setProperty("nes." + Configuration.NUDGE_URL, "*********");
+		System.setProperty("nes." + Configuration.ELASTIC_OUTPUT, "********");
+		System.setProperty("nes." + Configuration.ELASTIC_INDEX, "********");
 		Configuration config = new Configuration();
 		DaemonTask task = new DaemonTask(config);
 		task.run();
