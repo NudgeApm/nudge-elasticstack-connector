@@ -18,7 +18,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.config.Configuration.ExportType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
@@ -36,6 +35,7 @@ public class Daemon {
 
 	/**
 	 * Description : Launcher Deamon.
+	 * 
 	 * @param config
 	 */
 	static public void start(Configuration config) {
@@ -52,14 +52,9 @@ public class Daemon {
 
 	static class DaemonTask implements Runnable {
 		private Configuration config;
+
 		public DaemonTask(Configuration config) {
 			this.config = config;
-			switch (config.getExportType()) {
-			case ELASTIC:
-				break;
-			default:
-				throw new IllegalArgumentException("Export type " + config.getExportType() + " not yet implemented");
-			}
 		}
 
 		/**
@@ -97,6 +92,7 @@ public class Daemon {
 
 		/**
 		 * Description : recuperate datas from rawdatas and add it to parse.
+		 * 
 		 * @param transactionList
 		 * @return
 		 * @throws ParseException
@@ -111,20 +107,28 @@ public class Daemon {
 				String date = sdfr.format(trans.getStartTime());
 				long response_time = trans.getEndTime() - trans.getStartTime();
 				EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
-				// TortankLayer tortank = new TortankLayer(name, response_time,
-				// date, response_time);
 				events.add(transactionEvent);
-				// events.add(tortank);
 				// handle layers
 				buildLayerEvents(trans.getLayersList(), date, transactionEvent);
 				events.add(transactionEvent);
+
+				/*
+				 * TODO Separate layer and transaction TortankLayer tortank =
+				 * new TortankLayer(name, response_time, date, response_time);
+				 * events.add(tortank);
+				 */
 			}
-			System.out.println("sum of events which will be send to elastic : " + events.size());
+			if (events.size() != 0) {
+				System.out.println("sum of events which will be send to elastic : " + events.size());
+			} else {
+				System.out.println("no new events to add now");
+			}
 			return events;
 		}
 
 		/**
 		 * Description : build layer events
+		 * 
 		 * @param rawdataLayers
 		 * @param date
 		 * @param eventTrans
@@ -170,7 +174,6 @@ public class Daemon {
 				}
 			}
 
-			// TODO : elvis operator
 			long respTimeJaxws = 0;
 			if (eventTrans.getResponseTimeLayerJaxws() != null) {
 				respTimeJaxws = eventTrans.getResponseTimeLayerJaxws();
@@ -206,7 +209,6 @@ public class Daemon {
 				// handle data event
 				String jsonEvent = parser.writeValueAsString(event);
 				jsonEvents.add(jsonEvent + lineBreak);
-
 			}
 			System.out.println(jsonEvents);
 			return jsonEvents;
@@ -235,8 +237,9 @@ public class Daemon {
 		}
 
 		/**
-		 * Description : It permits to index huge rawdatas in elasticSearch with
+		 * Description : It permits to index huge rawdata in elasticSearch with
 		 * HTTP request
+		 * 
 		 * @param jsonEvents
 		 * @throws Exception
 		 */
@@ -269,9 +272,10 @@ public class Daemon {
 	} // end of class
 
 	public static void main(String[] args) throws Exception {
-		System.setProperty("nes." + Configuration.METRICS_APP_IDS, "*********");
+
+		// to test, replace "********" to the right configuration
+		System.setProperty("nes." + Configuration.NUDGE_APP_IDS, "*********");
 		System.setProperty("nes." + Configuration.NUDGE_LOGIN, "*********");
-		System.setProperty("nes." + Configuration.EXPORT_TYPE, ExportType.ELASTIC.toString());
 		System.setProperty("nes." + Configuration.NUDGE_PWD, "*********");
 		System.setProperty("nes." + Configuration.NUDGE_URL, "*********");
 		System.setProperty("nes." + Configuration.ELASTIC_OUTPUT, "********");

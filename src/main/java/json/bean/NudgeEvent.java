@@ -11,27 +11,26 @@ public abstract class NudgeEvent {
 	private long count;
 	private String type;
 
-	
 	// NudgeEvent constructors
-	public NudgeEvent(String name, long responseTime, String date,  long count , String type) {
+	public NudgeEvent(String name, long responseTime, String date, long count, String type) {
 		this.name = name;
 		this.date = date;
 		this.responseTime = responseTime;
 		this.count = count;
 		this.type = type;
 	}
-	
 
 	// NudgeEvent method
 	public String toString() {
 		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count;
 	}
-	
+
 	// Getters and Setters
 	@JsonProperty("@timestamp")
 	public String getDate() {
 		return date;
 	}
+
 	public void setDate(String date) {
 		this.date = date;
 	}
@@ -73,7 +72,5 @@ public abstract class NudgeEvent {
 	public void setCount(long count) {
 		this.count = count;
 	}
-
-
 
 } // end of class

@@ -4,14 +4,7 @@ import org.hamcrest.core.StringContains;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.nudge.elasticstack.config.Configuration.ExportType;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Properties;
-
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class ConfigurationTest {

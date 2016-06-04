@@ -3,31 +3,32 @@ package json.bean;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @SuppressWarnings("deprecation")
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class EventTransaction extends NudgeEvent {
 
-	// WS
+	// WS attributs
 	private Long responseTimeLayerJaxws;
 	private String layerNameJaxws;
 	private Long layerCountJaxws;
-	// SQL
+	// SQL attributs
 	private Long responseTimeLayerSql;
 	private String layerNameSql;
 	private Long layerCountSql;
-	// JMS
+	// JMS attributs
 	private Long responseTimeLayerJms;
 	private String layerNameJms;
 	private Long layerCountJms;
-	// JAVA
+	// JAVA attributs
 	private Long responseTimeLayerJava;
 	private String layerNameJava;
 	private Long layerCountJava;
 
-
+	// Constructor
 	public EventTransaction(String name, Long responseTime, String date, Long count) {
 		super(name, responseTime, date, count, "transaction");
 	}
 
+	// Getters and Setters
 	public Long getResponseTimeLayerJaxws() {
 		return responseTimeLayerJaxws;
 	}
