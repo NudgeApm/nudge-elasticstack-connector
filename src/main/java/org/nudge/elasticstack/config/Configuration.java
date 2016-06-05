@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -59,7 +61,13 @@ public class Configuration {
 			Path folderJarPath = Paths.get(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
 					.getParent();
 			String confFile = folderJarPath.toString() + "/" + CONF_FILE;
-			loadProperties(confFile);
+			// TODO FMA arrange this
+			if (Files.exists(Paths.get(confFile))) {
+				loadProperties(confFile);
+			} else {
+				URL systemResource = ClassLoader.getSystemResource("nudge-elastic.properties");
+				loadProperties(systemResource.getPath());
+			}
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
