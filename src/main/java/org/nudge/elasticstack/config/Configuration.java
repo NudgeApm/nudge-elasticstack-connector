@@ -1,5 +1,7 @@
 package org.nudge.elasticstack.config;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,6 +14,8 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class Configuration {
+
+	private static final Logger LOG = Logger.getLogger(Configuration.class);
 
 	// Configuration files
 	public static final String CONF_FILE = "nudge-elastic.properties";
@@ -65,8 +69,12 @@ public class Configuration {
 			if (Files.exists(Paths.get(confFile))) {
 				loadProperties(confFile);
 			} else {
-				URL systemResource = ClassLoader.getSystemResource("nudge-elastic.properties");
-				loadProperties(systemResource.getPath());
+				URL confURL = ClassLoader.getSystemResource(CONF_FILE);
+				if (confURL != null) {
+					LOG.debug(CONF_FILE + " found at the classloader root path");
+					loadProperties(confURL.getPath());
+				}
+				LOG.debug(CONF_FILE + " doesn't found at the classloader root path");
 			}
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
