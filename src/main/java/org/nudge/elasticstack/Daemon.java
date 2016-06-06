@@ -2,6 +2,8 @@ package org.nudge.elasticstack;
 
 /**
  * Class which permits to send rawdatas to elasticSearch with -startDeamon
+ *
+ * @author Sarah Bourgeois
  * @author Sarah Bourgeois
  */
 
@@ -17,6 +19,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.log4j.Logger;
 import org.nudge.elasticstack.config.Configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,13 +33,15 @@ import json.connection.Connection;
 
 public class Daemon {
 
+	private static final Logger LOG = Logger.getLogger(Daemon.class);
+
 	private static ScheduledExecutorService scheduler;
 	private static final String lineBreak = "\n";
 	private static List<String> analyzedFilenames = new ArrayList<>();
 
 	/**
 	 * Description : Launcher Deamon.
-	 * 
+	 *
 	 * @param config
 	 */
 	static public void start(Configuration config) {
@@ -92,7 +98,7 @@ public class Daemon {
 
 		/**
 		 * Description : recuperate datas from rawdatas and add it to parse.
-		 * 
+		 *
 		 * @param transactionList
 		 * @return
 		 * @throws ParseException
@@ -109,7 +115,7 @@ public class Daemon {
 				EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
 				events.add(transactionEvent);
 				// handle layers
-				buildLayerEvents(trans.getLayersList(), date, transactionEvent);
+				buildLayerEvents(trans.getLayersList(), transactionEvent);
 				events.add(transactionEvent);
 
 				/*
@@ -128,14 +134,14 @@ public class Daemon {
 
 		/**
 		 * Description : build layer events
-		 * 
+		 *
 		 * @param rawdataLayers
 		 * @param date
 		 * @param eventTrans
 		 * @throws ParseException
 		 * @throws JsonProcessingException
 		 */
-		public void buildLayerEvents(List<Layer> rawdataLayers, String date, EventTransaction eventTrans)
+		public void buildLayerEvents(List<Layer> rawdataLayers, EventTransaction eventTrans)
 				throws ParseException, JsonProcessingException {
 			for (Layer layer : rawdataLayers) {
 				if (layer.getLayerName().equals("SQL")) {
@@ -191,9 +197,9 @@ public class Daemon {
 		}
 
 		/**
-		 * 
+		 *
 		 * Desription : parse datas in Json
-		 * 
+		 *
 		 * @param eventList
 		 * @return
 		 * @throws Exception
@@ -215,15 +221,15 @@ public class Daemon {
 		}
 
 		/**
-		 * 
+		 *
 		 * Description : Permits to use API bulk to send huge rawdatas in
 		 * ElasticSearch To use this API it must be to format Json in the Bulk
 		 * Format.
-		 * 
+		 *
 		 * @param type
 		 * @return
 		 * @throws JsonProcessingException
-		 * 
+		 *
 		 */
 		public String generateMetaData(String type) throws JsonProcessingException {
 			Configuration conf = new Configuration();
@@ -239,35 +245,38 @@ public class Daemon {
 		/**
 		 * Description : It permits to index huge rawdata in elasticSearch with
 		 * HTTP request
-		 * 
+		 *
 		 * @param jsonEvents
 		 * @throws Exception
 		 */
 		public void sendToElastic(List<String> jsonEvents) throws Exception {
+			if (jsonEvents == null || jsonEvents.isEmpty()) {
+				LOG.info("No json documents to send");
+				return;
+			}
 			Configuration conf = new Configuration();
 			StringBuilder sb = new StringBuilder();
-			long start = System.currentTimeMillis();
-			int count = 0;
 			for (String json : jsonEvents) {
 				sb.append(json);
-				count++;
-				if (count == jsonEvents.size()) {
-					URL URL = new URL(conf.getElasticOutput() + "/_bulk");
-					HttpURLConnection httpCon = (HttpURLConnection) URL.openConnection();
-					httpCon.setDoOutput(true);
-					httpCon.setRequestMethod("PUT");
-					OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
-					out.write(sb.toString());
-					out.close();
-					System.out.println("[INFO] FLUSH 1000 Transactions in BULK insert");
-					System.out.println("[INFO] Response Code : " + httpCon.getResponseCode());
-					System.out.println("[INFO] Response Message : " + httpCon.getResponseMessage());
-					long end = System.currentTimeMillis();
-					long totalTime = end - start;
-					System.out.println("Operation ended in : " + (totalTime / 1000f) + "sec");
-				}
 			}
+			long start = System.currentTimeMillis();
+
+			URL URL = new URL(conf.getElasticOutput() + "/_bulk");
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Bulk request to : " + URL);
+			}
+			HttpURLConnection httpCon = (HttpURLConnection) URL.openConnection();
+			httpCon.setDoOutput(true);
+			httpCon.setRequestMethod("PUT");
+			OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
+			out.write(sb.toString());
+			out.close();
+			long end = System.currentTimeMillis();
+			long totalTime = end - start;
+			LOG.info("Flush " + jsonEvents.size() + " documents in BULK insert in " + (totalTime / 1000f) + "sec");
+			LOG.info("Response : " + httpCon.getResponseCode() + " - " + httpCon.getResponseMessage());
 		}
+
 
 	} // end of class
 

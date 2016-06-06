@@ -14,7 +14,7 @@ import org.nudge.elasticstack.config.Configuration;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 
 public class Connection {
-	Configuration conf = new Configuration();
+
 	public static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm";
 	private final String url;
 	private String sessionCookie;
@@ -83,7 +83,7 @@ public class Connection {
 
 	public List<String> requestRawdataList(String appId, String from) throws IOException {
 		List<String> contentRawdata = new ArrayList<String>();
-		String finalUrl = conf.getNudgeApiAdress() + "api/apps/" + appId + "/rawdata?from=" + TIME_TO_REQUEST;
+		String finalUrl = url + "api/apps/" + appId + "/rawdata?from=" + TIME_TO_REQUEST;
 		HttpURLConnection connection = prepareRequest(finalUrl);
 		String var = convertStreamToString(connection.getInputStream());
 		String var2 = var.substring(1, var.length() - 1);
@@ -97,7 +97,7 @@ public class Connection {
 	}
 
 	public RawData requestRawdata(String appId, String rawdataFilename) throws IOException {
-		String finalUrl = conf.getNudgeApiAdress() + "api/apps/" + appId + "/rawdata/" + rawdataFilename;
+		String finalUrl = url + "api/apps/" + appId + "/rawdata/" + rawdataFilename;
 		System.out.println("Request URL for getting a rawdata : " + finalUrl);
 		HttpURLConnection connection = prepareRequest(finalUrl);
 		System.out.println(connection.getResponseCode());
