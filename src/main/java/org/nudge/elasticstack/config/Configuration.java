@@ -1,5 +1,6 @@
 package org.nudge.elasticstack.config;
 
+import com.sun.tools.corba.se.idl.constExpr.BooleanOr;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -26,6 +27,7 @@ public class Configuration {
 	public static final String ELASTIC_INDEX = "elastic.index";
 	public static final String ELASTIC_OUTPUT = "elastic.output";
 	public static final String NUDGE_API_ADRESS = "nudge.api.adress";
+	public static final String DRY_RUN = "plugin.dryrun";
 
 	// Attributs
 	private Properties properties = new Properties();
@@ -36,6 +38,7 @@ public class Configuration {
 	private String elasticIndex;
 	private String elasticOutput;
 	private String nudgeApiAdress;
+	private boolean dryRun;
 
 	public Configuration() {
 		loadProperties();
@@ -100,6 +103,7 @@ public class Configuration {
 		elasticOutput = checkNotNull(ELASTIC_OUTPUT);
 		elasticIndex = checkNotNull(ELASTIC_INDEX);
 		nudgeApiAdress = checkNotNull(NUDGE_API_ADRESS);
+		dryRun = Boolean.valueOf(getProperty(DRY_RUN, "false"));
 	}
 
 	private String[] split(String composite) {
@@ -134,6 +138,7 @@ public class Configuration {
 		System.out.println(ELASTIC_INDEX + " -> Name of the elasticSearch index which will be create");
 		System.out.println(ELASTIC_OUTPUT + " -> Adress of the elasticSearch which will be use to index");
 		System.out.println(NUDGE_API_ADRESS + " -> Adress of Nudge API where rawdata will be request");
+		System.out.println(DRY_RUN + " -> Collect and log, dont push to elasticsearch");
 	}
 
 	public String getNudgeUrl() {
@@ -164,4 +169,7 @@ public class Configuration {
 		return nudgeApiAdress;
 	}
 
+	public boolean getDryRun() {
+		return dryRun;
+	}
 }

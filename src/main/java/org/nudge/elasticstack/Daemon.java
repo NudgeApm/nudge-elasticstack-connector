@@ -20,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.config.Configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -114,6 +115,10 @@ public class Daemon {
 				long response_time = trans.getEndTime() - trans.getStartTime();
 				EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
 				events.add(transactionEvent);
+
+				addLayers(transactionEvent, trans.getLayersList());
+
+
 				// handle layers
 				buildLayerEvents(trans.getLayersList(), transactionEvent);
 				events.add(transactionEvent);
@@ -132,11 +137,27 @@ public class Daemon {
 			return events;
 		}
 
+		protected EventTransaction addLayers(EventTransaction transaction, List<Layer> rawdataLayers) {
+			if (rawdataLayers != null && !rawdataLayers.isEmpty()) {
+				for (Layer rawdataLayer : rawdataLayers) {
+					json.bean.Layer layer = new json.bean.Layer(
+							rawdataLayer.getLayerName(),
+							rawdataLayer.getTime(),
+							rawdataLayer.getCount()
+					);
+					if (transaction.getLayers() == null) {
+						transaction.setLayers(new ArrayList<json.bean.Layer>());
+					}
+					transaction.getLayers().add(layer);
+				}
+			}
+			return transaction;
+		}
+
 		/**
 		 * Description : build layer events
 		 *
 		 * @param rawdataLayers
-		 * @param date
 		 * @param eventTrans
 		 * @throws ParseException
 		 * @throws JsonProcessingException
@@ -207,13 +228,16 @@ public class Daemon {
 		 */
 		public List<String> parseJson(List<NudgeEvent> eventList) throws Exception {
 			List<String> jsonEvents = new ArrayList<String>();
-			ObjectMapper parser = new ObjectMapper();
+			ObjectMapper jsonSerializer = new ObjectMapper();
+			if (config.getDryRun()) {
+				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			}
 			for (NudgeEvent event : eventList) {
 				// handle metadata
 				String jsonMetadata = generateMetaData(event.getType());
 				jsonEvents.add(jsonMetadata + lineBreak);
 				// handle data event
-				String jsonEvent = parser.writeValueAsString(event);
+				String jsonEvent = jsonSerializer.writeValueAsString(event);
 				jsonEvents.add(jsonEvent + lineBreak);
 			}
 			System.out.println(jsonEvents);
@@ -233,13 +257,15 @@ public class Daemon {
 		 */
 		public String generateMetaData(String type) throws JsonProcessingException {
 			Configuration conf = new Configuration();
-			ObjectMapper parser = new ObjectMapper();
+			ObjectMapper jsonSerializer = new ObjectMapper();
+			if (config.getDryRun()) {
+				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			}
 			BulkFormat elasticMetaData = new BulkFormat();
 			elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
 			elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
 			elasticMetaData.getIndexElement().setType(type);
-			String metaData = parser.writeValueAsString(elasticMetaData);
-			return metaData;
+			return jsonSerializer.writeValueAsString(elasticMetaData);
 		}
 
 		/**
@@ -259,6 +285,13 @@ public class Daemon {
 			for (String json : jsonEvents) {
 				sb.append(json);
 			}
+
+			if (config.getDryRun()) {
+				LOG.info("Dry run active, only log documents, don't push to elasticsearch");
+				LOG.info(sb);
+				return;
+			}
+
 			long start = System.currentTimeMillis();
 
 			URL URL = new URL(conf.getElasticOutput() + "/_bulk");

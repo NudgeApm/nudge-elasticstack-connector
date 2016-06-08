@@ -2,6 +2,8 @@ package json.bean;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.List;
+
 @SuppressWarnings("deprecation")
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class EventTransaction extends NudgeEvent {
@@ -22,6 +24,8 @@ public class EventTransaction extends NudgeEvent {
 	private Long responseTimeLayerJava;
 	private String layerNameJava;
 	private Long layerCountJava;
+
+	private List<Layer> layers;
 
 	// Constructor
 	public EventTransaction(String name, Long responseTime, String date, Long count) {
@@ -125,4 +129,11 @@ public class EventTransaction extends NudgeEvent {
 		this.layerCountJava = layerCountJava;
 	}
 
+	public List<Layer> getLayers() {
+		return layers;
+	}
+
+	public void setLayers(List<Layer> layers) {
+		this.layers = layers;
+	}
 }
