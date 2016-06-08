@@ -138,19 +138,27 @@ public class Daemon {
 		}
 
 		protected EventTransaction addLayers(EventTransaction transaction, List<Layer> rawdataLayers) {
+			long layersTime = 0;
+			long layersCount = 0;
+			if (transaction.getLayers() == null) {
+				transaction.setLayers(new ArrayList<json.bean.Layer>());
+			}
+
 			if (rawdataLayers != null && !rawdataLayers.isEmpty()) {
 				for (Layer rawdataLayer : rawdataLayers) {
 					json.bean.Layer layer = new json.bean.Layer(
-							rawdataLayer.getLayerName(),
+							rawdataLayer.getLayerName().toLowerCase(),
 							rawdataLayer.getTime(),
 							rawdataLayer.getCount()
 					);
-					if (transaction.getLayers() == null) {
-						transaction.setLayers(new ArrayList<json.bean.Layer>());
-					}
 					transaction.getLayers().add(layer);
+					layersTime += rawdataLayer.getTime();
+					layersCount += rawdataLayer.getCount();
 				}
 			}
+			long timeJava = transaction.getResponseTime() - layersTime;
+			long countJava = transaction.getCount() - layersCount;
+			transaction.getLayers().add(new json.bean.Layer("java", timeJava, countJava));
 			return transaction;
 		}
 
@@ -218,7 +226,6 @@ public class Daemon {
 		}
 
 		/**
-		 *
 		 * Desription : parse datas in Json
 		 *
 		 * @param eventList
@@ -245,7 +252,6 @@ public class Daemon {
 		}
 
 		/**
-		 *
 		 * Description : Permits to use API bulk to send huge rawdatas in
 		 * ElasticSearch To use this API it must be to format Json in the Bulk
 		 * Format.
@@ -253,7 +259,6 @@ public class Daemon {
 		 * @param type
 		 * @return
 		 * @throws JsonProcessingException
-		 *
 		 */
 		public String generateMetaData(String type) throws JsonProcessingException {
 			Configuration conf = new Configuration();
