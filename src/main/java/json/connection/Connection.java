@@ -8,17 +8,19 @@ package json.connection;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import org.nudge.elasticstack.config.Configuration;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 
 public class Connection {
 
-	public static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm";
+	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	private final String url;
 	private String sessionCookie;
-	private String TIME_TO_REQUEST = "-10m";
 
 	public Connection(String url) {
 		this.url = url;
@@ -81,9 +83,9 @@ public class Connection {
 		}
 	}
 
-	public List<String> requestRawdataList(String appId, String from) throws IOException {
+	public List<String> requestRawdataList(String appId) throws IOException {
 		List<String> contentRawdata = new ArrayList<String>();
-		String finalUrl = url + "api/apps/" + appId + "/rawdata?from=" + TIME_TO_REQUEST;
+		String finalUrl = url + "api/apps/" + appId + "/rawdata?" + buildFromTo(new Date());
 		HttpURLConnection connection = prepareRequest(finalUrl);
 		String var = convertStreamToString(connection.getInputStream());
 		String var2 = var.substring(1, var.length() - 1);
@@ -93,7 +95,25 @@ public class Connection {
 			contentRawdata.add(s1);
 		}
 		connection.disconnect();
+
+		// sort rawdata alphabetically
+		contentRawdata.sort(new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.compareTo(o2);
+			}
+		});
+
 		return contentRawdata;
+	}
+
+	protected String buildFromTo(Date to) {
+		final long ONE_MINUTE_IN_MILLIS = 60000;
+		Date from = new Date(to.getTime() - (10 * ONE_MINUTE_IN_MILLIS));
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+		String value = "from=" + sdf.format(from) + "&to=" + sdf.format(to);
+		System.out.println(value);
+		return value;
 	}
 
 	public RawData requestRawdata(String appId, String rawdataFilename) throws IOException {

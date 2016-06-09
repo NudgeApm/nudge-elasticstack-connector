@@ -73,7 +73,7 @@ public class Daemon {
 				Connection c = new Connection(config.getNudgeUrl());
 				c.login(config.getNudgeLogin(), config.getNudgePwd());
 				for (String appId : config.getAppIds()) {
-					List<String> rawdataList = c.requestRawdataList(appId, "-10m");
+					List<String> rawdataList = c.requestRawdataList(appId);
 					if (analyzedFilenames.size() == 0) {
 						// analyzedFilenames.addAll(rawdataList);
 					}
