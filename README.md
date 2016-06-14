@@ -12,7 +12,7 @@ Nudge-elasticstack-plugin was developed in optics to facilitate the task of the 
 Thanks to this plugin, directly connected on the API of Nudge, it will be possible to use this stack, so that developers can easily identify bugs and work within Kibana, attractive and very flexible interface.
 
 
-**Getting starting ! **
+**Getting starting !**
 ----------
 The installation and the configuration of the plugin are simple and will not take to you that a few minutes ! 
 
