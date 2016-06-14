@@ -5,6 +5,9 @@ package json.connection;
  * @author : Sarah Bourgeois.
  */
 
+import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,12 +16,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import org.nudge.elasticstack.config.Configuration;
-import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 
 public class Connection {
 
-	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+	private static final Logger LOG = Logger.getLogger(Connection.class);
+
+	public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	private final String url;
 	private String sessionCookie;
 
@@ -111,10 +114,13 @@ public class Connection {
 		final long ONE_MINUTE_IN_MILLIS = 60000;
 		Date from = new Date(to.getTime() - (10 * ONE_MINUTE_IN_MILLIS));
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-		String value = "from=" + sdf.format(from) + "&to=" + sdf.format(to);
-		System.out.println(value);
-		return value;
+		String fromAndTo = "from=" + sdf.format(from) + "&to=" + sdf.format(to);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("API parameter from and to requestes : " + fromAndTo);
+		}
+		return fromAndTo;
 	}
+
 
 	public RawData requestRawdata(String appId, String rawdataFilename) throws IOException {
 		String finalUrl = url + "api/apps/" + appId + "/rawdata/" + rawdataFilename;
