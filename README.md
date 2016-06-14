@@ -27,18 +27,17 @@ The installation and the configuration of the plugin are simple and will not tak
   
 To use the plugin of Nudge, it is necessary to be registered as user on the site of Nudge and possess :
 
-	- Your login
-	- Your password 
+	- Your credentials
 	- ID of the application
 
 ☞ **On the side from Elastic stack**
 
 It is essential that you have : 
 
-	- ElasticSearch with the version 2.3.X
-	- Kibana with the version 4.5.0 or superior
+	- ElasticSearch (version 2.3.X)
+	- Kibana (version 4.5.X)
 
-You can download it at this address: https: // www.elastic.co/
+You can download it at this address: <https://www.elastic.co/>
 
 
 

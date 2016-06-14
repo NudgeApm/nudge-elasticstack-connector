@@ -13,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -98,15 +97,6 @@ public class Connection {
 			contentRawdata.add(s1);
 		}
 		connection.disconnect();
-
-		// sort rawdata alphabetically
-		contentRawdata.sort(new Comparator<String>() {
-			@Override
-			public int compare(String o1, String o2) {
-				return o1.compareTo(o2);
-			}
-		});
-
 		return contentRawdata;
 	}
 

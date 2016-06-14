@@ -4,8 +4,20 @@ package org.nudge.elasticstack;
  * Class which permits to send rawdatas to elasticSearch with -startDeamon
  *
  * @author Sarah Bourgeois
- * @author Sarah Bourgeois
+ * @author Fred Massart
  */
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
+import json.bean.EventTransaction;
+import json.bean.NudgeEvent;
+import json.connection.Connection;
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.config.Configuration;
 
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -20,18 +32,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.config.Configuration;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
-import json.bean.EventTransaction;
-import json.bean.NudgeEvent;
-import json.connection.Connection;
-
 public class Daemon {
 
 	private static final Logger LOG = Logger.getLogger(Daemon.class);
@@ -43,9 +43,9 @@ public class Daemon {
 	/**
 	 * Description : Launcher Deamon.
 	 *
-	 * @param config
+	 * @param config the configuration for the plugin, with credentials and elasticsearch url
 	 */
-	static public void start(Configuration config) {
+	public static void start(Configuration config) {
 		scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
 			public Thread newThread(Runnable runnable) {
 				Thread thread = new Thread(runnable);
@@ -57,10 +57,10 @@ public class Daemon {
 		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
 	}
 
-	static class DaemonTask implements Runnable {
+	private static class DaemonTask implements Runnable {
 		private Configuration config;
 
-		public DaemonTask(Configuration config) {
+		DaemonTask(Configuration config) {
 			this.config = config;
 		}
 
@@ -317,19 +317,5 @@ public class Daemon {
 
 
 	} // end of class
-
-	public static void main(String[] args) throws Exception {
-
-		// to test, replace "********" to the right configuration
-		System.setProperty("nes." + Configuration.NUDGE_APP_IDS, "*********");
-		System.setProperty("nes." + Configuration.NUDGE_LOGIN, "*********");
-		System.setProperty("nes." + Configuration.NUDGE_PWD, "*********");
-		System.setProperty("nes." + Configuration.NUDGE_URL, "*********");
-		System.setProperty("nes." + Configuration.ELASTIC_OUTPUT, "********");
-		System.setProperty("nes." + Configuration.ELASTIC_INDEX, "********");
-		Configuration config = new Configuration();
-		DaemonTask task = new DaemonTask(config);
-		task.run();
-	}
 
 }

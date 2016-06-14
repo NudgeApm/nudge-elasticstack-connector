@@ -1,6 +1,5 @@
 package org.nudge.elasticstack.config;
 
-import com.sun.tools.corba.se.idl.constExpr.BooleanOr;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -113,7 +112,7 @@ public class Configuration {
 	String checkNotNull(String key) {
 		String value = getProperty(key, null);
 		if (value == null) {
-			throw new IllegalArgumentException("You must set the \"" + key + "\" parameter in your properties file.");
+			throw new IllegalArgumentException("$You must set the \"" + key + "\" parameter in your properties file.");
 		}
 		return value;
 	}
