@@ -16,7 +16,7 @@ The Nudge ElasticStack Plugin is a very simple daemon connector that let you int
 
 ###**Getting started**###
 ***
-First download and unpack our archive ...
+First download and unpack our archive.
 
 	$ wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.0.0/nudge-elasticstack-connector-1.0.0.zip
 	$ unzip nudge-elasticstack-connector-1.0.0.zip
