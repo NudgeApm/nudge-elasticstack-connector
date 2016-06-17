@@ -1,10 +1,11 @@
 package org.nudge.elasticstack;
 
 /**
- * Class which permits to send rawdatas to elasticSearch with -startDeamon
- *
+ * 
  * @author Sarah Bourgeois
- * @author Fred Massart
+ * @author Frederic Massart
+ *
+ * Description : Class which permits to send rawdatas to elasticSearch with -startDeamon
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,15 +36,14 @@ import java.util.concurrent.TimeUnit;
 public class Daemon {
 
 	private static final Logger LOG = Logger.getLogger(Daemon.class);
-
 	private static ScheduledExecutorService scheduler;
 	private static final String lineBreak = "\n";
 	private static List<String> analyzedFilenames = new ArrayList<>();
 
 	/**
 	 * Description : Launcher Deamon.
-	 *
-	 * @param config the configuration for the plugin, with credentials and elasticsearch url
+	 * @param config
+	 *  
 	 */
 	public static void start(Configuration config) {
 		scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -73,16 +73,16 @@ public class Daemon {
 				Connection c = new Connection(config.getNudgeUrl());
 				c.login(config.getNudgeLogin(), config.getNudgePwd());
 				for (String appId : config.getAppIds()) {
-					List<String> rawdataList = c.requestRawdataList(appId);
-					if (analyzedFilenames.size() == 0) {
-						// analyzedFilenames.addAll(rawdataList);
-					}
+					List<String> rawdataList = c.requestRawdataList(appId, "-10m");
 					// analyse files, comparaison and push
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
 							List<Transaction> transaction = rawdata.getTransactionsList();
-							List<NudgeEvent> events = buildTransactionEvents(transaction);
+							List<EventTransaction> events = buildTransactionEvents(transaction);
+							for (EventTransaction eventTrans : events) {
+								nullLayer(eventTrans);
+							}
 							List<String> jsonEvents = parseJson(events);
 							sendToElastic(jsonEvents);
 						}
@@ -105,9 +105,9 @@ public class Daemon {
 		 * @throws ParseException
 		 * @throws JsonProcessingException
 		 */
-		public List<NudgeEvent> buildTransactionEvents(List<Transaction> transactionList)
+		public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
 				throws ParseException, JsonProcessingException {
-			List<NudgeEvent> events = new ArrayList<NudgeEvent>();
+			List<EventTransaction> events = new ArrayList<EventTransaction>();
 			for (Transaction trans : transactionList) {
 				String name = trans.getCode();
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -115,19 +115,9 @@ public class Daemon {
 				long response_time = trans.getEndTime() - trans.getStartTime();
 				EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
 				events.add(transactionEvent);
-
-				addLayers(transactionEvent, trans.getLayersList());
-
-
 				// handle layers
 				buildLayerEvents(trans.getLayersList(), transactionEvent);
 				events.add(transactionEvent);
-
-				/*
-				 * TODO Separate layer and transaction TortankLayer tortank =
-				 * new TortankLayer(name, response_time, date, response_time);
-				 * events.add(tortank);
-				 */
 			}
 			if (events.size() != 0) {
 				System.out.println("sum of events which will be send to elastic : " + events.size());
@@ -135,31 +125,6 @@ public class Daemon {
 				System.out.println("no new events to add now");
 			}
 			return events;
-		}
-
-		protected EventTransaction addLayers(EventTransaction transaction, List<Layer> rawdataLayers) {
-			long layersTime = 0;
-			long layersCount = 0;
-			if (transaction.getLayers() == null) {
-				transaction.setLayers(new ArrayList<json.bean.Layer>());
-			}
-
-			if (rawdataLayers != null && !rawdataLayers.isEmpty()) {
-				for (Layer rawdataLayer : rawdataLayers) {
-					json.bean.Layer layer = new json.bean.Layer(
-							rawdataLayer.getLayerName().toLowerCase(),
-							rawdataLayer.getTime(),
-							rawdataLayer.getCount()
-					);
-					transaction.getLayers().add(layer);
-					layersTime += rawdataLayer.getTime();
-					layersCount += rawdataLayer.getCount();
-				}
-			}
-			long timeJava = transaction.getResponseTime() - layersTime;
-			long countJava = transaction.getCount() - layersCount;
-			transaction.getLayers().add(new json.bean.Layer("java", timeJava, countJava));
-			return transaction;
 		}
 
 		/**
@@ -177,31 +142,17 @@ public class Daemon {
 					eventTrans.setResponseTimeLayerSql(layer.getTime());
 					eventTrans.setLayerCountSql(layer.getCount());
 					eventTrans.setLayerNameSql(layer.getLayerName());
-					if (layer.getLayerName().equals("SQL") && layer.getLayerName() == null) {
-						eventTrans.setLayerCountSql(null);
-						eventTrans.setResponseTimeLayerSql(null);
-						eventTrans.setLayerNameSql(null);
-					}
 				}
 				if (layer.getLayerName().equals("JMS")) {
 					eventTrans.setResponseTimeLayerJms(layer.getTime());
 					eventTrans.setLayerCountJms(layer.getCount());
 					eventTrans.setLayerNameJms(layer.getLayerName());
-					if (layer.getLayerName().equals("JMS") && layer.getLayerName() == null) {
-						eventTrans.setResponseTimeLayerJms(null);
-						eventTrans.setLayerCountJms(null);
-						eventTrans.setLayerNameJms(null);
-					}
 				}
 				if (layer.getLayerName().equals("JAX-WS")) {
 					eventTrans.setResponseTimeLayerJaxws(layer.getTime());
 					eventTrans.setLayerCountJaxws(layer.getCount());
 					eventTrans.setLayerNameJaxws(layer.getLayerName());
-					if (layer.getLayerName().equals("JAX-WS") && layer.getLayerName() == null) {
-						eventTrans.setResponseTimeLayerJaxws(null);
-						eventTrans.setLayerCountJaxws(null);
-						eventTrans.setLayerNameJaxws(null);
-					}
+
 				}
 				if (layer.getLayerName().equals("JAVA")) {
 					eventTrans.setLayerCountJava(layer.getCount());
@@ -225,6 +176,26 @@ public class Daemon {
 			eventTrans.setResponseTimeLayerJava(responseTimeJava);
 		}
 
+		public EventTransaction nullLayer(EventTransaction eventTrans) {
+			if (eventTrans.getLayerNameSql() == null) {
+				eventTrans.setResponseTimeLayerSql(0L);
+				eventTrans.setLayerCountSql(0L);
+				eventTrans.setLayerNameSql("null layer");
+			}
+			if (eventTrans.getLayerNameJaxws() == null) {
+				eventTrans.setResponseTimeLayerJaxws(0L);
+				eventTrans.setLayerCountJaxws(0L);
+				eventTrans.setLayerNameJaxws("null layer");
+			}
+
+			if (eventTrans.getLayerNameJms() == null) {
+				eventTrans.setLayerCountJms(0L);
+				eventTrans.setResponseTimeLayerJms(0L);
+				eventTrans.setLayerNameJms("null layer");
+			}
+			return eventTrans;
+		}
+
 		/**
 		 * Desription : parse datas in Json
 		 *
@@ -233,7 +204,7 @@ public class Daemon {
 		 * @throws Exception
 		 * @Description :
 		 */
-		public List<String> parseJson(List<NudgeEvent> eventList) throws Exception {
+		public List<String> parseJson(List<EventTransaction> eventList) throws Exception {
 			List<String> jsonEvents = new ArrayList<String>();
 			ObjectMapper jsonSerializer = new ObjectMapper();
 			if (config.getDryRun()) {
@@ -299,7 +270,7 @@ public class Daemon {
 
 			long start = System.currentTimeMillis();
 
-			URL URL = new URL(conf.getElasticOutput() + "/_bulk");
+			URL URL = new URL(conf.getOutputElasticHosts() + "/_bulk");
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Bulk request to : " + URL);
 			}
@@ -314,7 +285,6 @@ public class Daemon {
 			LOG.info("Flush " + jsonEvents.size() + " documents in BULK insert in " + (totalTime / 1000f) + "sec");
 			LOG.info("Response : " + httpCon.getResponseCode() + " - " + httpCon.getResponseMessage());
 		}
-
 
 	} // end of class
 

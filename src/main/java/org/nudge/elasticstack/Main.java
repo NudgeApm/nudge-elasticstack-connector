@@ -3,6 +3,9 @@ package org.nudge.elasticstack;
 import org.nudge.elasticstack.config.Configuration;
 
 /**
+ * @author Sarah Bourgeois
+ * @author Frederic Massart
+ * 
  * Entry point for NudgeApm - ElasticStack connector
  */
 public class Main {

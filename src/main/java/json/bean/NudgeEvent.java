@@ -1,17 +1,23 @@
 package json.bean;
 
+/**
+ * 
+ * @author : Sarah Bourgeois
+ * @author : Frederic Massart
+ * 
+ */
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class NudgeEvent {
-
-	// NudgeEvent Attributs
+	//Attributs
 	private String date;
 	private String name;
 	protected long responseTime;
 	private long count;
 	private String type;
 
-	// NudgeEvent constructors
+	//Constructors
 	public NudgeEvent(String name, long responseTime, String date, long count, String type) {
 		this.name = name;
 		this.date = date;
@@ -20,7 +26,7 @@ public abstract class NudgeEvent {
 		this.type = type;
 	}
 
-	// NudgeEvent method
+	// Method
 	public String toString() {
 		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count;
 	}

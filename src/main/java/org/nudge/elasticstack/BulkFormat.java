@@ -4,6 +4,7 @@ package org.nudge.elasticstack;
 /**
  * Convert data for the Bulk API 
  * @author Sarah Bourgeois
+ * @author Frederic Massart
  */
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,8 +27,7 @@ public class BulkFormat {
 		}
 		
 
-		// -- Inner class Index
-		
+		// -- Inner class Index	
 		public class Index {
 			
 			private String index;
@@ -46,6 +46,7 @@ public class BulkFormat {
 			public String getType() {
 				return type;
 			}
+			
 			public void setType(String type) {
 				this.type = type;
 			}

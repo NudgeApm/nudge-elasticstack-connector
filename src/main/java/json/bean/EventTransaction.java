@@ -1,11 +1,15 @@
 package json.bean;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+/**
+ * 
+ * @author : Sarah Bourgeois
+ * @author : Frederic Massart
+ * 
+ */
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-@SuppressWarnings("deprecation")
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class EventTransaction extends NudgeEvent {
 
 	// WS attributs
@@ -25,7 +29,6 @@ public class EventTransaction extends NudgeEvent {
 	private String layerNameJava;
 	private Long layerCountJava;
 
-	private List<Layer> layers;
 
 	// Constructor
 	public EventTransaction(String name, Long responseTime, String date, Long count) {
@@ -111,7 +114,7 @@ public class EventTransaction extends NudgeEvent {
 
 	public void setResponseTimeLayerJava(long responseTimeLayerJava) {
 		this.responseTimeLayerJava = responseTimeLayerJava;
-	}
+	} 
 
 	public String getLayerNameJava() {
 		return layerNameJava;
@@ -128,12 +131,5 @@ public class EventTransaction extends NudgeEvent {
 	public void setLayerCountJava(Long layerCountJava) {
 		this.layerCountJava = layerCountJava;
 	}
-
-	public List<Layer> getLayers() {
-		return layers;
-	}
-
-	public void setLayers(List<Layer> layers) {
-		this.layers = layers;
-	}
-}
+	
+} //end of class

@@ -1,7 +1,13 @@
 package org.nudge.elasticstack.config;
 
-import org.apache.log4j.Logger;
+/**
+ * 
+ * @author Sarah Bourgeois
+ * @author Frederic Massart
+ * 
+ */
 
+import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,8 +30,7 @@ public class Configuration {
 	public static final String NUDGE_PWD = "nudge.password";
 	public static final String NUDGE_APP_IDS = "nudge.app.ids";
 	public static final String ELASTIC_INDEX = "elastic.index";
-	public static final String ELASTIC_OUTPUT = "elastic.output";
-	public static final String NUDGE_API_ADRESS = "nudge.api.adress";
+	public static final String OUTUPUT_ELASTIC_HOSTS = "output.elastic.hosts";
 	public static final String DRY_RUN = "plugin.dryrun";
 
 	// Attributs
@@ -35,8 +40,7 @@ public class Configuration {
 	private String nudgePwd;
 	private String[] apps;
 	private String elasticIndex;
-	private String elasticOutput;
-	private String nudgeApiAdress;
+	private String outputElasticHosts;
 	private boolean dryRun;
 
 	public Configuration() {
@@ -61,13 +65,11 @@ public class Configuration {
 	 * Load properties with the default conf file, must be placed next to the
 	 * jar program.
 	 */
-
 	public void loadProperties() {
 		try {
 			Path folderJarPath = Paths.get(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
 					.getParent();
 			String confFile = folderJarPath.toString() + "/" + CONF_FILE;
-			// TODO FMA arrange this
 			if (Files.exists(Paths.get(confFile))) {
 				loadProperties(confFile);
 			} else {
@@ -99,9 +101,8 @@ public class Configuration {
 		nudgeLogin = checkNotNull(NUDGE_LOGIN);
 		nudgePwd = checkNotNull(NUDGE_PWD);
 		apps = split(checkNotNull(NUDGE_APP_IDS));
-		elasticOutput = checkNotNull(ELASTIC_OUTPUT);
+		outputElasticHosts = checkNotNull(OUTUPUT_ELASTIC_HOSTS);
 		elasticIndex = checkNotNull(ELASTIC_INDEX);
-		nudgeApiAdress = checkNotNull(NUDGE_API_ADRESS);
 		dryRun = Boolean.valueOf(getProperty(DRY_RUN, "false"));
 	}
 
@@ -135,8 +136,7 @@ public class Configuration {
 		System.out.println(NUDGE_PWD + " -> Password that should be used to connect to NudgeAPM");
 		System.out.println(NUDGE_APP_IDS + " -> Apps id to grab data from NudgeAPM");
 		System.out.println(ELASTIC_INDEX + " -> Name of the elasticSearch index which will be create");
-		System.out.println(ELASTIC_OUTPUT + " -> Adress of the elasticSearch which will be use to index");
-		System.out.println(NUDGE_API_ADRESS + " -> Adress of Nudge API where rawdata will be request");
+		System.out.println(OUTUPUT_ELASTIC_HOSTS + " -> Adress of the elasticSearch which will be use to index");
 		System.out.println(DRY_RUN + " -> Collect and log, dont push to elasticsearch");
 	}
 
@@ -160,12 +160,8 @@ public class Configuration {
 		return elasticIndex;
 	}
 
-	public String getElasticOutput() {
-		return elasticOutput;
-	}
-
-	public String getNudgeApiAdress() {
-		return nudgeApiAdress;
+	public String getOutputElasticHosts() {
+		return outputElasticHosts;
 	}
 
 	public boolean getDryRun() {
