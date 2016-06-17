@@ -18,8 +18,8 @@ The Nudge ElasticStack Plugin is a very simple daemon connector that let you int
 ***
 First download and unpack our archive ...
 
-	$ wget ...
-	$ tar -zxvf ...
+	$ wget <https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.0.0/nudge-elasticstack-connector-1.0.0.zip>
+	$ unzip nudge-elasticstack-connector-1.0.0.zip
 
 Then edit the properties file and set your own properties.
 These are the mandatory properties you have to specify :
