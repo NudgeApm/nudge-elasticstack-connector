@@ -35,7 +35,7 @@ These are the mandatory properties you have to specify :
 
 Finally start the service.
 
-	$ java -jar nudge-elastocstack-plugin.jar -startDaemon
+	$ java -jar nudge-elasticstack-connector-1.0.0-jar-with-dependencies.jar -startDaemon
 
 The plugin is now fetching live data from Nudge APM and writing them to your Elastic.
 You can easily set up a initial Kibana dashboard using the shell script provided in the archive : `kibana_dashboard_init.sh`.
