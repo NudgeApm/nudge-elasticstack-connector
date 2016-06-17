@@ -1,10 +1,8 @@
 ###***kibana_dashboard_init.sh***###
 -----------------------
 
-
-Within the connector there is a script called : **kibana_dashboard_init.sh** in the folder script.
 It directly imports  visualizations and dashboards in you Kibana. They are based on the data of the software of accessible demonstration of Nudge after your registration on the site. 
-So you can see how to build your own visualisations, dashboards very easily.
+So you can see how to build your own visualisations and dashboards very easily.
 
 
 ####***Requirements ***####
