@@ -31,7 +31,7 @@ These are the mandatory properties you have to specify :
 |`nudge.password`|Password to Nudge APM platform                               |
 |`nudge.apps.ids`|Your application token                                       |
 |`elastic.index` |The name of the Elastic index you want the plugin to write to|
-|`elastic.output`|Elastic hosts (default http://localhost:9200)                |
+|`output.elastic.hosts`|Elastic hosts (default http://localhost:9200)                |
 
 Finally start the service.
 
