@@ -27,11 +27,11 @@ These are the mandatory properties you have to specify :
 
 | Property       | Value                                                       |
 |----------------|-------------------------------------------------------------|
-|`nudge.login`   |Login to Nudge APM platform                                  |
-|`nudge.password`|Password to Nudge APM platform                               |
-|`nudge.apps.ids`|Your application token in Nudge API                                      |
-|`elastic.index` |The name of the Elastic index you want the plugin to write to|
-|`output.elastic.hosts`|Elastic hosts (default http://localhost:9200)                |
+|nudge.login   |Login to Nudge APM platform                                  |
+|nudge.password|Password to Nudge APM platform                               |
+|nudge.apps.ids|Your application token in Nudge API                                      |
+|elastic.index |The name of the Elastic index you want the plugin to write to|
+|output.elastic.hosts|Elastic hosts (default http://localhost:9200)                |
 
 Finally start the service.
 
@@ -43,3 +43,7 @@ You can easily set up a initial Kibana dashboard using the shell script provided
 	$ ./kibana_dashboard_init.sh import
 
 For more informations about this script, read the related documentation page.
+
+###**Live demo**###
+To view a live demo follow this link :
+http://kibana.nudgeapm.io/app/kibana#/dashboard/nudgeapm_petclinicDashboards
