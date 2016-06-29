@@ -8,18 +8,7 @@ package org.nudge.elasticstack;
  * Description : Class which permits to send rawdatas to elasticSearch with -startDeamon
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
-import json.bean.EventTransaction;
-import json.bean.NudgeEvent;
-import json.connection.Connection;
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.config.Configuration;
-
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -32,6 +21,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.config.Configuration;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
+import json.bean.EventTransaction;
+import json.bean.MappingProperties;
+import json.bean.MappingPropertiesBuilder;
+import json.bean.NudgeEvent;
+import json.connection.Connection;
 
 public class Daemon {
 
@@ -42,8 +44,9 @@ public class Daemon {
 
 	/**
 	 * Description : Launcher Deamon.
+	 * 
 	 * @param config
-	 *  
+	 * 
 	 */
 	public static void start(Configuration config) {
 		scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -54,6 +57,7 @@ public class Daemon {
 				return thread;
 			}
 		});
+
 		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
 	}
 
@@ -70,6 +74,7 @@ public class Daemon {
 		@Override
 		public void run() {
 			try {
+
 				Connection c = new Connection(config.getNudgeUrl());
 				c.login(config.getNudgeLogin(), config.getNudgePwd());
 				for (String appId : config.getAppIds()) {
@@ -80,21 +85,50 @@ public class Daemon {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
 							List<Transaction> transaction = rawdata.getTransactionsList();
 							List<EventTransaction> events = buildTransactionEvents(transaction);
+
 							for (EventTransaction eventTrans : events) {
 								nullLayer(eventTrans);
 							}
 							List<String> jsonEvents = parseJson(events);
+							pushMapping();
 							sendToElastic(jsonEvents);
 						}
 					}
 					analyzedFilenames = rawdataList;
 				}
+
 			} catch (Throwable t) {
 				t.printStackTrace();
 				if (null != scheduler) {
 					scheduler.shutdown();
 				}
 			}
+		}
+
+		/**
+		 * Description : update default elasticsearch mapping
+		 * 
+		 * @throws IOException
+		 */
+		public static void pushMapping() throws IOException {
+			ObjectMapper jsonSerializer = new ObjectMapper();
+			MappingProperties mappingProperies = MappingPropertiesBuilder.buildMappingProperties("multi_field",
+					"string", "analyzed", "string", "not_analyzed");
+			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			String jsonEvent = jsonSerializer.writeValueAsString(mappingProperies);
+			URL URL = new URL("http://elk-nudge.servebeer.com:9200/nudge/transaction/_mapping");
+			System.out.println("     ");
+			System.out.println("      ");
+			System.out.println(URL);
+			HttpURLConnection httpCon2 = (HttpURLConnection) URL.openConnection();
+			httpCon2.setDoOutput(true);
+			httpCon2.setRequestMethod("PUT");
+			OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
+
+			out.write(jsonEvent);
+			out.close();
+			LOG.info(" Transaction Mapping Flushed : " + httpCon2.getResponseCode() + " - "
+					+ httpCon2.getResponseMessage());
 		}
 
 		/**
@@ -108,6 +142,7 @@ public class Daemon {
 		public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
 				throws ParseException, JsonProcessingException {
 			List<EventTransaction> events = new ArrayList<EventTransaction>();
+
 			for (Transaction trans : transactionList) {
 				String name = trans.getCode();
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -118,11 +153,6 @@ public class Daemon {
 				// handle layers
 				buildLayerEvents(trans.getLayersList(), transactionEvent);
 				events.add(transactionEvent);
-			}
-			if (events.size() != 0) {
-				System.out.println("sum of events which will be send to elastic : " + events.size());
-			} else {
-				System.out.println("no new events to add now");
 			}
 			return events;
 		}
@@ -207,6 +237,7 @@ public class Daemon {
 		public List<String> parseJson(List<EventTransaction> eventList) throws Exception {
 			List<String> jsonEvents = new ArrayList<String>();
 			ObjectMapper jsonSerializer = new ObjectMapper();
+
 			if (config.getDryRun()) {
 				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 			}
@@ -217,8 +248,9 @@ public class Daemon {
 				// handle data event
 				String jsonEvent = jsonSerializer.writeValueAsString(event);
 				jsonEvents.add(jsonEvent + lineBreak);
+
 			}
-			System.out.println(jsonEvents);
+			LOG.debug(jsonEvents);
 			return jsonEvents;
 		}
 
@@ -252,8 +284,9 @@ public class Daemon {
 		 * @throws Exception
 		 */
 		public void sendToElastic(List<String> jsonEvents) throws Exception {
+
 			if (jsonEvents == null || jsonEvents.isEmpty()) {
-				LOG.info("No json documents to send");
+				// LOG.info("No json documents to send");
 				return;
 			}
 			Configuration conf = new Configuration();
@@ -264,13 +297,12 @@ public class Daemon {
 
 			if (config.getDryRun()) {
 				LOG.info("Dry run active, only log documents, don't push to elasticsearch");
-				LOG.info(sb);
+				// LOG.info(sb);
 				return;
 			}
 
 			long start = System.currentTimeMillis();
-
-			URL URL = new URL(conf.getOutputElasticHosts() + "/_bulk");
+			URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Bulk request to : " + URL);
 			}
@@ -282,8 +314,9 @@ public class Daemon {
 			out.close();
 			long end = System.currentTimeMillis();
 			long totalTime = end - start;
-			LOG.info("Flush " + jsonEvents.size() + " documents in BULK insert in " + (totalTime / 1000f) + "sec");
-			LOG.info("Response : " + httpCon.getResponseCode() + " - " + httpCon.getResponseMessage());
+			LOG.info(" Flush " + jsonEvents.size() + " documents in BULK insert in " + (totalTime / 1000f) + "sec");
+			httpCon.getResponseCode();
+			httpCon.getResponseMessage();
 		}
 
 	} // end of class

@@ -3,7 +3,7 @@
 # Description : import visualizations and dashboards directly on your Kibana thanks to the Nudge connector.
 
 #Elastic Stack parameters
-ELASTICSEARCH_HOST="http://elk-nudge.servebeer.com:9200/"
+ELASTICSEARCH_HOST="http://localhost:9200/"
 NAME_ELASTIC_INDEX=".kibana"
 #Internal script command
 CURL=curl
@@ -112,27 +112,27 @@ done
 }
 
 #Arguments to use the Nudge script
-if [[ $1 = '' ]];
+if [ $1 = '' ];
 then
 help_command
 fi
 
-if [[ $1 = 'import' ]];
+if [ $1 = 'import' ];
 then
 import
 fi
 
-if [[ $1 = 'delete_all' ]];
+if [ $1 = 'delete_all' ];
 then
 delete_all
 fi
 
-if [[ $1 = 'delete_visu' ]];
+if [ $1 = 'delete_visu' ];
 then
 delete_visu
 fi
 
-if [[ $1 = 'delete_dash' ]];
+if [ $1 = 'delete_dash' ];
 then
 delete_dash
 fi

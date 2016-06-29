@@ -11,6 +11,9 @@ import org.nudge.elasticstack.config.Configuration;
 public class Main {
 
 	public static void main(String[] args) {
+		
+		System.out.println("      Nudge-Elastic-Connector : starting ... ");
+		System.out.println("------------------------------------------- \n");
 		if (args.length < 1) {
 			usage();
 			System.exit(1);

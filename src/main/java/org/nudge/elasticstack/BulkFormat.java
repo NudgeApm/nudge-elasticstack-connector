@@ -21,15 +21,12 @@ public class BulkFormat {
 		public Index getIndexElement() {
 			return indexElement;
 		}
-
 		public void setIndexElement(Index indexElement) {
 			this.indexElement = indexElement;
 		}
 		
-
 		// -- Inner class Index	
 		public class Index {
-			
 			private String index;
 			private String type;
 			private String id;

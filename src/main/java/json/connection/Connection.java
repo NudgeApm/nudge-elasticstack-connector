@@ -12,9 +12,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.Daemon;
+
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 
 public class Connection {
+	private static final Logger LOG = Logger.getLogger(Connection.class);
 	public static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm";
 	private final String url;
 	private String sessionCookie;
@@ -28,7 +33,6 @@ public class Connection {
 		try {
 			HttpURLConnection con;
 			URL loginUrl = new URL(url + "login/usrpwd");
-			System.out.println(loginUrl);
 			con = (HttpURLConnection) loginUrl.openConnection();
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
@@ -63,7 +67,7 @@ public class Connection {
 		List<String> contentRawdata = new ArrayList<String>();
 		String finalUrl = url + "api/apps/" + appId + "/rawdata?from=-10m";
 		HttpURLConnection connection = prepareRequest(finalUrl);
-		System.out.println(connection.getResponseCode());
+		LOG.debug(connection.getResponseCode());
 		String var = convertStreamToString(connection.getInputStream());
 		String var2 = var.substring(1, var.length() - 1);
 		String[] var3 = var2.split(",");
@@ -84,9 +88,7 @@ public class Connection {
 
 	public RawData requestRawdata(String appId, String rawdataFilename) throws IOException {
 		String finalUrl = url + "api/apps/" + appId + "/rawdata/" + rawdataFilename;
-		System.out.println("Request URL for getting a rawdata : " + finalUrl);
 		HttpURLConnection connection = prepareRequest(finalUrl);
-		System.out.println(connection.getResponseCode());
 		return RawData.parseFrom(connection.getInputStream());
 	}
 

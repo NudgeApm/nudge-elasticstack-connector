@@ -1,5 +1,6 @@
 package json.bean;
 
+
 /**
  * 
  * @author : Sarah Bourgeois
@@ -16,10 +17,11 @@ public abstract class NudgeEvent {
 	protected long responseTime;
 	private long count;
 	private String type;
+	
 
 	//Constructors
 	public NudgeEvent(String name, long responseTime, String date, long count, String type) {
-		this.name = name;
+		setName(name);
 		this.date = date;
 		this.responseTime = responseTime;
 		this.count = count;
@@ -42,18 +44,14 @@ public abstract class NudgeEvent {
 	}
 
 	public String getName() {
-		if (name.equals("JAX-WS")) {
-			name = "JAXWS";
-		} else {
-			return name;
-		}
 		return name;
 	}
+
 
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
 	public String getType() {
 		return type;
 	}
