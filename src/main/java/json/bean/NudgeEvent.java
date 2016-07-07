@@ -18,7 +18,6 @@ public abstract class NudgeEvent {
 	private long count;
 	private String type;
 	
-
 	//Constructors
 	public NudgeEvent(String name, long responseTime, String date, long count, String type) {
 		setName(name);
@@ -26,6 +25,7 @@ public abstract class NudgeEvent {
 		this.responseTime = responseTime;
 		this.count = count;
 		this.type = type;
+	
 	}
 
 	// Method
@@ -76,5 +76,7 @@ public abstract class NudgeEvent {
 	public void setCount(long count) {
 		this.count = count;
 	}
+	
+
 
 } // end of class

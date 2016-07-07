@@ -26,9 +26,15 @@ import org.nudge.elasticstack.config.Configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
+import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
+
+import json.bean.EventMBean;
 import json.bean.EventTransaction;
 import json.bean.MappingProperties;
 import json.bean.MappingPropertiesBuilder;
@@ -57,7 +63,6 @@ public class Daemon {
 				return thread;
 			}
 		});
-
 		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
 	}
 
@@ -77,26 +82,38 @@ public class Daemon {
 
 				Connection c = new Connection(config.getNudgeUrl());
 				c.login(config.getNudgeLogin(), config.getNudgePwd());
+
 				for (String appId : config.getAppIds()) {
 					List<String> rawdataList = c.requestRawdataList(appId, "-10m");
 					// analyse files, comparaison and push
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
+
+							// Transaction
 							List<Transaction> transaction = rawdata.getTransactionsList();
 							List<EventTransaction> events = buildTransactionEvents(transaction);
+
+							// Mbean
+							List<MBean> mbean = rawdata.getMBeanList();
+							Dictionary dictionary = rawdata.getMbeanDictionary();
+
+							List<EventMBean> eventsMBeans = buildMbeanEvents(mbean, dictionary);
+							List<String> jsonEvents2 = parseJsonMBean(eventsMBeans);
 
 							for (EventTransaction eventTrans : events) {
 								nullLayer(eventTrans);
 							}
+
 							List<String> jsonEvents = parseJson(events);
 							pushMapping();
 							sendToElastic(jsonEvents);
+
+							// sendElk(jsonEvents2);
 						}
 					}
 					analyzedFilenames = rawdataList;
 				}
-
 			} catch (Throwable t) {
 				t.printStackTrace();
 				if (null != scheduler) {
@@ -111,20 +128,18 @@ public class Daemon {
 		 * @throws IOException
 		 */
 		public static void pushMapping() throws IOException {
+			Configuration conf = new Configuration();
 			ObjectMapper jsonSerializer = new ObjectMapper();
 			MappingProperties mappingProperies = MappingPropertiesBuilder.buildMappingProperties("multi_field",
 					"string", "analyzed", "string", "not_analyzed");
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 			String jsonEvent = jsonSerializer.writeValueAsString(mappingProperies);
-			URL URL = new URL("http://elk-nudge.servebeer.com:9200/nudge/transaction/_mapping");
-			System.out.println("     ");
-			System.out.println("      ");
+			URL URL = new URL(conf.getOutputElasticHosts() + conf.getElasticIndex() + "/transaction/_mapping");
 			System.out.println(URL);
 			HttpURLConnection httpCon2 = (HttpURLConnection) URL.openConnection();
 			httpCon2.setDoOutput(true);
 			httpCon2.setRequestMethod("PUT");
 			OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
-
 			out.write(jsonEvent);
 			out.close();
 			LOG.info(" Transaction Mapping Flushed : " + httpCon2.getResponseCode() + " - "
@@ -142,7 +157,6 @@ public class Daemon {
 		public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
 				throws ParseException, JsonProcessingException {
 			List<EventTransaction> events = new ArrayList<EventTransaction>();
-
 			for (Transaction trans : transactionList) {
 				String name = trans.getCode();
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -155,6 +169,99 @@ public class Daemon {
 				events.add(transactionEvent);
 			}
 			return events;
+		}
+
+		public List<EventMBean> buildMbeanEvents(List<MBean> mbean, Dictionary dictionary)
+				throws JsonProcessingException {
+			List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
+			
+			List<DictionaryEntry> dico =dictionary.getDictionaryList();
+			
+			
+			
+		DictionaryEntry a = dico.get(0);
+		
+		
+			
+
+			for (MBean mb : mbean) {
+				for (MBeanAttributeInfo mBeanAttributeInfo : mb.getAttributeInfoList()) {
+					EventMBean mbeanEvent = new EventMBean(null, null, null, 0, 0, null, 0, 0);
+					mbeanEvent.setNameMbean(mBeanAttributeInfo.getName());
+					mbeanEvent.setCollectingTime(mb.getCollectingTime());
+					mbeanEvent.setObjectName(mb.getObjectName());
+					mbeanEvent.setCountAttribute(mb.getAttributeInfoCount());
+					mbeanEvent.setNameId(mBeanAttributeInfo.getNameId());
+					mbeanEvent.setTypeMbean(mBeanAttributeInfo.getType());
+					mbeanEvent.setTypeId(mBeanAttributeInfo.getTypeId());
+					mbeanEvent.setValueMbean(mBeanAttributeInfo.getValue());
+					eventsMbean.add(mbeanEvent);
+			
+				}
+				
+				
+			}
+			return eventsMbean;
+		}
+
+		public List<String> parseJsonMBean(List<EventMBean> eventList) throws Exception {
+			List<String> jsonEvents2 = new ArrayList<String>();
+			ObjectMapper jsonSerializer = new ObjectMapper();
+
+			if (config.getDryRun()) {
+				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			}
+
+			for (EventMBean event : eventList) {
+				String jsonMetadata = generateMetaDataMbean(event.getType());
+				jsonEvents2.add(jsonMetadata + lineBreak);
+				// Handle data event
+				String jsonEvent = jsonSerializer.writeValueAsString(event);
+				jsonEvents2.add(jsonEvent + lineBreak);
+			}
+			// System.out.println(jsonEvents2);
+			LOG.debug(jsonEvents2);
+			System.out.println(jsonEvents2);
+			return jsonEvents2;
+		}
+
+		// ********** BULK MBEAN *******************
+		public String generateMetaDataMbean(String mbean) throws JsonProcessingException {
+			Configuration conf = new Configuration();
+			ObjectMapper jsonSerializer = new ObjectMapper();
+			if (config.getDryRun()) {
+				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			}
+			BulkFormat elasticMetaData = new BulkFormat();
+			elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
+			elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
+			elasticMetaData.getIndexElement().setType("mbean");
+			return jsonSerializer.writeValueAsString(elasticMetaData);
+		}
+
+		public void sendElk(List<String> jsonEvents2) throws IOException {
+			Configuration conf = new Configuration();
+			StringBuilder sb = new StringBuilder();
+
+			for (String json : jsonEvents2) {
+				sb.append(json);
+			}
+			if (config.getDryRun()) {
+				LOG.info("Dry run active, only log documents, don't push to elasticsearch.");
+				return;
+			}
+			URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
+			System.out.println("mbean url " + URL);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Bulk request to : " + URL);
+			}
+			HttpURLConnection httpCon2 = (HttpURLConnection) URL.openConnection();
+			httpCon2.setDoOutput(true);
+			httpCon2.setRequestMethod("PUT");
+			OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
+			out.write(sb.toString());
+			out.close();
+			LOG.info(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 		}
 
 		/**
@@ -217,7 +324,6 @@ public class Daemon {
 				eventTrans.setLayerCountJaxws(0L);
 				eventTrans.setLayerNameJaxws("null layer");
 			}
-
 			if (eventTrans.getLayerNameJms() == null) {
 				eventTrans.setLayerCountJms(0L);
 				eventTrans.setResponseTimeLayerJms(0L);
@@ -237,7 +343,6 @@ public class Daemon {
 		public List<String> parseJson(List<EventTransaction> eventList) throws Exception {
 			List<String> jsonEvents = new ArrayList<String>();
 			ObjectMapper jsonSerializer = new ObjectMapper();
-
 			if (config.getDryRun()) {
 				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 			}
@@ -248,16 +353,14 @@ public class Daemon {
 				// handle data event
 				String jsonEvent = jsonSerializer.writeValueAsString(event);
 				jsonEvents.add(jsonEvent + lineBreak);
-
 			}
 			LOG.debug(jsonEvents);
 			return jsonEvents;
 		}
 
 		/**
-		 * Description : Permits to use API bulk to send huge rawdatas in
-		 * ElasticSearch To use this API it must be to format Json in the Bulk
-		 * Format.
+		 * Description : Use bulk API to send huge rawdatas in ElasticSearch To
+		 * use this API it must be to format Json in the Bulk Format.
 		 *
 		 * @param type
 		 * @return
@@ -284,9 +387,7 @@ public class Daemon {
 		 * @throws Exception
 		 */
 		public void sendToElastic(List<String> jsonEvents) throws Exception {
-
 			if (jsonEvents == null || jsonEvents.isEmpty()) {
-				// LOG.info("No json documents to send");
 				return;
 			}
 			Configuration conf = new Configuration();
@@ -294,13 +395,11 @@ public class Daemon {
 			for (String json : jsonEvents) {
 				sb.append(json);
 			}
-
 			if (config.getDryRun()) {
 				LOG.info("Dry run active, only log documents, don't push to elasticsearch");
 				// LOG.info(sb);
 				return;
 			}
-
 			long start = System.currentTimeMillis();
 			URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
 			if (LOG.isDebugEnabled()) {

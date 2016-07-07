@@ -6,12 +6,12 @@ import org.nudge.elasticstack.config.Configuration;
  * @author Sarah Bourgeois
  * @author Frederic Massart
  * 
- * Entry point for NudgeApm - ElasticStack connector
+ *         Entry point for NudgeApm - ElasticStack connector
  */
 public class Main {
 
 	public static void main(String[] args) {
-		
+
 		System.out.println("      Nudge-Elastic-Connector : starting ... ");
 		System.out.println("------------------------------------------- \n");
 		if (args.length < 1) {
