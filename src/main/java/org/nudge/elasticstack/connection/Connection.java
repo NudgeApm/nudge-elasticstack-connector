@@ -1,4 +1,4 @@
-package json.connection;
+package org.nudge.elasticstack.connection;
 
 /**
  * @author : Sarah Bourgeois.
@@ -7,16 +7,14 @@ package json.connection;
  */
 
 
+import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.Daemon;
-
-import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 
 public class Connection {
 	private static final Logger LOG = Logger.getLogger(Connection.class);

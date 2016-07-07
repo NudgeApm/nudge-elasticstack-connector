@@ -1,4 +1,4 @@
-package json.bean;
+package org.nudge.elasticstack.json.bean;
 
 /**
  * @author : Sarah Bourgeois 
@@ -7,10 +7,9 @@ package json.bean;
  * Description : builder for the new mapping
  */
 
-import json.bean.MappingProperties;
-import json.bean.MappingProperties.Properties.Name;
-import json.bean.MappingProperties.Properties.Name.Fields;
-import json.bean.MappingProperties.Properties.Name.Fields.FieldAttribute;
+import org.nudge.elasticstack.json.bean.MappingProperties.Properties.Name;
+import org.nudge.elasticstack.json.bean.MappingProperties.Properties.Name.Fields;
+import org.nudge.elasticstack.json.bean.MappingProperties.Properties.Name.Fields.FieldAttribute;
 
 public class MappingPropertiesBuilder {
 

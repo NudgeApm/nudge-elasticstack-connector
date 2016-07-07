@@ -1,4 +1,4 @@
-package json.bean;
+package org.nudge.elasticstack.json.bean;
 
 /**
  * @author : Sarah Bourgeois 

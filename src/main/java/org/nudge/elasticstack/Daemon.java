@@ -8,6 +8,20 @@ package org.nudge.elasticstack;
  * Description : Class which permits to send rawdatas to elasticSearch with -startDeamon
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.connection.Connection;
+import org.nudge.elasticstack.json.bean.EventTransaction;
+import org.nudge.elasticstack.json.bean.MappingProperties;
+import org.nudge.elasticstack.json.bean.MappingPropertiesBuilder;
+import org.nudge.elasticstack.json.bean.NudgeEvent;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -21,19 +35,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.config.Configuration;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
-import json.bean.EventTransaction;
-import json.bean.MappingProperties;
-import json.bean.MappingPropertiesBuilder;
-import json.bean.NudgeEvent;
-import json.connection.Connection;
 
 public class Daemon {
 
@@ -286,7 +287,7 @@ public class Daemon {
 		public void sendToElastic(List<String> jsonEvents) throws Exception {
 
 			if (jsonEvents == null || jsonEvents.isEmpty()) {
-				// LOG.info("No json documents to send");
+				// LOG.info("No org.nudge.elasticstack.json documents to send");
 				return;
 			}
 			Configuration conf = new Configuration();

@@ -31,15 +31,15 @@ import () {
   echo "Loading to $ELASTICSEARCH_HOST in $NAME_ELASTIC_INDEX ... "
 
 
-for file in $DIR/visualization/*.json
+for file in $DIR/visualization/*.org.nudge.elasticstack.json
 do
-    name=`basename $file .json`
+    name=`basename $file .org.nudge.elasticstack.json`
     echo "Loading visualization called $name: "
     curl -XPUT $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name -d @$file ||exit 1
     echo "\n"
 done
 
-for file in $DIR/index-pattern/*.json
+for file in $DIR/index-pattern/*.org.nudge.elasticstack.json
 do
    name=`awk '$1 == "\"title\":" {gsub(/"/, "", $2); print $2}' $file`
     echo "Loading index pattern $name:"
@@ -48,9 +48,9 @@ do
     echo "\n"
 done
 
-for file in $DIR/dashboards/*.json
+for file in $DIR/dashboards/*.org.nudge.elasticstack.json
 do
-    name=`basename $file .json`
+    name=`basename $file .org.nudge.elasticstack.json`
     echo "Loading dashboard $name:"
     $CURL -XPUT $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$name \
         -d @$file
@@ -61,25 +61,25 @@ echo "\n"
 
 # Delete all : vizualisations, index-pattern and dasboards
 delete_all () {
-for file in $DIR/visualization/*.json
+for file in $DIR/visualization/*.org.nudge.elasticstack.json
 do
-    name=`basename $file .json`
+    name=`basename $file .org.nudge.elasticstack.json`
     echo "Supressing visualization called $name: "
     curl -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name -d @$file ||exit 1
     echo "\n"
 done
 
-for file in $DIR/dashboards/*.json
+for file in $DIR/dashboards/*.org.nudge.elasticstack.json
 do
-    name=`basename $file .json`
+    name=`basename $file .org.nudge.elasticstack.json`
     echo "Supressing dashboards called $name: "
     curl -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
     echo "\n"
 done
 
-for file in $DIR/index-pattern/*.json
+for file in $DIR/index-pattern/*.org.nudge.elasticstack.json
 do
-    name=`basename $file .json`
+    name=`basename $file .org.nudge.elasticstack.json`
     echo "Supressing index-pattern called $name: "
     curl -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name -d @$file ||exit 1
     echo "\n"
@@ -89,7 +89,7 @@ done
 # Delete vizualisation one per one
 delete_visu () {
 echo "List of Nudge vizualisations : "
-echo $DIR/visualization/*.json "\n"
+echo $DIR/visualization/*.org.nudge.elasticstack.json "\n"
 for file in $DIR/visualization/*
 do
 read -p 'Which vizualisation do you want to delete ? (example : nudgeapm_ResponsetimeLayers)  ' name
@@ -102,8 +102,8 @@ done
 # Delete dashboards one per one
 delete_dash() {
   echo "List of Nudge dashboards : "
-  echo $DIR/dashboards/*.json "\n"
-for file in $DIR/dashboards/*.json
+  echo $DIR/dashboards/*.org.nudge.elasticstack.json "\n"
+for file in $DIR/dashboards/*.org.nudge.elasticstack.json
 do
 read -p 'Which dashboard do you want to delete ? (example : nudgeapm_petclinicDashboards)  ' name
     curl -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
