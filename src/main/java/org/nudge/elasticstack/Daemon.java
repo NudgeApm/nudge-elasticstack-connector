@@ -62,7 +62,7 @@ public class Daemon {
 		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
 	}
 
-	private static class DaemonTask implements Runnable {
+	protected static class DaemonTask implements Runnable {
 		private Configuration config;
 
 		DaemonTask(Configuration config) {
@@ -106,21 +106,26 @@ public class Daemon {
 			}
 		}
 
+		public static void pushMapping() throws IOException {
+			pushMapping("elk-nudge.servebeer.com", 9200, "nudge");
+
+		}
 		/**
 		 * Description : update default elasticsearch mapping
 		 * 
 		 * @throws IOException
 		 */
-		public static void pushMapping() throws IOException {
+		public static void pushMapping(String hostDNS, int hostPort, String index) throws IOException {
 			ObjectMapper jsonSerializer = new ObjectMapper();
 			MappingProperties mappingProperies = MappingPropertiesBuilder.buildMappingProperties("multi_field",
 					"string", "analyzed", "string", "not_analyzed");
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 			String jsonEvent = jsonSerializer.writeValueAsString(mappingProperies);
-			URL URL = new URL("http://elk-nudge.servebeer.com:9200/nudge/transaction/_mapping");
+			URL URL = new URL("http://" + hostDNS + ":" + hostPort + "/" + index + "/transaction/_mapping");
 			System.out.println("     ");
 			System.out.println("      ");
 			System.out.println(URL);
+
 			HttpURLConnection httpCon2 = (HttpURLConnection) URL.openConnection();
 			httpCon2.setDoOutput(true);
 			httpCon2.setRequestMethod("PUT");

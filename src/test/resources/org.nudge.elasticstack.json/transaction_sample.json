@@ -1,0 +1,17 @@
+{
+  "name": "/",
+  "count": 1,
+  "type": "transaction",
+  "responseTimeLayerJaxws": 0,
+  "layerNameJaxws": "null layer",
+  "layerCountJaxws": 0,
+  "responseTimeLayerSql": 0,
+  "layerNameSql": "null layer",
+  "layerCountSql": 0,
+  "responseTimeLayerJms": 0,
+  "layerNameJms": "null layer",
+  "layerCountJms": 0,
+  "responseTimeLayerJava": 2,
+  "@timestamp": "2016-07-04T18:03:51.847+0200",
+  "response_time": 2
+}
