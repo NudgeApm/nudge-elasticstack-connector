@@ -58,7 +58,10 @@ public class Daemon {
                 return thread;
             }
         });
+        scheduleDaemon(scheduler, config);
+    }
 
+    private static void scheduleDaemon(ScheduledExecutorService scheduler, Configuration config) {
         scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
     }
 
@@ -113,10 +116,11 @@ public class Daemon {
                         LOG.warn("Interrupted before a daemon restart", e);
                     }
                     LOG.info("Restarting daemon ...");
-                    scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
+                    scheduleDaemon(scheduler, config);
                 }
             }
         }
+
 
         public static void pushMapping() throws IOException {
             pushMapping("elk-nudge.servebeer.com", 9200, "nudge");
