@@ -25,8 +25,7 @@ public class DaemonTest {
 
     private static final Logger LOG = Logger.getLogger(DaemonTest.class);
     private static final String INDEX_TEST = "nudge.test";
-    private static final String LOCAL_HOST = "localhost";
-    private static final String URL_ELASTIC_TEST = "http://localhost:9200";
+    private static final String URL_ELASTIC_TEST = "http://localhost:9200/";
 
     @Test
     public void pushMapping_test() throws IOException, URISyntaxException {
@@ -34,7 +33,7 @@ public class DaemonTest {
         initTransactionBean();
 
         // when
-        Daemon.DaemonTask.pushMapping(LOCAL_HOST, 9200, INDEX_TEST);
+        Daemon.DaemonTask.pushMapping(URL_ELASTIC_TEST, INDEX_TEST);
 
         // then
         URL elasticTest = new URL(URL_ELASTIC_TEST + "/" + INDEX_TEST + "/transaction/_mapping");

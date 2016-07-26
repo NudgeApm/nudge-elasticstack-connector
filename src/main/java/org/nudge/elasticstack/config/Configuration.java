@@ -8,6 +8,7 @@ package org.nudge.elasticstack.config;
  */
 
 import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,14 +25,14 @@ public class Configuration {
 	private static final Logger LOG = Logger.getLogger(Configuration.class);
 
 	// Configuration files
-	public static final String CONF_FILE = "nudge-elastic.properties";
-	public static final String NUDGE_URL = "nudge.url";
-	public static final String NUDGE_LOGIN = "nudge.login";
-	public static final String NUDGE_PWD = "nudge.password";
-	public static final String NUDGE_APP_IDS = "nudge.app.ids";
-	public static final String ELASTIC_INDEX = "elastic.index";
-	public static final String OUTUPUT_ELASTIC_HOSTS = "output.elastic.hosts";
-	public static final String DRY_RUN = "plugin.dryrun";
+	private static final String CONF_FILE = "nudge-elastic.properties";
+	private static final String NUDGE_URL = "nudge.url";
+	private static final String NUDGE_LOGIN = "nudge.login";
+	private static final String NUDGE_PWD = "nudge.password";
+	private static final String NUDGE_APP_IDS = "nudge.app.ids";
+	private static final String ELASTIC_INDEX = "elastic.index";
+	private static final String OUTUPUT_ELASTIC_HOSTS = "output.elastic.hosts";
+	private static final String DRY_RUN = "plugin.dryrun";
 
 	// Attributs
 	private Properties properties = new Properties();
@@ -44,39 +45,40 @@ public class Configuration {
 	private boolean dryRun;
 
 	public Configuration() {
-		loadProperties();
+		searchPropertiesFile();
 	}
 
 	Configuration(boolean initWithoutLoad) {
 		if (!initWithoutLoad) {
-			loadProperties();
+			searchPropertiesFile();
 		}
 	}
 
 	Configuration(Properties props) {
 		this.properties = props;
+        loadProperties();
 	}
 
 	Configuration(String pathFile) {
-		loadProperties(pathFile);
+		loadPropertiesFile(pathFile);
 	}
 
 	/**
 	 * Load properties with the default conf file, must be placed next to the
 	 * jar program.
 	 */
-	public void loadProperties() {
+	private void searchPropertiesFile() {
 		try {
 			Path folderJarPath = Paths.get(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
 					.getParent();
 			String confFile = folderJarPath.toString() + "/" + CONF_FILE;
 			if (Files.exists(Paths.get(confFile))) {
-				loadProperties(confFile);
+				loadPropertiesFile(confFile);
 			} else {
 				URL confURL = ClassLoader.getSystemResource(CONF_FILE);
 				if (confURL != null) {
 					LOG.debug(CONF_FILE + " found at the classloader root path");
-					loadProperties(confURL.getPath());
+					loadPropertiesFile(confURL.getPath());
 				}
 				LOG.debug(CONF_FILE + " doesn't found at the classloader root path");
 			}
@@ -85,7 +87,7 @@ public class Configuration {
 		}
 	}
 
-	public void loadProperties(String pathFile) {
+	private void loadPropertiesFile(String pathFile) {
 		File propsFile = new File(pathFile);
 		boolean propsFileExists = propsFile.exists();
 		if (propsFileExists) {
@@ -95,16 +97,23 @@ public class Configuration {
 				throw new IllegalStateException(e.getMessage(), e);
 			}
 		}
-		nudgeUrl = getProperty(NUDGE_URL, "https://monitor.nudge-apm.com");
-		if (!nudgeUrl.endsWith("/"))
-			nudgeUrl += "/";
-		nudgeLogin = checkNotNull(NUDGE_LOGIN);
-		nudgePwd = checkNotNull(NUDGE_PWD);
-		apps = split(checkNotNull(NUDGE_APP_IDS));
-		outputElasticHosts = checkNotNull(OUTUPUT_ELASTIC_HOSTS);
-		elasticIndex = checkNotNull(ELASTIC_INDEX);
-		dryRun = Boolean.valueOf(getProperty(DRY_RUN, "false"));
+	    loadProperties();
 	}
+
+	private void loadProperties() {
+        nudgeUrl = getProperty(NUDGE_URL, "https://monitor.nudge-apm.com");
+        if (!nudgeUrl.endsWith("/"))
+            nudgeUrl += "/";
+        nudgeLogin = checkNotNull(NUDGE_LOGIN);
+        nudgePwd = checkNotNull(NUDGE_PWD);
+        apps = split(checkNotNull(NUDGE_APP_IDS));
+        outputElasticHosts = checkNotNull(OUTUPUT_ELASTIC_HOSTS);
+        if (!outputElasticHosts.endsWith("/"))
+            outputElasticHosts += "/";
+        elasticIndex = checkNotNull(ELASTIC_INDEX);
+        dryRun = Boolean.valueOf(getProperty(DRY_RUN, "false"));
+
+    }
 
 	private String[] split(String composite) {
 		return composite.contains(",") ? composite.split(",") : composite.split(";");

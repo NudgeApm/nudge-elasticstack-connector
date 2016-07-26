@@ -82,7 +82,6 @@ public class Daemon {
         @Override
         public void run() {
             try {
-
                 Connection c = new Connection(config.getNudgeUrl());
                 c.login(config.getNudgeLogin(), config.getNudgePwd());
                 for (String appId : config.getAppIds()) {
@@ -98,13 +97,12 @@ public class Daemon {
                                 nullLayer(eventTrans);
                             }
                             List<String> jsonEvents = parseJson(events);
-                            pushMapping();
+                            pushMapping(config);
                             sendToElastic(jsonEvents);
                         }
                     }
                     analyzedFilenames = rawdataList;
                 }
-
             } catch (Throwable t) {
                 LOG.fatal("The daemon has encountered a crash error", t);
                 if (null != scheduler) {
@@ -122,8 +120,9 @@ public class Daemon {
         }
 
 
-        public static void pushMapping() throws IOException {
-            pushMapping("elk-nudge.servebeer.com", 9200, "nudge");
+        private static void pushMapping(Configuration config) throws IOException {
+            String elasticURL = config.getOutputElasticHosts();
+            pushMapping(elasticURL, "nudge");
 
         }
 
@@ -132,13 +131,13 @@ public class Daemon {
          *
          * @throws IOException
          */
-        public static void pushMapping(String hostDNS, int hostPort, String index) throws IOException {
+        public static void pushMapping(String elasticURL, String index) throws IOException {
             ObjectMapper jsonSerializer = new ObjectMapper();
             MappingProperties mappingProperies = MappingPropertiesBuilder.buildMappingProperties("multi_field",
                     "string", "analyzed", "string", "not_analyzed");
             jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
             String jsonEvent = jsonSerializer.writeValueAsString(mappingProperies);
-            URL URL = new URL("http://" + hostDNS + ":" + hostPort + "/" + index + "/transaction/_mapping");
+            URL URL = new URL(elasticURL + index + "/transaction/_mapping");
             System.out.println("     ");
             System.out.println("      ");
             System.out.println(URL);
