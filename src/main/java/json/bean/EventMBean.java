@@ -1,5 +1,7 @@
 package json.bean;
 
+import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
+
 /**
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
@@ -10,7 +12,7 @@ package json.bean;
 public class EventMBean {
 
 	// Attribut MBean attribute info
-	private String nameMbean;
+	private DictionaryEntry nameMbean;
 	private int nameId;
 	private String typeMbean;
 	private int typeId;
@@ -23,9 +25,9 @@ public class EventMBean {
 	private long collectingTime;
 
 	// Constructor
-	public EventMBean(String nameMbean, String objectName, String typeMBean, int typeId, int nameId, String valueMbean,
+	public EventMBean(DictionaryEntry nameMbean2, String objectName, String typeMBean, int typeId, int nameId, String valueMbean,
 			long collectingTime, int countAttribute) {
-		this.setNameMbean(nameMbean);
+		this.setNameMbean(nameMbean2);
 		this.setNameId(nameId);
 		this.setTypeMbean(typeMBean);
 		this.setTypeId(typeId);
@@ -66,56 +68,56 @@ public class EventMBean {
 		return collectingTime;
 	}
 
-	public void setCollectingTime(long collectingTime) {
-		this.collectingTime = collectingTime;
+	public long setCollectingTime(long collectingTime) {
+		return this.collectingTime = collectingTime;
 	}
 
 	public int getNameId() {
 		return nameId;
 	}
 
-	public void setNameId(int nameId) {
-		this.nameId = nameId;
+	public int setNameId(int nameId) {
+		return this.nameId = nameId;
 	}
 
 	public String getTypeMbean() {
 		return typeMbean;
 	}
 
-	public void setTypeMbean(String typeMbean) {
-		this.typeMbean = typeMbean;
+	public String setTypeMbean(String typeMbean) {
+		return this.typeMbean = typeMbean;
 	}
 
 	public int getTypeId() {
 		return typeId;
 	}
 
-	public void setTypeId(int typeId) {
-		this.typeId = typeId;
+	public int setTypeId(int typeId) {
+		return this.typeId = typeId;
 	}
 
 	public String getValueMbean() {
 		return valueMbean;
 	}
 
-	public void setValueMbean(String valueMbean) {
-		this.valueMbean = valueMbean;
+	public String setValueMbean(String valueMbean) {
+		return this.valueMbean = valueMbean;
 	}
 
 	public int getCountAttribute() {
 		return countAttribute;
 	}
 
-	public void setCountAttribute(int countAttribute) {
-		this.countAttribute = countAttribute;
+	public int setCountAttribute(int countAttribute) {
+		return this.countAttribute = countAttribute;
 	}
 
-	public String getNameMbean() {
+	public DictionaryEntry getNameMbean() {
 		return nameMbean;
 	}
 
-	public void setNameMbean(String nameMbean) {
-		this.nameMbean = nameMbean;
+	public DictionaryEntry setNameMbean(DictionaryEntry nameMbean2) {
+		return this.nameMbean = nameMbean2;
 	}
 
 

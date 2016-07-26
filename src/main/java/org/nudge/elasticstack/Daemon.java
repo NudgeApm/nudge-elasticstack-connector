@@ -174,32 +174,33 @@ public class Daemon {
 		public List<EventMBean> buildMbeanEvents(List<MBean> mbean, Dictionary dictionary)
 				throws JsonProcessingException {
 			List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
-			
-			List<DictionaryEntry> dico =dictionary.getDictionaryList();
-			
-			
-			
-		DictionaryEntry a = dico.get(0);
-		
-		
-			
 
+			List<DictionaryEntry> dico = dictionary.getDictionaryList();
+
+			// recuperate MBean
 			for (MBean mb : mbean) {
 				for (MBeanAttributeInfo mBeanAttributeInfo : mb.getAttributeInfoList()) {
-					EventMBean mbeanEvent = new EventMBean(null, null, null, 0, 0, null, 0, 0);
-					mbeanEvent.setNameMbean(mBeanAttributeInfo.getName());
-					mbeanEvent.setCollectingTime(mb.getCollectingTime());
-					mbeanEvent.setObjectName(mb.getObjectName());
-					mbeanEvent.setCountAttribute(mb.getAttributeInfoCount());
-					mbeanEvent.setNameId(mBeanAttributeInfo.getNameId());
-					mbeanEvent.setTypeMbean(mBeanAttributeInfo.getType());
-					mbeanEvent.setTypeId(mBeanAttributeInfo.getTypeId());
-					mbeanEvent.setValueMbean(mBeanAttributeInfo.getValue());
+					DictionaryEntry a = dico.get(1);
+					DictionaryEntry nameMbean = null;
+					String objectName = null, typeMbean = null, valueMbean = null;
+					long collectingTime = 0;
+					int countAttribute = 0, nameId = 0, typeId = 0;
+					EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, typeMbean, typeId, nameId, valueMbean,
+							collectingTime, countAttribute);
+//					nameMbean = mbeanEvent.setNameMbean(mBeanAttributeInfo.getName());
+					nameMbean = a;
+					collectingTime = mbeanEvent.setCollectingTime(mb.getCollectingTime());
+					objectName = mbeanEvent.setObjectName(mb.getObjectName());
+					countAttribute = mbeanEvent.setCountAttribute(mb.getAttributeInfoCount());
+					nameId = mbeanEvent.setNameId(mBeanAttributeInfo.getNameId());
+					typeMbean = mbeanEvent.setTypeMbean(mBeanAttributeInfo.getType());
+					typeId = mbeanEvent.setTypeId(mBeanAttributeInfo.getTypeId());
+					valueMbean = mbeanEvent.setValueMbean(mBeanAttributeInfo.getValue());
+
 					eventsMbean.add(mbeanEvent);
-			
+
 				}
-				
-				
+
 			}
 			return eventsMbean;
 		}
