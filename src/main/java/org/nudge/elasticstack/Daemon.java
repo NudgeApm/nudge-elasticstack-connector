@@ -3,7 +3,7 @@ package org.nudge.elasticstack;
 /**
  * @author Sarah Bourgeois
  * @author Frederic Massart
- * <p>
+ *
  * Description : Class which permits to send rawdatas to elasticSearch with -startDeamon
  */
 
@@ -34,6 +34,25 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.config.Configuration;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
+import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
+import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
+
+import json.bean.EventMBean;
+import json.bean.EventTransaction;
+import json.bean.MappingProperties;
+import json.bean.MappingPropertiesBuilder;
+import json.bean.NudgeEvent;
+import json.connection.Connection;
 
 public class Daemon {
 
@@ -76,22 +95,32 @@ public class Daemon {
             this.config = config;
         }
 
-        /**
-         * Description : Collect data from Nudge API and push it.
-         */
-        @Override
-        public void run() {
-            try {
-                Connection c = new Connection(config.getNudgeUrl());
-                c.login(config.getNudgeLogin(), config.getNudgePwd());
-                for (String appId : config.getAppIds()) {
-                    List<String> rawdataList = c.requestRawdataList(appId, "-10m");
-                    // analyse files, comparaison and push
-                    for (String rawdataFilename : rawdataList) {
-                        if (!analyzedFilenames.contains(rawdataFilename)) {
-                            RawData rawdata = c.requestRawdata(appId, rawdataFilename);
-                            List<Transaction> transaction = rawdata.getTransactionsList();
-                            List<EventTransaction> events = buildTransactionEvents(transaction);
+		/**
+		 * Description : Collect data from Nudge API and push it.
+		 */
+		@Override
+		public void run() {
+			try {
+
+				Connection c = new Connection(config.getNudgeUrl());
+				c.login(config.getNudgeLogin(), config.getNudgePwd());
+
+				for (String appId : config.getAppIds()) {
+					List<String> rawdataList = c.requestRawdataList(appId, "-10m");
+					// analyse files, comparaison and push
+					for (String rawdataFilename : rawdataList) {
+						if (!analyzedFilenames.contains(rawdataFilename)) {
+							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
+
+							// Transaction
+							List<Transaction> transaction = rawdata.getTransactionsList();
+							List<EventTransaction> events = buildTransactionEvents(transaction);
+
+                            // Mbean
+                            List<MBean> mbean = rawdata.getMBeanList();
+                            Dictionary dictionary = rawdata.getMbeanDictionary();
+                            List<EventMBean> eventsMBeans = buildMbeanEvents(mbean, dictionary);
+                            List<String> jsonEvents2 = parseJsonMBean(eventsMBeans);
 
                             for (EventTransaction eventTrans : events) {
                                 nullLayer(eventTrans);
@@ -153,57 +182,179 @@ public class Daemon {
                     + httpCon2.getResponseMessage());
         }
 
-        /**
-         * Description : recuperate datas from rawdatas and add it to parse.
-         *
-         * @param transactionList
-         * @return
-         * @throws ParseException
-         * @throws JsonProcessingException
-         */
-        public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
-                throws ParseException, JsonProcessingException {
-            List<EventTransaction> events = new ArrayList<EventTransaction>();
+		/**
+		 * Description : retrieve data from rawdata and add it to parse.
+		 *
+		 * @param transactionList
+		 * @return
+		 * @throws ParseException
+		 * @throws JsonProcessingException
+		 */
+		public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
+				throws ParseException, JsonProcessingException {
+			List<EventTransaction> events = new ArrayList<EventTransaction>();
+			for (Transaction trans : transactionList) {
+				String name = trans.getCode();
+				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				String date = sdfr.format(trans.getStartTime());
+				long response_time = trans.getEndTime() - trans.getStartTime();
+				EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
+				events.add(transactionEvent);
+				// handle layers
+				buildLayerEvents(trans.getLayersList(), transactionEvent);
+				events.add(transactionEvent);
+			}
+			return events;
+		}
 
-            for (Transaction trans : transactionList) {
-                String name = trans.getCode();
-                SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                String date = sdfr.format(trans.getStartTime());
-                long response_time = trans.getEndTime() - trans.getStartTime();
-                EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
-                events.add(transactionEvent);
-                // handle layers
-                buildLayerEvents(trans.getLayersList(), transactionEvent);
-                events.add(transactionEvent);
-            }
-            return events;
-        }
+		/**
+		 * Description : retrieve Mbean from rawdata
+		 *
+		 * @param mbean
+		 * @param dictionary
+		 * @return
+		 * @throws JsonProcessingException
+		 */
+		public List<EventMBean> buildMbeanEvents(List<MBean> mbean, Dictionary dictionary)
+				throws JsonProcessingException {
+			List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
+			List<DictionaryEntry> dico = dictionary.getDictionaryList();
 
-        /**
-         * Description : build layer events
-         *
-         * @param rawdataLayers
-         * @param eventTrans
-         * @throws ParseException
-         * @throws JsonProcessingException
-         */
-        public void buildLayerEvents(List<Layer> rawdataLayers, EventTransaction eventTrans)
-                throws ParseException, JsonProcessingException {
-            for (Layer layer : rawdataLayers) {
-                if (layer.getLayerName().equals("SQL")) {
-                    eventTrans.setResponseTimeLayerSql(layer.getTime());
-                    eventTrans.setLayerCountSql(layer.getCount());
-                    eventTrans.setLayerNameSql(layer.getLayerName());
-                }
-                if (layer.getLayerName().equals("JMS")) {
-                    eventTrans.setResponseTimeLayerJms(layer.getTime());
-                    eventTrans.setLayerCountJms(layer.getCount());
-                    eventTrans.setLayerNameJms(layer.getLayerName());
-                }
-                if (layer.getLayerName().equals("JAX-WS")) {
-                    eventTrans.setResponseTimeLayerJaxws(layer.getTime());
-                    eventTrans.setLayerCountJaxws(layer.getCount());
-                    eventTrans.setLayerNameJaxws(layer.getLayerName());
+			// recuperate MBean
+			for (MBean mb : mbean) {
+				for (MBeanAttributeInfo mBeanAttributeInfo : mb.getAttributeInfoList()) {
+					DictionaryEntry a = dico.get(1);
+					String nameMbean = null, objectName = null, type = null, valueMbean = null;
+					int countAttribute = 0, nameId = 0, typeId = 0;
+					long collectingTime = 0;
+
+					EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, typeId, nameId, valueMbean,
+							collectingTime, countAttribute);
+					collectingTime = mbeanEvent.setCollectingTime(mb.getCollectingTime());
+					objectName = mbeanEvent.setObjectName(mb.getObjectName());
+					countAttribute = mbeanEvent.setCountAttribute(mb.getAttributeInfoCount());
+					nameId = mbeanEvent.setNameId(mBeanAttributeInfo.getNameId());
+					type = mbeanEvent.setType("Mbean");
+					typeId = mbeanEvent.setTypeId(mBeanAttributeInfo.getTypeId());
+					valueMbean = mbeanEvent.setValueMbean(mBeanAttributeInfo.getValue());
+					// retrieve nameMbean with Dictionary
+					for (DictionaryEntry dictionaryEntry : dico) {
+						String name = dictionaryEntry.getName();
+						int id = dictionaryEntry.getId();
+						if (nameId == id) {
+							nameMbean = mbeanEvent.setNameMbean(name);
+						}
+					}
+					// add events
+					eventsMbean.add(mbeanEvent);
+				}
+			}
+			return eventsMbean;
+		}
+
+		/**
+		 * Description : Parse Mbean to send to Elastic
+		 *
+		 * @param eventList
+		 * @return
+		 * @throws Exception
+		 */
+		public List<String> parseJsonMBean(List<EventMBean> eventList) throws Exception {
+			List<String> jsonEvents2 = new ArrayList<String>();
+			ObjectMapper jsonSerializer = new ObjectMapper();
+
+			if (config.getDryRun()) {
+				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			}
+
+			for (EventMBean event : eventList) {
+				String jsonMetadata = generateMetaDataMbean(event.getType());
+				jsonEvents2.add(jsonMetadata + lineBreak);
+				// Handle data event
+				String jsonEvent = jsonSerializer.writeValueAsString(event);
+				jsonEvents2.add(jsonEvent + lineBreak);
+			}
+			System.out.println(jsonEvents2);
+			LOG.debug(jsonEvents2);
+			return jsonEvents2;
+		}
+
+		/**
+		 * Description : generate Mbean for Bulk api
+		 *
+		 * @param mbean
+		 * @return
+		 * @throws JsonProcessingException
+		 */
+		public String generateMetaDataMbean(String mbean) throws JsonProcessingException {
+			Configuration conf = new Configuration();
+			ObjectMapper jsonSerializer = new ObjectMapper();
+			if (config.getDryRun()) {
+				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			}
+			BulkFormat elasticMetaData = new BulkFormat();
+			elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
+			elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
+			elasticMetaData.getIndexElement().setType("mbean");
+			return jsonSerializer.writeValueAsString(elasticMetaData);
+		}
+
+		/**
+		 * Description : Send MBean into elasticSearch
+		 *
+		 * @param jsonEvents2
+		 * @throws IOException
+		 */
+		public void sendElk(List<String> jsonEvents2) throws IOException {
+			Configuration conf = new Configuration();
+			StringBuilder sb = new StringBuilder();
+
+			for (String json : jsonEvents2) {
+				sb.append(json);
+			}
+			if (config.getDryRun()) {
+				LOG.info("Dry run active, only log documents, don't push to elasticsearch.");
+				return;
+			}
+			URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
+			System.out.println("mbean url " + URL);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Bulk request to : " + URL);
+			}
+			HttpURLConnection httpCon2 = (HttpURLConnection) URL.openConnection();
+			httpCon2.setDoOutput(true);
+			httpCon2.setRequestMethod("PUT");
+			OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
+			out.write(sb.toString());
+			out.close();
+			LOG.info(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		}
+
+		/**
+		 * Description : build layer events
+		 *
+		 * @param rawdataLayers
+		 * @param eventTrans
+		 * @throws ParseException
+		 * @throws JsonProcessingException
+		 */
+		public void buildLayerEvents(List<Layer> rawdataLayers, EventTransaction eventTrans)
+				throws ParseException, JsonProcessingException {
+			for (Layer layer : rawdataLayers) {
+				if (layer.getLayerName().equals("SQL")) {
+					eventTrans.setResponseTimeLayerSql(layer.getTime());
+					eventTrans.setLayerCountSql(layer.getCount());
+					eventTrans.setLayerNameSql(layer.getLayerName());
+				}
+				if (layer.getLayerName().equals("JMS")) {
+					eventTrans.setResponseTimeLayerJms(layer.getTime());
+					eventTrans.setLayerCountJms(layer.getCount());
+					eventTrans.setLayerNameJms(layer.getLayerName());
+				}
+				if (layer.getLayerName().equals("JAX-WS")) {
+					eventTrans.setResponseTimeLayerJaxws(layer.getTime());
+					eventTrans.setLayerCountJaxws(layer.getCount());
+					eventTrans.setLayerNameJaxws(layer.getLayerName());
 
                 }
                 if (layer.getLayerName().equals("JAVA")) {
@@ -228,119 +379,109 @@ public class Daemon {
             eventTrans.setResponseTimeLayerJava(responseTimeJava);
         }
 
-        public EventTransaction nullLayer(EventTransaction eventTrans) {
-            if (eventTrans.getLayerNameSql() == null) {
-                eventTrans.setResponseTimeLayerSql(0L);
-                eventTrans.setLayerCountSql(0L);
-                eventTrans.setLayerNameSql("null layer");
-            }
-            if (eventTrans.getLayerNameJaxws() == null) {
-                eventTrans.setResponseTimeLayerJaxws(0L);
-                eventTrans.setLayerCountJaxws(0L);
-                eventTrans.setLayerNameJaxws("null layer");
-            }
+		public EventTransaction nullLayer(EventTransaction eventTrans) {
+			if (eventTrans.getLayerNameSql() == null) {
+				eventTrans.setResponseTimeLayerSql(0L);
+				eventTrans.setLayerCountSql(0L);
+				eventTrans.setLayerNameSql("null layer");
+			}
+			if (eventTrans.getLayerNameJaxws() == null) {
+				eventTrans.setResponseTimeLayerJaxws(0L);
+				eventTrans.setLayerCountJaxws(0L);
+				eventTrans.setLayerNameJaxws("null layer");
+			}
+			if (eventTrans.getLayerNameJms() == null) {
+				eventTrans.setLayerCountJms(0L);
+				eventTrans.setResponseTimeLayerJms(0L);
+				eventTrans.setLayerNameJms("null layer");
+			}
+			return eventTrans;
+		}
 
-            if (eventTrans.getLayerNameJms() == null) {
-                eventTrans.setLayerCountJms(0L);
-                eventTrans.setResponseTimeLayerJms(0L);
-                eventTrans.setLayerNameJms("null layer");
-            }
-            return eventTrans;
-        }
+		/**
+		 * Desription : parse datas in Json
+		 *
+		 * @param eventList
+		 * @return
+		 * @throws Exception
+		 * @Description :
+		 */
+		public List<String> parseJson(List<EventTransaction> eventList) throws Exception {
+			List<String> jsonEvents = new ArrayList<String>();
+			ObjectMapper jsonSerializer = new ObjectMapper();
+			if (config.getDryRun()) {
+				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			}
+			for (NudgeEvent event : eventList) {
+				// handle metadata
+				String jsonMetadata = generateMetaData(event.getType());
+				jsonEvents.add(jsonMetadata + lineBreak);
+				// handle data event
+				String jsonEvent = jsonSerializer.writeValueAsString(event);
+				jsonEvents.add(jsonEvent + lineBreak);
+			}
+			LOG.debug(jsonEvents);
+			return jsonEvents;
+		}
 
-        /**
-         * Desription : parse datas in Json
-         *
-         * @param eventList
-         * @return
-         * @throws Exception
-         * @Description :
-         */
-        public List<String> parseJson(List<EventTransaction> eventList) throws Exception {
-            List<String> jsonEvents = new ArrayList<String>();
-            ObjectMapper jsonSerializer = new ObjectMapper();
+		/**
+		 * Description : Use bulk API to send huge rawdatas in ElasticSearch To
+		 * use this API it must be to format Json in the Bulk Format.
+		 *
+		 * @param type
+		 * @return
+		 * @throws JsonProcessingException
+		 */
+		public String generateMetaData(String type) throws JsonProcessingException {
+			Configuration conf = new Configuration();
+			ObjectMapper jsonSerializer = new ObjectMapper();
+			if (config.getDryRun()) {
+				jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+			}
+			BulkFormat elasticMetaData = new BulkFormat();
+			elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
+			elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
+			elasticMetaData.getIndexElement().setType(type);
+			return jsonSerializer.writeValueAsString(elasticMetaData);
+		}
 
-            if (config.getDryRun()) {
-                jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
-            }
-            for (NudgeEvent event : eventList) {
-                // handle metadata
-                String jsonMetadata = generateMetaData(event.getType());
-                jsonEvents.add(jsonMetadata + lineBreak);
-                // handle data event
-                String jsonEvent = jsonSerializer.writeValueAsString(event);
-                jsonEvents.add(jsonEvent + lineBreak);
-
-            }
-            LOG.debug(jsonEvents);
-            return jsonEvents;
-        }
-
-        /**
-         * Description : Permits to use API bulk to send huge rawdatas in
-         * ElasticSearch To use this API it must be to format Json in the Bulk
-         * Format.
-         *
-         * @param type
-         * @return
-         * @throws JsonProcessingException
-         */
-        public String generateMetaData(String type) throws JsonProcessingException {
-            Configuration conf = new Configuration();
-            ObjectMapper jsonSerializer = new ObjectMapper();
-            if (config.getDryRun()) {
-                jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
-            }
-            BulkFormat elasticMetaData = new BulkFormat();
-            elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
-            elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
-            elasticMetaData.getIndexElement().setType(type);
-            return jsonSerializer.writeValueAsString(elasticMetaData);
-        }
-
-        /**
-         * Description : It permits to index huge rawdata in elasticSearch with
-         * HTTP request
-         *
-         * @param jsonEvents
-         * @throws Exception
-         */
-        public void sendToElastic(List<String> jsonEvents) throws Exception {
-
-            if (jsonEvents == null || jsonEvents.isEmpty()) {
-                // LOG.info("No org.nudge.elasticstack.json documents to send");
-                return;
-            }
-            Configuration conf = new Configuration();
-            StringBuilder sb = new StringBuilder();
-            for (String json : jsonEvents) {
-                sb.append(json);
-            }
-
-            if (config.getDryRun()) {
-                LOG.info("Dry run active, only log documents, don't push to elasticsearch");
-                // LOG.info(sb);
-                return;
-            }
-
-            long start = System.currentTimeMillis();
-            URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Bulk request to : " + URL);
-            }
-            HttpURLConnection httpCon = (HttpURLConnection) URL.openConnection();
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("PUT");
-            OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
-            out.write(sb.toString());
-            out.close();
-            long end = System.currentTimeMillis();
-            long totalTime = end - start;
-            LOG.info(" Flush " + jsonEvents.size() + " documents in BULK insert in " + (totalTime / 1000f) + "sec");
-            httpCon.getResponseCode();
-            httpCon.getResponseMessage();
-        }
-
-    } // end of class
+		/**
+		 * Description : It permits to index huge rawdata in elasticSearch with
+		 * HTTP request
+		 *
+		 * @param jsonEvents
+		 * @throws Exception
+		 */
+		public void sendToElastic(List<String> jsonEvents) throws Exception {
+			if (jsonEvents == null || jsonEvents.isEmpty()) {
+				return;
+			}
+			Configuration conf = new Configuration();
+			StringBuilder sb = new StringBuilder();
+			for (String json : jsonEvents) {
+				sb.append(json);
+			}
+			if (config.getDryRun()) {
+				LOG.info("Dry run active, only log documents, don't push to elasticsearch");
+				return;
+			}
+			long start = System.currentTimeMillis();
+			URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Bulk request to : " + URL);
+			}
+			HttpURLConnection httpCon = (HttpURLConnection) URL.openConnection();
+			httpCon.setDoOutput(true);
+			httpCon.setRequestMethod("PUT");
+			OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
+			out.write(sb.toString());
+			out.close();
+			long end = System.currentTimeMillis();
+			long totalTime = end - start;
+			LOG.info(" Flush " + jsonEvents.size() + " documents in BULK insert in " + (totalTime / 1000f) + "sec");
+			httpCon.getResponseCode();
+			httpCon.getResponseMessage();
+		}
+	} // end of class
 
 }
