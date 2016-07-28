@@ -11,6 +11,7 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -62,18 +63,24 @@ public class Connection {
 	}
 
 	public List<String> requestRawdataList(String appId, String from) throws IOException {
-		List<String> contentRawdata = new ArrayList<String>();
+		// TODO parametriser le from
 		String finalUrl = url + "api/apps/" + appId + "/rawdata?from=-10m";
 		HttpURLConnection connection = prepareRequest(finalUrl);
 		LOG.debug(connection.getResponseCode());
-		String var = convertStreamToString(connection.getInputStream());
+		List<String> contentRawdata = parseRawdataListResponse(connection.getInputStream());
+		connection.disconnect();
+		return contentRawdata;
+	}
+
+	protected List<String> parseRawdataListResponse(InputStream stream) {
+		List<String> contentRawdata = new ArrayList<String>();
+		String var = convertStreamToString(stream);
 		String var2 = var.substring(1, var.length() - 1);
 		String[] var3 = var2.split(",");
 		for (String s : var3) {
 			String s1 = s.substring(1, s.length() - 1);
 			contentRawdata.add(s1);
 		}
-		connection.disconnect();
 		return contentRawdata;
 	}
 
