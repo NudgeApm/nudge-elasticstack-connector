@@ -1,7 +1,5 @@
 package json.bean;
 
-import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
-
 /**
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
@@ -12,7 +10,7 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 public class EventMBean {
 
 	// Attribut MBean attribute info
-	private DictionaryEntry nameMbean;
+	private String nameMbean;
 	private int nameId;
 	private String typeMbean;
 	private int typeId;
@@ -25,34 +23,27 @@ public class EventMBean {
 	private long collectingTime;
 
 	// Constructor
-	public EventMBean(DictionaryEntry nameMbean2, String objectName, String typeMBean, int typeId, int nameId, String valueMbean,
+	public EventMBean(String nameMbean, String objectName, String type, int typeId, int nameId, String valueMbean,
 			long collectingTime, int countAttribute) {
-		this.setNameMbean(nameMbean2);
+		this.setNameMbean(nameMbean);
 		this.setNameId(nameId);
-		this.setTypeMbean(typeMBean);
 		this.setTypeId(typeId);
 		this.setValueMbean(valueMbean);
 		this.setCollectingTime(collectingTime);
 		this.setCountAttribute(countAttribute);
 		this.setObjectName(objectName);
+		this.setType(type);
 	}
 
-	// Method
-	// public String toString() {
-	// return "objectName : " + objectName + "type : " + "mbean" + " type_id : "
-	// + typeId + " name : " + nameMbean + " name_id : " + nameId + " value : "
-	// + valueMbean + " collecting time : " + collectingTime + " count attribute
-	// :" + countAttribute;
-	//
-	// }
-
-	// Getters and Setters
+	// ===========================
+	//  Getters and Setters
+	// ===========================
 	public String getType() {
 		return type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public String setType(String type) {
+		return this.type = type;
 	}
 
 	public String getObjectName() {
@@ -63,7 +54,6 @@ public class EventMBean {
 		return this.objectName = objectName;
 	}
 
-	// @JsonProperty("@timestamp")
 	public long getCollectingTime() {
 		return collectingTime;
 	}
@@ -80,13 +70,8 @@ public class EventMBean {
 		return this.nameId = nameId;
 	}
 
-	public String getTypeMbean() {
-		return typeMbean;
-	}
-
-	public String setTypeMbean(String typeMbean) {
-		return this.typeMbean = typeMbean;
-	}
+	
+	
 
 	public int getTypeId() {
 		return typeId;
@@ -112,13 +97,12 @@ public class EventMBean {
 		return this.countAttribute = countAttribute;
 	}
 
-	public DictionaryEntry getNameMbean() {
+	public String getNameMbean() {
 		return nameMbean;
 	}
 
-	public DictionaryEntry setNameMbean(DictionaryEntry nameMbean2) {
-		return this.nameMbean = nameMbean2;
+	public String setNameMbean(String nameMbean) {
+		return this.nameMbean = nameMbean;
 	}
-
 
 } // end of class

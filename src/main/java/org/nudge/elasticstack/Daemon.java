@@ -89,7 +89,7 @@ public class Daemon {
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
-
+							
 							// Transaction
 							List<Transaction> transaction = rawdata.getTransactionsList();
 							List<EventTransaction> events = buildTransactionEvents(transaction);
@@ -97,7 +97,6 @@ public class Daemon {
 							// Mbean
 							List<MBean> mbean = rawdata.getMBeanList();
 							Dictionary dictionary = rawdata.getMbeanDictionary();
-
 							List<EventMBean> eventsMBeans = buildMbeanEvents(mbean, dictionary);
 							List<String> jsonEvents2 = parseJsonMBean(eventsMBeans);
 
@@ -147,7 +146,7 @@ public class Daemon {
 		}
 
 		/**
-		 * Description : recuperate datas from rawdatas and add it to parse.
+		 * Description : retrieve data from rawdata and add it to parse.
 		 *
 		 * @param transactionList
 		 * @return
@@ -171,40 +170,58 @@ public class Daemon {
 			return events;
 		}
 
+		/**
+		 * Description : retrieve Mbean from rawdata
+		 * 
+		 * @param mbean
+		 * @param dictionary
+		 * @return
+		 * @throws JsonProcessingException
+		 */
 		public List<EventMBean> buildMbeanEvents(List<MBean> mbean, Dictionary dictionary)
 				throws JsonProcessingException {
 			List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
-
 			List<DictionaryEntry> dico = dictionary.getDictionaryList();
 
 			// recuperate MBean
 			for (MBean mb : mbean) {
 				for (MBeanAttributeInfo mBeanAttributeInfo : mb.getAttributeInfoList()) {
 					DictionaryEntry a = dico.get(1);
-					DictionaryEntry nameMbean = null;
-					String objectName = null, typeMbean = null, valueMbean = null;
-					long collectingTime = 0;
+					String nameMbean = null, objectName = null, type = null, valueMbean = null;
 					int countAttribute = 0, nameId = 0, typeId = 0;
-					EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, typeMbean, typeId, nameId, valueMbean,
+					long collectingTime = 0;
+
+					EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, typeId, nameId, valueMbean,
 							collectingTime, countAttribute);
-//					nameMbean = mbeanEvent.setNameMbean(mBeanAttributeInfo.getName());
-					nameMbean = a;
 					collectingTime = mbeanEvent.setCollectingTime(mb.getCollectingTime());
 					objectName = mbeanEvent.setObjectName(mb.getObjectName());
 					countAttribute = mbeanEvent.setCountAttribute(mb.getAttributeInfoCount());
 					nameId = mbeanEvent.setNameId(mBeanAttributeInfo.getNameId());
-					typeMbean = mbeanEvent.setTypeMbean(mBeanAttributeInfo.getType());
+					type = mbeanEvent.setType("Mbean");
 					typeId = mbeanEvent.setTypeId(mBeanAttributeInfo.getTypeId());
 					valueMbean = mbeanEvent.setValueMbean(mBeanAttributeInfo.getValue());
-
+					// retrieve nameMbean with Dictionary
+					for (DictionaryEntry dictionaryEntry : dico) {
+						String name = dictionaryEntry.getName();
+						int id = dictionaryEntry.getId();
+						if (nameId == id) {
+							nameMbean = mbeanEvent.setNameMbean(name);
+						}
+					}
+					// add events
 					eventsMbean.add(mbeanEvent);
-
 				}
-
 			}
 			return eventsMbean;
 		}
 
+		/**
+		 * Description : Parse Mbean to send to Elastic
+		 * 
+		 * @param eventList
+		 * @return
+		 * @throws Exception
+		 */
 		public List<String> parseJsonMBean(List<EventMBean> eventList) throws Exception {
 			List<String> jsonEvents2 = new ArrayList<String>();
 			ObjectMapper jsonSerializer = new ObjectMapper();
@@ -220,13 +237,18 @@ public class Daemon {
 				String jsonEvent = jsonSerializer.writeValueAsString(event);
 				jsonEvents2.add(jsonEvent + lineBreak);
 			}
-			// System.out.println(jsonEvents2);
-			LOG.debug(jsonEvents2);
 			System.out.println(jsonEvents2);
+			LOG.debug(jsonEvents2);
 			return jsonEvents2;
 		}
 
-		// ********** BULK MBEAN *******************
+		/**
+		 * Description : generate Mbean for Bulk api
+		 *
+		 * @param mbean
+		 * @return
+		 * @throws JsonProcessingException
+		 */
 		public String generateMetaDataMbean(String mbean) throws JsonProcessingException {
 			Configuration conf = new Configuration();
 			ObjectMapper jsonSerializer = new ObjectMapper();
@@ -240,6 +262,12 @@ public class Daemon {
 			return jsonSerializer.writeValueAsString(elasticMetaData);
 		}
 
+		/**
+		 * Description : Send MBean into elasticSearch
+		 * 
+		 * @param jsonEvents2
+		 * @throws IOException
+		 */
 		public void sendElk(List<String> jsonEvents2) throws IOException {
 			Configuration conf = new Configuration();
 			StringBuilder sb = new StringBuilder();
@@ -398,7 +426,6 @@ public class Daemon {
 			}
 			if (config.getDryRun()) {
 				LOG.info("Dry run active, only log documents, don't push to elasticsearch");
-				// LOG.info(sb);
 				return;
 			}
 			long start = System.currentTimeMillis();
@@ -418,7 +445,6 @@ public class Daemon {
 			httpCon.getResponseCode();
 			httpCon.getResponseMessage();
 		}
-
 	} // end of class
 
 }
