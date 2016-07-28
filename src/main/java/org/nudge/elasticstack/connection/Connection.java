@@ -72,6 +72,12 @@ public class Connection {
 		return contentRawdata;
 	}
 
+	/**
+	 * Parse a stream and return a list of rawdata names.
+	 *
+	 * @param stream the stream response, contains a string of rawdata names
+	 * @return the list of rawdata anmes
+     */
 	protected List<String> parseRawdataListResponse(InputStream stream) {
 		List<String> contentRawdata = new ArrayList<String>();
 		String var = convertStreamToString(stream);
