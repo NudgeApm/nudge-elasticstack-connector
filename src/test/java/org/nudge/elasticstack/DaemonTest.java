@@ -25,7 +25,7 @@ public class DaemonTest {
 
     private static final Logger LOG = Logger.getLogger(DaemonTest.class);
     private static final String INDEX_TEST = "nudge.test";
-    private static final String URL_ELASTIC_TEST = "http://localhost:9200/";
+    private static final String URL_ELASTIC_TEST = "http://kibana.nudgeapm.io:9200/";
 
     @Test
     public void pushMapping_test() throws IOException, URISyntaxException {
