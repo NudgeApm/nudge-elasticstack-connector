@@ -168,7 +168,7 @@ public class Daemon {
 		 *
 		 * @param transactionList
 		 * @return
-		 * @throws ParseException
+		 * @throws ParseException 
 		 * @throws JsonProcessingException
 		 */
 		public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
@@ -278,7 +278,7 @@ public class Daemon {
 			elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
 			elasticMetaData.getIndexElement().setType("mbean");
 			return jsonSerializer.writeValueAsString(elasticMetaData);
-		}
+		} 
 
 		/**
 		 * Description : Send MBean into elasticSearch

@@ -6,7 +6,6 @@ package org.nudge.elasticstack.connection;
  * Description : Connection to the Nudge API. 
  */
 
-
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import org.apache.log4j.Logger;
 
@@ -75,19 +74,23 @@ public class Connection {
 	/**
 	 * Parse a stream and return a list of rawdata names.
 	 *
-	 * @param stream the stream response, contains a string of rawdata names
+	 * @param stream
+	 *            the stream response, contains a string of rawdata names
 	 * @return the list of rawdata anmes
-     */
+	 */
 	protected List<String> parseRawdataListResponse(InputStream stream) {
 		List<String> contentRawdata = new ArrayList<String>();
 		String var = convertStreamToString(stream);
 		String var2 = var.substring(1, var.length() - 1);
+		if (var2.length() == 0) {
+			return contentRawdata;
+		}		
 		String[] var3 = var2.split(",");
 		for (String s : var3) {
 			String s1 = s.substring(1, s.length() - 1);
 			contentRawdata.add(s1);
 		}
-		return contentRawdata;
+		return contentRawdata; 
 	}
 
 	private static String convertStreamToString(java.io.InputStream is) {
