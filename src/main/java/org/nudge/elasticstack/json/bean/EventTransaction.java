@@ -1,5 +1,7 @@
 package org.nudge.elasticstack.json.bean;
 
+import org.nudge.elasticstack.Daemon;
+
 /**
  * 
  * @author : Sarah Bourgeois
@@ -12,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class EventTransaction extends NudgeEvent {
 
+	
+	
 	// WS attributs
 	private Long responseTimeLayerJaxws;
 	private String layerNameJaxws;

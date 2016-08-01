@@ -27,9 +27,12 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -98,6 +101,11 @@ public class Daemon {
 							// Transaction
 							List<Transaction> transactions = rawdata.getTransactionsList();
 							List<EventTransaction> events = buildTransactionEvents(transactions);
+							for (EventTransaction eventTrans : events) {
+								nullLayer(eventTrans);
+							}
+							List<String> jsonEvents = parseJson(events);
+							sendToElastic(jsonEvents);
 
 							// Mbean
 							List<MBean> mbean = rawdata.getMBeanList();
@@ -111,12 +119,8 @@ public class Daemon {
 							List<String> jsonEventsSql = parseJsonSQL(sql);
 							sendToElastic(jsonEventsSql);
 
-							for (EventTransaction eventTrans : events) {
-								nullLayer(eventTrans);
-							}
-							List<String> jsonEvents = parseJson(events);
 							pushMapping(config);
-							sendToElastic(jsonEvents);
+
 						}
 					}
 					analyzedFilenames = rawdataList;
@@ -343,20 +347,22 @@ public class Daemon {
 			// retrieve MBean
 			for (MBean mb : mbean) {
 				for (MBeanAttributeInfo mBeanAttributeInfo : mb.getAttributeInfoList()) {
-					DictionaryEntry a = dico.get(1);
 					String nameMbean = null, objectName = null, type = null, valueMbean = null;
 					int countAttribute = 0, nameId = 0, typeId = 0;
-					long collectingTime = 0;
+					String collectingTime;
 
+				
+//					collectingTime = mbeanEvent.setCollectingTime(mb.getCollectingTime());
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+					collectingTime = sdfr.format(mb.getCollectingTime());
+					objectName = mb.getObjectName();
+					countAttribute = mb.getAttributeInfoCount();
+					nameId = mBeanAttributeInfo.getNameId();
+					type = "Mbean";
+					typeId = mBeanAttributeInfo.getTypeId();
+					valueMbean = mBeanAttributeInfo.getValue();
 					EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, typeId, nameId, valueMbean,
 							collectingTime, countAttribute);
-					collectingTime = mbeanEvent.setCollectingTime(mb.getCollectingTime());
-					objectName = mbeanEvent.setObjectName(mb.getObjectName());
-					countAttribute = mbeanEvent.setCountAttribute(mb.getAttributeInfoCount());
-					nameId = mbeanEvent.setNameId(mBeanAttributeInfo.getNameId());
-					type = mbeanEvent.setType("Mbean");
-					typeId = mbeanEvent.setTypeId(mBeanAttributeInfo.getTypeId());
-					valueMbean = mbeanEvent.setValueMbean(mBeanAttributeInfo.getValue());
 					// retrieve nameMbean with Dictionary
 					for (DictionaryEntry dictionaryEntry : dico) {
 						String name = dictionaryEntry.getName();
@@ -395,6 +401,7 @@ public class Daemon {
 				jsonEvents2.add(jsonEvent + lineBreak);
 			}
 			LOG.debug(jsonEvents2);
+			System.out.println(jsonEvents2);
 			return jsonEvents2;
 		}
 
@@ -469,13 +476,13 @@ public class Daemon {
 				layerDetail.addAll(lay.getCallsList());
 			}
 			for (LayerDetail layd : layerDetail) {
-				long timestampSql = 0;
-				String codeSql = null;
+				String codeSql = null, timestampSql;
 				long countSql = 0, timeSql = 0;
 				codeSql = layd.getCode();
 				countSql = layd.getCount();
 				timeSql = layd.getTime();
-				timestampSql = layd.getTimestamp();
+				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				timestampSql = sdfr.format(layd.getTimestamp());
 				EventSQL sqlevent = new EventSQL(timestampSql, codeSql, countSql, timeSql);
 				eventSqls.add(sqlevent);
 			}
@@ -579,6 +586,7 @@ public class Daemon {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 			String jsonEvent = jsonSerializer.writeValueAsString(mappingProperies);
 			URL URL = new URL(elasticURL + index + "/transaction/_mapping");
+			System.out.println(URL);
 			System.out.println("     ");
 			System.out.println("      ");
 			System.out.println(URL);

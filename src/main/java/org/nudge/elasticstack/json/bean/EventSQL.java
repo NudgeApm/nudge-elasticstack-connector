@@ -1,5 +1,7 @@
 package org.nudge.elasticstack.json.bean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Sarah Bourgeois
  * 		   Frederic Massart
@@ -10,13 +12,13 @@ package org.nudge.elasticstack.json.bean;
 public class EventSQL {
 
 	// Attribut
-	private long timestampSql;
+	private String timestampSql;
 	private String codeSql;
 	private long countSql;
 	private long timeSql;
 
 	// Constructor
-	public EventSQL(long timestampSql, String codeSql, long countSql, long timeSql) {
+	public EventSQL(String timestampSql, String codeSql, long countSql, long timeSql) {
 		super();
 		this.setTimestampSql(timestampSql);
 		this.setCodeSql(codeSql);
@@ -27,11 +29,13 @@ public class EventSQL {
 	// ===========================
 	// Getters and Setters
 	// ===========================
-	public long getTimestampSql() {
+	
+	@JsonProperty("@timestamp")
+	public String getTimestampSql() {
 		return timestampSql;
 	}
 
-	public void setTimestampSql(long timestampSql) {
+	public void setTimestampSql(String timestampSql) {
 		this.timestampSql = timestampSql;
 	}
 

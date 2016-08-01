@@ -1,5 +1,7 @@
 package org.nudge.elasticstack.json.bean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
@@ -12,7 +14,6 @@ public class EventMBean {
 	// Attribut MBean attribute info
 	private String nameMbean;
 	private int nameId;
-	private String typeMbean;
 	private int typeId;
 	private String valueMbean;
 	private String type;
@@ -20,11 +21,11 @@ public class EventMBean {
 	// General Mbean attribute
 	private String objectName;
 	private int countAttribute;
-	private long collectingTime;
+	private String collectingTime;
 
 	// Constructor
 	public EventMBean(String nameMbean, String objectName, String type, int typeId, int nameId, String valueMbean,
-			long collectingTime, int countAttribute) {
+			String collectingTime, int countAttribute) {
 		this.setNameMbean(nameMbean);
 		this.setNameId(nameId);
 		this.setTypeId(typeId);
@@ -54,11 +55,12 @@ public class EventMBean {
 		return this.objectName = objectName;
 	}
 
-	public long getCollectingTime() {
+	@JsonProperty("@timestamp")
+	public String getCollectingTime() {
 		return collectingTime;
 	}
 
-	public long setCollectingTime(long collectingTime) {
+	public String setCollectingTime(String collectingTime) {
 		return this.collectingTime = collectingTime;
 	}
 
@@ -69,9 +71,6 @@ public class EventMBean {
 	public int setNameId(int nameId) {
 		return this.nameId = nameId;
 	}
-
-	
-	
 
 	public int getTypeId() {
 		return typeId;
