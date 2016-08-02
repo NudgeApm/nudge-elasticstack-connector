@@ -8,11 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.Daemon;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventMBean;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,12 +21,11 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 
 public class Mbean {
-	
+
 	private static final Logger LOG = Logger.getLogger(Mbean.class);
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
-	
-	
+
 	/**
 	 * Description : retrieve Mbean from rawdata
 	 *
@@ -38,8 +34,7 @@ public class Mbean {
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public List<EventMBean> buildMbeanEvents(List<MBean> mbean, Dictionary dictionary)
-			throws JsonProcessingException {
+	public List<EventMBean> buildMbeanEvents(List<MBean> mbean, Dictionary dictionary) throws JsonProcessingException {
 		List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
 		List<DictionaryEntry> dico = dictionary.getDictionaryList();
 
@@ -49,7 +44,7 @@ public class Mbean {
 				String nameMbean = null, objectName = null, type = null, valueMbean = null;
 				int countAttribute = 0, nameId = 0, typeId = 0;
 				String collectingTime;
-				
+
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				collectingTime = sdfr.format(mb.getCollectingTime());
 				objectName = mb.getObjectName();
@@ -83,7 +78,7 @@ public class Mbean {
 	 * @throws Exception
 	 */
 	public List<String> parseJsonMBean(List<EventMBean> eventList) throws Exception {
-	
+
 		List<String> jsonEvents2 = new ArrayList<String>();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 
@@ -98,7 +93,7 @@ public class Mbean {
 			String jsonEvent = jsonSerializer.writeValueAsString(event);
 			jsonEvents2.add(jsonEvent + lineBreak);
 		}
-		LOG.debug(jsonEvents2); 
+		LOG.debug(jsonEvents2);
 		return jsonEvents2;
 	}
 
@@ -140,7 +135,6 @@ public class Mbean {
 			return;
 		}
 		URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
-		System.out.println("mbean url " + URL);
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
 		}
@@ -152,6 +146,5 @@ public class Mbean {
 		out.close();
 		LOG.info(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
-	
 
 } // End of class

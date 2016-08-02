@@ -21,11 +21,11 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.LayerDetail;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 
 public class Sql {
-	
+
 	private static final Logger LOG = Logger.getLogger(Sql.class);
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
-	
+
 	/**
 	 * Description : retrieve SQL request
 	 */
@@ -35,7 +35,6 @@ public class Sql {
 		List<LayerDetail> layerDetail = new ArrayList<>();
 		for (Transaction trans : transaction) {
 			trans.getLayersList();
-
 			layer.addAll(trans.getLayersList());
 		}
 		for (Layer lay : layer) {
@@ -78,7 +77,6 @@ public class Sql {
 			jsonEventsSql.add(jsonEvent + lineBreak);
 		}
 		LOG.debug(jsonEventsSql);
-		System.out.println(jsonEventsSql);
 		return jsonEventsSql;
 	}
 
@@ -98,7 +96,7 @@ public class Sql {
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
 		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
-		elasticMetaData.getIndexElement().setType("SQL");
+		elasticMetaData.getIndexElement().setType("sql");
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
 
@@ -111,7 +109,6 @@ public class Sql {
 	public void sendSqltoElk(List<String> jsonEventsSql) throws IOException {
 		Configuration conf = new Configuration();
 		StringBuilder sb = new StringBuilder();
-
 		for (String json : jsonEventsSql) {
 			sb.append(json);
 		}
@@ -127,10 +124,13 @@ public class Sql {
 		httpCon2.setDoOutput(true);
 		httpCon2.setRequestMethod("PUT");
 		OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
-		out.write(sb.toString());
+		if (sb.length() == 0) {
+			return;
+		} else {
+			out.write(sb.toString());
+		}
 		out.close();
-		LOG.info(" Sending SQL : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		LOG.info(" Sending Sql : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 
-	
 } // End of class

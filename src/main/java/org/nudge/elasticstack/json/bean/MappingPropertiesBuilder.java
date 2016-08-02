@@ -30,7 +30,6 @@ public class MappingPropertiesBuilder {
 
 	public static MappingProperties buildMappingProperties(String propertyType, String nameFieldType,
 			String nameFieldIndex, String rawFieldType, String rawFieldIndex) {
-		
 		MappingProperties mappingProperties = MappingPropertiesBuilder.createMappingProperties();
 		mappingProperties.getPropertiesElement().getName().setType(propertyType);
 		mappingProperties.getPropertiesElement().getName().getFields().getName().setType(nameFieldType);

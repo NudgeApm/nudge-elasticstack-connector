@@ -40,11 +40,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-
 @SuppressWarnings("unused")
 
 public class Daemon {
-
 	private static final Logger LOG = Logger.getLogger(Daemon.class);
 	private static ScheduledExecutorService scheduler;
 	private static List<String> analyzedFilenames = new ArrayList<>();
@@ -52,7 +50,7 @@ public class Daemon {
 
 	/**
 	 * Description : Launcher Deamon.
-	 *
+	 * 
 	 * @param config
 	 *
 	 */
@@ -78,13 +76,12 @@ public class Daemon {
 
 	protected static class DaemonTask implements Runnable {
 		private Configuration config;
-
 		DaemonTask(Configuration config) {
 			this.config = config;
 		}
 
 		/**
-		 * Description : Collect data from Nudge API and push it.
+		 * Description : Call connector methods and run it
 		 */
 		@Override
 		public void run() {
@@ -124,16 +121,19 @@ public class Daemon {
 							// ===========================
 							// Type : SQL
 							// ===========================
-							Sql sql = new Sql();
-							List<EventSQL> sqlList = sql.buildSqlEvents(transactions);
-							List<String> jsonEventsSql = sql.parseJsonSQL(sqlList);
-							sql.sendSqltoElk(jsonEventsSql);
+							Sql s = new Sql();
+							List<EventSQL> sql = s.buildSqlEvents(transactions);
+							List<String> jsonEventsSql = s.parseJsonSQL(sql);
+							s.sendSqltoElk(jsonEventsSql);
 
 							// ===========================
 							// Mapping
 							// ===========================
-							// Transaction mapping
-							Mapping.pushMapping(config);
+							Mapping mapping = new Mapping();
+//							// Transaction update mapping
+							mapping.pushMapping(config, "transaction");
+//							// Sql update mapping
+							mapping.pushMapping(config, "sql");
 
 						}
 					}
@@ -154,8 +154,6 @@ public class Daemon {
 				}
 			}
 		}
-
-	
 	} // end of class
 
 }

@@ -1,5 +1,10 @@
 package org.nudge.elasticstack.json.bean;
 
+import org.mockito.cglib.core.Customizer;
+import org.nudge.elasticstack.json.MappingCustomSerializer;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+
 /**
  * @author : Sarah Bourgeois 
  * @author : Frederic Massart
@@ -8,6 +13,10 @@ package org.nudge.elasticstack.json.bean;
  */
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import mapping.Mapping;
+
 
 public class MappingProperties {
 
@@ -26,7 +35,11 @@ public class MappingProperties {
 		this.propertiesElement = propertiesElement;
 	}
 
+	// ===========================
 	// Inner class
+	// ===========================
+	
+	// ***** Properties ******
 	public class Properties {
 
 		private Name name;
@@ -40,7 +53,6 @@ public class MappingProperties {
 		}
 
 		public class Name {
-
 			private String type;
 			private Fields fields;
 
@@ -60,29 +72,30 @@ public class MappingProperties {
 				this.fields = fields;
 			}
 
+			// ******* Field  *******
 			public class Fields {
 				
+				//@JsonProperty("fieldAttributeName")
+				//@JsonSerialize(using = MappingCustomSerializer.class)
 				private FieldAttribute name;
 				private FieldAttribute raw;
 
+				
 				public FieldAttribute getName() {
 					return name;
-				}
-
+				}			
+				
 				public void setName(FieldAttribute name) {
 					this.name = name;
 				}
-
 				public FieldAttribute getRaw() {
 					return raw;
 				}
-
 				public void setRaw(FieldAttribute raw) {
 					this.raw = raw;
 				}
 
 				public class FieldAttribute {
-
 					private String type;
 					private String index;
 
@@ -101,18 +114,14 @@ public class MappingProperties {
 					public void setIndex(String index) {
 						this.index = index;
 					}
-
 				}
 
+				public void setName(String code) {
+					return;
+					
+				}
 			}
-
 		}
-
 	}
-
-
-
-
-
 
 }
