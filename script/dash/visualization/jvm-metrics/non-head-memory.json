@@ -1,0 +1,14 @@
+{
+  "_id": "Non-Heap-memory-usage",
+  "_type": "visualization",
+  "_source": {
+    "title": "Non Heap memory usage",
+    "visState": "{\"title\":\"Heap memory usage\",\"type\":\"area\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"interpolate\":\"linear\",\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"valueMbean\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}",
+    "uiStateJSON": "{}",
+    "description": "",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"nudge\",\"query\":{\"query_string\":{\"query\":\"objectName:\\\"java.lang:type=Memory\\\" AND nameMbean:\\\"NonHeapMemoryUsage.used\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+    }
+  }
+}

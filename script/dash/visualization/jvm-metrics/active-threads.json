@@ -1,0 +1,14 @@
+{
+  "_id": "Threads",
+  "_type": "visualization",
+  "_source": {
+    "title": "Threads",
+    "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{\"field\":\"valueMbean\"},\"schema\":\"metric\",\"type\":\"avg\"},{\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"interpolate\":\"linear\",\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{}},\"title\":\"Non Heap memory usage\",\"type\":\"area\"}",
+    "uiStateJSON": "{}",
+    "description": "",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"nudge\",\"query\":{\"query_string\":{\"query\":\"objectName:\\\"java.lang:type=Threading\\\" AND nameMbean:\\\"ThreadCount\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+    }
+  }
+}
