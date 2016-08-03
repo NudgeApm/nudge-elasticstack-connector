@@ -78,7 +78,6 @@ public class Mbean {
 	 * @throws Exception
 	 */
 	public List<String> parseJsonMBean(List<EventMBean> eventList) throws Exception {
-
 		List<String> jsonEvents2 = new ArrayList<String>();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 

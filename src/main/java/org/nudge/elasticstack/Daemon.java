@@ -40,6 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
 @SuppressWarnings("unused")
 
 public class Daemon {
@@ -76,6 +77,7 @@ public class Daemon {
 
 	protected static class DaemonTask implements Runnable {
 		private Configuration config;
+
 		DaemonTask(Configuration config) {
 			this.config = config;
 		}
@@ -130,10 +132,10 @@ public class Daemon {
 							// Mapping
 							// ===========================
 							Mapping mapping = new Mapping();
-//							// Transaction update mapping
-							mapping.pushMapping(config, "transaction");
-//							// Sql update mapping
-							mapping.pushMapping(config, "sql");
+							// Transaction update mapping
+							mapping.pushMapping(config, 1);
+							// Sql update mapping
+							mapping.pushMapping(config, 2);
 
 						}
 					}
@@ -154,6 +156,6 @@ public class Daemon {
 				}
 			}
 		}
-	} // end of class
+	}
 
-}
+} // End of class
