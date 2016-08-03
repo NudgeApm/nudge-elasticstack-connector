@@ -70,7 +70,6 @@ public class Mapping {
 			httpCon2.setRequestMethod("PUT");
 			OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
 			out.write(jsonEvent);
-			
 			out.close();
 			LOG.debug(" Sql Mapping Flushed : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 			break;
@@ -97,9 +96,7 @@ public class Mapping {
 			OutputStreamWriter out4 = new OutputStreamWriter(httpCon4.getOutputStream());
 			out4.write(jsonEvent);
 			out4.close();
-			LOG.debug(" Sql Mapping Flushed : " + httpCon4.getResponseCode() + " - " + httpCon4.getResponseMessage());
-			
-			
+			LOG.debug(" Sql Mapping Flushed : " + httpCon4.getResponseCode() + " - " + httpCon4.getResponseMessage());	
 			break;
 
 		} // end switch

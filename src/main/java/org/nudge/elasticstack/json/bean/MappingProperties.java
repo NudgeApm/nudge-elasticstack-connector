@@ -17,11 +17,9 @@ public class MappingProperties {
 	public MappingProperties() {
 		this.propertiesElement = new Properties();
 	}
-
 	public Properties getPropertiesElement() {
 		return propertiesElement;
 	}
-
 	public void setPropertiesElement(Properties propertiesElement) {
 		this.propertiesElement = propertiesElement;
 	}
@@ -63,7 +61,7 @@ public class MappingProperties {
 				this.fields = fields;
 			}
 
-			// ******* Field Attribute *******
+			// ******* Field *******
 			public class Fields {
 
 				private FieldAttribute name;
@@ -85,6 +83,7 @@ public class MappingProperties {
 					this.raw = raw;
 				}
 
+				// ******* Field Attribute *******
 				public class FieldAttribute {
 					private String type;
 					private String index;

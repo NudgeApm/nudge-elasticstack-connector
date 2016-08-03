@@ -158,6 +158,5 @@ public class DaemonTest {
             throw new IllegalStateException("Invalid state when research this index : " + INDEX_TEST);
         }
     }
-
 }
 

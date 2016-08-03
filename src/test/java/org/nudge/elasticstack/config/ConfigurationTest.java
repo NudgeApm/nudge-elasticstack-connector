@@ -16,13 +16,16 @@ public class ConfigurationTest {
         Properties properties = defineDefaultProperties();
         String propNudge = "https://monitor.nudge-apm.com";
         String propElastic = "https://elastic.com/";
+        String propRawdata = "-10m";
         properties.setProperty("nudge.url", propNudge);
         properties.setProperty("output.elastic.hosts", propElastic);
+        properties.setProperty("rawdata.history", propRawdata);
         Configuration configuration = new Configuration(properties);
 
         // when
         String confNudge = configuration.getNudgeUrl();
         String confElastic = configuration.getOutputElasticHosts();
+        String confRawdata = configuration.getRawdataHistory();
 
         // then
         Assert.assertTrue(confNudge.endsWith("/"));
@@ -38,6 +41,7 @@ public class ConfigurationTest {
         properties.setProperty("elastic.index", "nudge");
         properties.setProperty("output.elastic.hosts", "http://localhost:9200/");
         properties.setProperty("nudge.url", "https://monitor.nudge-apm.com");
+        properties.setProperty("rawdata.history", "-10m");
         return properties;
     }
 

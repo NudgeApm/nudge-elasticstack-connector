@@ -8,6 +8,7 @@ package org.nudge.elasticstack.connection;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import org.apache.log4j.Logger;
+import org.nudge.elasticstack.config.Configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Connection {
+	Configuration config = new Configuration();
 	private static final Logger LOG = Logger.getLogger(Connection.class);
 	public static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm";
 	private final String url;
@@ -63,7 +65,7 @@ public class Connection {
 
 	public List<String> requestRawdataList(String appId, String from) throws IOException {
 		// TODO parametriser le from
-		String finalUrl = url + "api/apps/" + appId + "/rawdata?from=-10m";
+		String finalUrl = url + "api/apps/" + appId + "/rawdata?from=" + config.getRawdataHistory();
 		HttpURLConnection connection = prepareRequest(finalUrl);
 		LOG.debug(connection.getResponseCode());
 		List<String> contentRawdata = parseRawdataListResponse(connection.getInputStream());

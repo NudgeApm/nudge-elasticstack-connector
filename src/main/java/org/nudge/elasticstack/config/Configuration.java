@@ -33,6 +33,7 @@ public class Configuration {
 	private static final String ELASTIC_INDEX = "elastic.index";
 	private static final String OUTUPUT_ELASTIC_HOSTS = "output.elastic.hosts";
 	private static final String DRY_RUN = "plugin.dryrun";
+	private static final String RAWDATA_HISTORY = "rawdata.history";
 
 	// Attributs
 	private Properties properties = new Properties();
@@ -43,6 +44,7 @@ public class Configuration {
 	private String elasticIndex;
 	private String outputElasticHosts;
 	private boolean dryRun;
+	private String rawdataHistory;
 
 	public Configuration() {
 		searchPropertiesFile();
@@ -56,7 +58,7 @@ public class Configuration {
 
 	Configuration(Properties props) {
 		this.properties = props;
-        loadProperties();
+		loadProperties();
 	}
 
 	Configuration(String pathFile) {
@@ -77,10 +79,10 @@ public class Configuration {
 			} else {
 				URL confURL = ClassLoader.getSystemResource(CONF_FILE);
 				if (confURL != null) {
-					LOG.debug(CONF_FILE + " found at the classloader root path");
+					LOG.warn(CONF_FILE + " found at the classloader root path");
 					loadPropertiesFile(confURL.getPath());
 				}
-				LOG.debug(CONF_FILE + " doesn't found at the classloader root path");
+				LOG.warn(CONF_FILE + " doesn't found at the classloader root path");
 			}
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -97,23 +99,23 @@ public class Configuration {
 				throw new IllegalStateException(e.getMessage(), e);
 			}
 		}
-	    loadProperties();
+		loadProperties();
 	}
 
 	private void loadProperties() {
-        nudgeUrl = getProperty(NUDGE_URL, "https://monitor.nudge-apm.com");
-        if (!nudgeUrl.endsWith("/"))
-            nudgeUrl += "/";
-        nudgeLogin = checkNotNull(NUDGE_LOGIN);
-        nudgePwd = checkNotNull(NUDGE_PWD);
-        apps = split(checkNotNull(NUDGE_APP_IDS));
-        outputElasticHosts = checkNotNull(OUTUPUT_ELASTIC_HOSTS);
-        if (!outputElasticHosts.endsWith("/"))
-            outputElasticHosts += "/";
-        elasticIndex = checkNotNull(ELASTIC_INDEX);
-        dryRun = Boolean.valueOf(getProperty(DRY_RUN, "false"));
-
-    }
+		nudgeUrl = getProperty(NUDGE_URL, "https://monitor.nudge-apm.com");
+		if (!nudgeUrl.endsWith("/"))
+			nudgeUrl += "/";
+		nudgeLogin = checkNotNull(NUDGE_LOGIN);
+		nudgePwd = checkNotNull(NUDGE_PWD);
+		apps = split(checkNotNull(NUDGE_APP_IDS));
+		outputElasticHosts = checkNotNull(OUTUPUT_ELASTIC_HOSTS);
+		rawdataHistory = checkNotNull(RAWDATA_HISTORY);
+		if (!outputElasticHosts.endsWith("/"))
+			outputElasticHosts += "/";
+		elasticIndex = checkNotNull(ELASTIC_INDEX);
+		dryRun = Boolean.valueOf(getProperty(DRY_RUN, "false"));
+	}
 
 	private String[] split(String composite) {
 		return composite.contains(",") ? composite.split(",") : composite.split(";");
@@ -147,8 +149,12 @@ public class Configuration {
 		System.out.println(ELASTIC_INDEX + " -> Name of the elasticSearch index which will be create");
 		System.out.println(OUTUPUT_ELASTIC_HOSTS + " -> Adress of the elasticSearch which will be use to index");
 		System.out.println(DRY_RUN + " -> Collect and log, dont push to elasticsearch");
+		System.out.println(RAWDATA_HISTORY + " -> Period of the Nudge Rawdata to push into Elasticsearch");
 	}
 
+	// ======================
+	// Getters and Setters
+	// ======================
 	public String getNudgeUrl() {
 		return nudgeUrl;
 	}
@@ -176,4 +182,9 @@ public class Configuration {
 	public boolean getDryRun() {
 		return dryRun;
 	}
+
+	public String getRawdataHistory() {
+		return rawdataHistory;
+	}
+
 }
