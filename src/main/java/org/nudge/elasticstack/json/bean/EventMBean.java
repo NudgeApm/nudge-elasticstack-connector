@@ -15,7 +15,7 @@ public class EventMBean {
 	private String nameMbean;
 	private int nameId;
 	private int typeId;
-	private String valueMbean;
+	private double valueMbean;
 	private String type;
 
 	// General Mbean attribute
@@ -24,7 +24,7 @@ public class EventMBean {
 	private String collectingTime;
 
 	// Constructor
-	public EventMBean(String nameMbean, String objectName, String type, int typeId, int nameId, String valueMbean,
+	public EventMBean(String nameMbean, String objectName, String type, int typeId, int nameId, double valueMbean,
 			String collectingTime, int countAttribute) {
 		this.setNameMbean(nameMbean);
 		this.setNameId(nameId);
@@ -80,11 +80,11 @@ public class EventMBean {
 		return this.typeId = typeId;
 	}
 
-	public String getValueMbean() {
+	public double getValueMbean() {
 		return valueMbean;
 	}
 
-	public String setValueMbean(String valueMbean) {
+	public double setValueMbean(double valueMbean) {
 		return this.valueMbean = valueMbean;
 	}
 

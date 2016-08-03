@@ -1,5 +1,17 @@
 package type;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
+import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
+import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.json.bean.EventMBean;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -8,17 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventMBean;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 
 public class Mbean {
 
@@ -41,8 +42,9 @@ public class Mbean {
 		// retrieve MBean
 		for (MBean mb : mbean) {
 			for (MBeanAttributeInfo mBeanAttributeInfo : mb.getAttributeInfoList()) {
-				String nameMbean = null, objectName = null, type = null, valueMbean = null;
+				String nameMbean = null, objectName = null, type = null;
 				int countAttribute = 0, nameId = 0, typeId = 0;
+				double valueMbean = 0;
 				String collectingTime;
 				
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -52,7 +54,13 @@ public class Mbean {
 				nameId = mBeanAttributeInfo.getNameId();
 				type = "Mbean";
 				typeId = mBeanAttributeInfo.getTypeId();
-				valueMbean = mBeanAttributeInfo.getValue();
+				try {
+					valueMbean = Double.parseDouble(mBeanAttributeInfo.getValue());
+				} catch (NumberFormatException nfe) {
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Impossible to get the value of a mbean, it will not be inserted to ELK. MBean from rawdata : " + mBeanAttributeInfo);
+					}
+				}
 				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, typeId, nameId, valueMbean,
 						collectingTime, countAttribute);
 				// retrieve nameMbean with Dictionary
