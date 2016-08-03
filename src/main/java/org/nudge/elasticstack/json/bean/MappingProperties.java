@@ -105,7 +105,6 @@ public class MappingProperties {
 						this.index = index;
 					}
 				}
-
 				public void setName(String code) {
 					return;
 

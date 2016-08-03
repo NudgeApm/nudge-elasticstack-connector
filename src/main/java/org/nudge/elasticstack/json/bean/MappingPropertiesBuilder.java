@@ -14,6 +14,7 @@ import org.nudge.elasticstack.json.bean.MappingProperties.Properties.Name.Fields
 public class MappingPropertiesBuilder {
 
 	public static MappingProperties createMappingProperties() {
+		
 		MappingProperties mappingProperties = new MappingProperties();
 		MappingProperties.Properties properties = mappingProperties.new Properties();
 		mappingProperties.setPropertiesElement(properties);
@@ -30,6 +31,7 @@ public class MappingPropertiesBuilder {
 
 	public static MappingProperties buildMappingProperties(String propertyType, String nameFieldType,
 			String nameFieldIndex, String rawFieldType, String rawFieldIndex) {
+		
 		MappingProperties mappingProperties = MappingPropertiesBuilder.createMappingProperties();
 		mappingProperties.getPropertiesElement().getName().setType(propertyType);
 		mappingProperties.getPropertiesElement().getName().getFields().getName().setType(nameFieldType);

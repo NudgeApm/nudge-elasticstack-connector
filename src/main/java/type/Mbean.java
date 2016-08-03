@@ -22,7 +22,7 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 
 public class Mbean {
 
-	private static final Logger LOG = Logger.getLogger(Mbean.class);
+	private static final Logger LOG = Logger.getLogger("Mbean type : ");
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
@@ -44,7 +44,7 @@ public class Mbean {
 				String nameMbean = null, objectName = null, type = null, valueMbean = null;
 				int countAttribute = 0, nameId = 0, typeId = 0;
 				String collectingTime;
-
+				
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				collectingTime = sdfr.format(mb.getCollectingTime());
 				objectName = mb.getObjectName();
@@ -133,6 +133,7 @@ public class Mbean {
 			LOG.info("Dry run active, only log documents, don't push to elasticsearch.");
 			return;
 		}
+		long start = System.currentTimeMillis();
 		URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
@@ -143,7 +144,10 @@ public class Mbean {
 		OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
 		out.write(sb.toString());
 		out.close();
-		LOG.info(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		long end = System.currentTimeMillis();
+		long totalTime = end - start;
+		LOG.info(" Flush " + jsonEvents2.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
+		LOG.debug(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 
 } // End of class

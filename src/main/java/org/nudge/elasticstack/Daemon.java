@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 
 public class Daemon {
-	private static final Logger LOG = Logger.getLogger(Daemon.class);
+	private static final Logger LOG = Logger.getLogger("Connector : ");
 	private static ScheduledExecutorService scheduler;
 	private static List<String> analyzedFilenames = new ArrayList<>();
 	private static final long ONE_MIN = 60000;
@@ -136,7 +136,8 @@ public class Daemon {
 							mapping.pushMapping(config, 1);
 							// Sql update mapping
 							mapping.pushMapping(config, 2);
-
+							// Mbean update mapping
+							mapping.pushMapping(config, 3);
 						}
 					}
 					analyzedFilenames = rawdataList;

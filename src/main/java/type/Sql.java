@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
 import org.nudge.elasticstack.config.Configuration;
@@ -22,7 +21,7 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 
 public class Sql {
 
-	private static final Logger LOG = Logger.getLogger(Sql.class);
+	private static final Logger LOG = Logger.getLogger("Sql type :");
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
@@ -113,9 +112,10 @@ public class Sql {
 			sb.append(json);
 		}
 		if (config.getDryRun()) {
-			LOG.info("Dry run active, only log documents, don't push to elasticsearch.");
+			LOG.debug("Dry run active, only log documents, don't push to elasticsearch.");
 			return;
 		}
+		long start = System.currentTimeMillis();
 		URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
@@ -130,7 +130,10 @@ public class Sql {
 			out.write(sb.toString());
 		}
 		out.close();
-		LOG.info(" Sending Sql : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		long end = System.currentTimeMillis();
+		long totalTime = end - start;
+		LOG.info(" Flush " + jsonEventsSql.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
+		LOG.debug(" Sending Sql : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 
 } // End of class

@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import mapping.Mapping;
+
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,14 +30,16 @@ public class DaemonTest {
     private static final Logger LOG = Logger.getLogger(DaemonTest.class);
     private static final String INDEX_TEST = "nudge.test";
     private static final String URL_ELASTIC_TEST = "http://kibana.nudgeapm.io:9200/";
-
+    private static final int TYPE = 1;
+   
     @Test
     public void pushMapping_test() throws IOException, URISyntaxException {
         // given
         initTransactionBean();
 
         // when
-      //  Daemon.DaemonTask.pushMapping(URL_ELASTIC_TEST, INDEX_TEST);
+        Mapping mapping = new Mapping();
+        mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, TYPE);
 
         // then
         URL elasticTest = new URL(URL_ELASTIC_TEST + "/" + INDEX_TEST + "/transaction/_mapping");

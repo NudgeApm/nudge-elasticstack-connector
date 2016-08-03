@@ -20,9 +20,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 
+
 public class TransactionLayer {
 	
-	private static final Logger LOG = Logger.getLogger(TransactionLayer.class);
+	private static final Logger LOG = Logger.getLogger("Transaction type : ");
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
