@@ -2,6 +2,7 @@
 
 package org.nudge.elasticstack;
 
+import mapping.Mapping;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
@@ -30,12 +31,14 @@ public class DaemonTest {
     private static final String URL_ELASTIC_TEST = "http://kibana.nudgeapm.io:9200/";
 
     @Test
+    // TODO migrate this test in MappingTest
     public void pushMapping_test() throws IOException, URISyntaxException {
         // given
         initTransactionBean();
 
         // when
-      //  Daemon.DaemonTask.pushMapping(URL_ELASTIC_TEST, INDEX_TEST);
+        Mapping mapping = new Mapping();
+        mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, 1);
 
         // then
         URL elasticTest = new URL(URL_ELASTIC_TEST + "/" + INDEX_TEST + "/transaction/_mapping");
