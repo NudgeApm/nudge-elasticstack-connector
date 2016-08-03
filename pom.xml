@@ -9,6 +9,17 @@
 		<jackson.version>2.7.3</jackson.version>
 	</properties>
 
+	<distributionManagement>
+		<repository>
+			<id>${repo.mgr.releases.id}</id>
+			<url>${repo.mgr.base}/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>${repo.mgr.snapshots.id}</id>
+			<url>${repo.mgr.base}/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

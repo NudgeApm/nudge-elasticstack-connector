@@ -2,6 +2,7 @@
 
 package org.nudge.elasticstack;
 
+import mapping.Mapping;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
@@ -33,24 +34,22 @@ public class DaemonTest {
     private static final int TYPE = 1;
    
     @Test
+    // TODO migrate this test in MappingTest
     public void pushMapping_test() throws IOException, URISyntaxException {
         // given
         initTransactionBean();
 
         // when
         Mapping mapping = new Mapping();
+
         mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, TYPE);
+        mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, 1);
 
         // then
         URL elasticTest = new URL(URL_ELASTIC_TEST + "/" + INDEX_TEST + "/transaction/_mapping");
         HttpURLConnection connection = (HttpURLConnection) elasticTest.openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("GET");
-
-//        JsonFactory jsonFactory = new JsonFactory();
-//        InputStream inputStream = connection.getInputStream();
-//        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-//        JsonParser parser = jsonFactory.createParser(bufferedInputStream);
         boolean isMappingEffective = analyseResponse(connection.getInputStream(), "not_analyzed");
         Assert.assertTrue(isMappingEffective);
     }
