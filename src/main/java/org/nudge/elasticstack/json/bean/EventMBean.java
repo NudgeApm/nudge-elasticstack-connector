@@ -6,29 +6,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
  * 
- *         Description : Build Manage-Bean insertion
+ * Description : Build Manage-Bean insertion
  */
 
 public class EventMBean {
 
-	// Attribut MBean attribute info
+	// MBean attribute info
 	private String nameMbean;
-	private int nameId;
-	private int typeId;
 	private double valueMbean;
 	private String type;
-
-	// General Mbean attribute
 	private String objectName;
 	private int countAttribute;
 	private String collectingTime;
 
 	// Constructor
-	public EventMBean(String nameMbean, String objectName, String type, int typeId, int nameId, double valueMbean,
-			String collectingTime, int countAttribute) {
+	public EventMBean(String nameMbean, String objectName, String type, double valueMbean, String collectingTime,
+			int countAttribute) {
 		this.setNameMbean(nameMbean);
-		this.setNameId(nameId);
-		this.setTypeId(typeId);
 		this.setValueMbean(valueMbean);
 		this.setCollectingTime(collectingTime);
 		this.setCountAttribute(countAttribute);
@@ -37,8 +31,10 @@ public class EventMBean {
 	}
 
 	// ===========================
-	//  Getters and Setters
+	// Getters and Setters
 	// ===========================
+
+	
 	public String getType() {
 		return type;
 	}
@@ -47,6 +43,7 @@ public class EventMBean {
 		return this.type = type;
 	}
 
+	@JsonProperty("mbean_name")
 	public String getObjectName() {
 		return objectName;
 	}
@@ -64,22 +61,7 @@ public class EventMBean {
 		return this.collectingTime = collectingTime;
 	}
 
-	public int getNameId() {
-		return nameId;
-	}
-
-	public int setNameId(int nameId) {
-		return this.nameId = nameId;
-	}
-
-	public int getTypeId() {
-		return typeId;
-	}
-
-	public int setTypeId(int typeId) {
-		return this.typeId = typeId;
-	}
-
+	@JsonProperty("mbean_value")
 	public double getValueMbean() {
 		return valueMbean;
 	}
@@ -88,6 +70,7 @@ public class EventMBean {
 		return this.valueMbean = valueMbean;
 	}
 
+	@JsonProperty("mbean_count")
 	public int getCountAttribute() {
 		return countAttribute;
 	}
@@ -96,6 +79,7 @@ public class EventMBean {
 		return this.countAttribute = countAttribute;
 	}
 
+	@JsonProperty("mbean_attributename")
 	public String getNameMbean() {
 		return nameMbean;
 	}

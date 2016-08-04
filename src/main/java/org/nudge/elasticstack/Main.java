@@ -6,7 +6,7 @@ import org.nudge.elasticstack.config.Configuration;
  * @author Sarah Bourgeois
  * @author Frederic Massart
  * 
- *         Entry point for NudgeApm - ElasticStack connector
+ * Entry point for NudgeApm - ElasticStack connector
  */
 public class Main {
 
@@ -45,7 +45,6 @@ public class Main {
 			Configuration.displayOptions();
 			return;
 		}
-
 		usage();
 		System.exit(1);
 	}

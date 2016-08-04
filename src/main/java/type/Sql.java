@@ -41,14 +41,14 @@ public class Sql {
 			layerDetail.addAll(lay.getCallsList());
 		}
 		for (LayerDetail layd : layerDetail) {
-			String codeSql = null, timestampSql;
-			long countSql = 0, timeSql = 0;
-			codeSql = layd.getCode();
-			countSql = layd.getCount();
-			timeSql = layd.getTime();
+			String sqlCode = null, sqlTimestamp;
+			long sqlCount = 0, sqlTime = 0;
+			sqlCode = layd.getCode();
+			sqlCount = layd.getCount();
+			sqlTime = layd.getTime();
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			timestampSql = sdfr.format(layd.getTimestamp());
-			EventSQL sqlevent = new EventSQL(timestampSql, codeSql, countSql, timeSql);
+			sqlTimestamp = sdfr.format(layd.getTimestamp());
+			EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime);
 			eventSqls.add(sqlevent);
 		}
 		return eventSqls;
@@ -76,6 +76,7 @@ public class Sql {
 			jsonEventsSql.add(jsonEvent + lineBreak);
 		}
 		LOG.debug(jsonEventsSql);
+		System.out.println(jsonEventsSql);
 		return jsonEventsSql;
 	}
 

@@ -25,7 +25,6 @@ public abstract class NudgeEvent {
 		this.responseTime = responseTime;
 		this.count = count;
 		this.type = type;
-	
 	}
 
 	// Method
@@ -33,7 +32,10 @@ public abstract class NudgeEvent {
 		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count;
 	}
 
-	// Getters and Setters
+	// =========================
+	//  Getters and Setters
+	// =========================
+	
 	@JsonProperty("@timestamp")
 	public String getDate() {
 		return date;
@@ -43,6 +45,7 @@ public abstract class NudgeEvent {
 		this.date = date;
 	}
 
+	@JsonProperty("transaction_name")
 	public String getName() {
 		return name;
 	}
@@ -52,6 +55,7 @@ public abstract class NudgeEvent {
 		this.name = name;
 	}
 	
+
 	public String getType() {
 		return type;
 	}
@@ -60,7 +64,7 @@ public abstract class NudgeEvent {
 		this.type = type;
 	}
 
-	@JsonProperty("response_time")
+	@JsonProperty("transaction_responseTime")
 	public long getResponseTime() {
 		return responseTime;
 	}
@@ -69,6 +73,7 @@ public abstract class NudgeEvent {
 		this.responseTime = responseTime;
 	}
 
+	@JsonProperty("transaction_count")
 	public long getCount() {
 		return count;
 	}

@@ -43,7 +43,7 @@ public class Mbean {
 		for (MBean mb : mbean) {
 			for (MBeanAttributeInfo mBeanAttributeInfo : mb.getAttributeInfoList()) {
 				String nameMbean = null, objectName = null, type = null;
-				int countAttribute = 0, nameId = 0, typeId = 0;
+				int countAttribute = 0, nameId = 0;
 				double valueMbean = 0;
 				String collectingTime;
 				
@@ -53,7 +53,6 @@ public class Mbean {
 				countAttribute = mb.getAttributeInfoCount();
 				nameId = mBeanAttributeInfo.getNameId();
 				type = "Mbean";
-				typeId = mBeanAttributeInfo.getTypeId();
 				try {
 					valueMbean = Double.parseDouble(mBeanAttributeInfo.getValue());
 				} catch (NumberFormatException nfe) {
@@ -61,7 +60,7 @@ public class Mbean {
 						LOG.debug("Impossible to get the value of a mbean, it will not be inserted to ELK. MBean from rawdata : " + mBeanAttributeInfo);
 					}
 				}
-				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, typeId, nameId, valueMbean,
+				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, valueMbean,
 						collectingTime, countAttribute);
 				// retrieve nameMbean with Dictionary
 				for (DictionaryEntry dictionaryEntry : dico) {
@@ -101,6 +100,7 @@ public class Mbean {
 			jsonEvents2.add(jsonEvent + lineBreak);
 		}
 		LOG.debug(jsonEvents2);
+		System.out.println(jsonEvents2);
 		return jsonEvents2;
 	}
 

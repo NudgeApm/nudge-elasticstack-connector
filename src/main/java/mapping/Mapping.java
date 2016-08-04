@@ -11,16 +11,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.MappingProperties;
-import org.nudge.elasticstack.json.bean.MappingPropertiesBuilder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class Mapping {
 
 	private static final Logger LOG = Logger.getLogger("Update mapping : ");
-	public static final int typeSql = 2;
 	public static final int typeTransaction = 1;
+	public static final int typeSql = 2;
 	public static final int typeMbean = 3;
 
 	/**
@@ -50,53 +49,53 @@ public class Mapping {
 		// ***** Case transaction update mapping ******
 		case typeTransaction:
 			URL URL = new URL(elasticURL + index + "/transaction/_mapping");
-			HttpURLConnection httpConSql = (HttpURLConnection) URL.openConnection();
-			httpConSql.setDoOutput(true);
-			httpConSql.setRequestMethod("PUT");
-			OutputStreamWriter outT = new OutputStreamWriter(httpConSql.getOutputStream());
-			outT.write(jsonEvent);
-			outT.close();
-			LOG.debug(" Transaction Mapping Flushed : " + httpConSql.getResponseCode() + " - "
-					+ httpConSql.getResponseMessage());
+			HttpURLConnection httpConTrans = (HttpURLConnection) URL.openConnection();
+			httpConTrans.setDoOutput(true);
+			httpConTrans.setRequestMethod("PUT");
+			OutputStreamWriter outTrans = new OutputStreamWriter(httpConTrans.getOutputStream());
+			outTrans.write(jsonEvent);
+			outTrans.close();
+			LOG.debug(" Transaction Mapping Flushed : " + httpConTrans.getResponseCode() + " - "
+					+ httpConTrans.getResponseMessage());
 			break;
 
 		// ******* Case Sql update mapping *******
 		case typeSql:
 			// change mapping value
-			jsonEvent = jsonEvent.replaceAll("name", "codeSql");
+			jsonEvent = jsonEvent.replaceAll("transaction_name", "sql_code");
 			URL = new URL(elasticURL + index + "/sql/_mapping");
-			HttpURLConnection httpCon2 = (HttpURLConnection) URL.openConnection();
-			httpCon2.setDoOutput(true);
-			httpCon2.setRequestMethod("PUT");
-			OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
-			out.write(jsonEvent);
-			out.close();
-			LOG.debug(" Sql Mapping Flushed : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+			HttpURLConnection httpConSql = (HttpURLConnection) URL.openConnection();
+			httpConSql.setDoOutput(true);
+			httpConSql.setRequestMethod("PUT");
+			OutputStreamWriter outSql = new OutputStreamWriter(httpConSql.getOutputStream());
+			outSql.write(jsonEvent);
+			outSql.close();
+			LOG.debug(" Sql Mapping Flushed : " + httpConSql.getResponseCode() + " - " + httpConSql.getResponseMessage());
 			break;
 
 		// ******* Case Mbean update mapping *******
 		case typeMbean:
-			// change mapping value : for NameMbean
-			jsonEvent = jsonEvent.replaceAll("name", "nameMbean");
+			// change mapping value : for attributeName
+			jsonEvent = jsonEvent.replaceAll("transaction_name", "mbean_attributename");
 			URL = new URL(elasticURL + index + "/mbean/_mapping");
-			HttpURLConnection httpCon3 = (HttpURLConnection) URL.openConnection();
-			httpCon3.setDoOutput(true);
-			httpCon3.setRequestMethod("PUT");
-			OutputStreamWriter out3 = new OutputStreamWriter(httpCon3.getOutputStream());
-			out3.write(jsonEvent);
-			out3.close();
-			LOG.debug(" Sql Mapping Flushed : " + httpCon3.getResponseCode() + " - " + httpCon3.getResponseMessage());
+			HttpURLConnection httpConMbean1= (HttpURLConnection) URL.openConnection();
+			httpConMbean1.setDoOutput(true);
+			httpConMbean1.setRequestMethod("PUT");
+			OutputStreamWriter outMbean1 = new OutputStreamWriter(httpConMbean1.getOutputStream());
+			outMbean1.write(jsonEvent);
+			outMbean1.close();
+			LOG.debug(" Mbean Mapping 1/2 Flushed : " + httpConMbean1.getResponseCode() + " - " + httpConMbean1.getResponseMessage());
 			
-			// change mapping value : for ObjectMbean
-			jsonEvent = jsonEvent.replaceAll("name", "objectName");
+			// change mapping value : for name
+			jsonEvent = jsonEvent.replaceAll("transaction_name", "mbean_name");
 			URL = new URL(elasticURL + index + "/mbean/_mapping");
-			HttpURLConnection httpCon4 = (HttpURLConnection) URL.openConnection();
-			httpCon4.setDoOutput(true);
-			httpCon4.setRequestMethod("PUT");
-			OutputStreamWriter out4 = new OutputStreamWriter(httpCon4.getOutputStream());
-			out4.write(jsonEvent);
-			out4.close();
-			LOG.debug(" Sql Mapping Flushed : " + httpCon4.getResponseCode() + " - " + httpCon4.getResponseMessage());	
+			HttpURLConnection httpConMbean2 = (HttpURLConnection) URL.openConnection();
+			httpConMbean2 .setDoOutput(true);
+			httpConMbean2 .setRequestMethod("PUT");
+			OutputStreamWriter outMbean2 = new OutputStreamWriter(httpConMbean2 .getOutputStream());
+			outMbean2.write(jsonEvent);
+			outMbean2.close();
+			LOG.debug(" Mbean Mapping 2/2 Flushed : " + httpConMbean2 .getResponseCode() + " - " + httpConMbean2 .getResponseMessage());	
 			break;
 
 		} // end switch

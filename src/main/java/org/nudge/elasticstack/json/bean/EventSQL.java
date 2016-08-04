@@ -39,6 +39,7 @@ public class EventSQL {
 		this.timestampSql = timestampSql;
 	}
 
+	@JsonProperty("sql_code")
 	public String getCodeSql() {
 		return codeSql;
 	}
@@ -47,6 +48,7 @@ public class EventSQL {
 		this.codeSql = codeSql;
 	}
 
+	@JsonProperty("sql_count")
 	public long getCountSql() {
 		return countSql;
 	}
@@ -55,6 +57,7 @@ public class EventSQL {
 		this.countSql = countSql;
 	}
 
+	@JsonProperty("sql_responseTime")
 	public long getTimeSql() {
 		return timeSql;
 	}

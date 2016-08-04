@@ -1,15 +1,15 @@
-package org.nudge.elasticstack.json.bean;
+package mapping;
 
 /**
- * @author : Sarah Bourgeois 
- * @author : Frederic Massart
+ * @author : Sarah Bourgeois
+ * 		   : Frederic Massart
  * 
- * Description : builder for the new mapping
+ * Description : Build properties to update mapping
  */
 
-import org.nudge.elasticstack.json.bean.MappingProperties.Properties.Name;
-import org.nudge.elasticstack.json.bean.MappingProperties.Properties.Name.Fields;
-import org.nudge.elasticstack.json.bean.MappingProperties.Properties.Name.Fields.FieldAttribute;
+import mapping.MappingProperties.Properties.Name;
+import mapping.MappingProperties.Properties.Name.Fields;
+import mapping.MappingProperties.Properties.Name.Fields.FieldAttribute;
 
 public class MappingPropertiesBuilder {
 

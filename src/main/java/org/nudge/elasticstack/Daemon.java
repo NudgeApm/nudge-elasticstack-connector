@@ -8,6 +8,8 @@ package org.nudge.elasticstack;
  */
 
 import mapping.Mapping;
+import mapping.MappingProperties;
+import mapping.MappingPropertiesBuilder;
 import type.Mbean;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
@@ -21,8 +23,6 @@ import org.nudge.elasticstack.connection.Connection;
 import org.nudge.elasticstack.json.bean.EventMBean;
 import org.nudge.elasticstack.json.bean.EventSQL;
 import org.nudge.elasticstack.json.bean.EventTransaction;
-import org.nudge.elasticstack.json.bean.MappingProperties;
-import org.nudge.elasticstack.json.bean.MappingPropertiesBuilder;
 import org.nudge.elasticstack.json.bean.NudgeEvent;
 import java.io.IOException;
 import java.io.OutputStreamWriter;

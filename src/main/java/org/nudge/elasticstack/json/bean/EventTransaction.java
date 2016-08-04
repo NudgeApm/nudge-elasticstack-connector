@@ -1,21 +1,19 @@
 package org.nudge.elasticstack.json.bean;
 
-import org.nudge.elasticstack.Daemon;
-
 /**
  * 
  * @author : Sarah Bourgeois
- * @author : Frederic Massart
+ *  * @author : Frederic Massart
  * 
  */
 
+
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class EventTransaction extends NudgeEvent {
 
-	
-	
 	// WS attributs
 	private Long responseTimeLayerJaxws;
 	private String layerNameJaxws;
@@ -39,23 +37,31 @@ public class EventTransaction extends NudgeEvent {
 		super(name, responseTime, date, count, "transaction");
 	}
 
-	// Getters and Setters
+	// ========================
+	//  Getters and Setters
+	// =========================
+	
+	// ******** Layer Jaxws ***********
+
+	@JsonProperty("layer_jaxws_responsetime")
 	public Long getResponseTimeLayerJaxws() {
 		return responseTimeLayerJaxws;
 	}
-
+	
 	public void setResponseTimeLayerJaxws(Long responseTimeLayerJaxws) {
 		this.responseTimeLayerJaxws = responseTimeLayerJaxws;
 	}
 
+	@JsonProperty("layer_jaws_name")
 	public String getLayerNameJaxws() {
 		return layerNameJaxws;
 	}
-
+	
 	public void setLayerNameJaxws(String layerNameJaxws) {
 		this.layerNameJaxws = layerNameJaxws;
 	}
 
+	@JsonProperty("layer_jaxws_count")
 	public Long getLayerCountJaxws() {
 		return layerCountJaxws;
 	}
@@ -64,6 +70,9 @@ public class EventTransaction extends NudgeEvent {
 		this.layerCountJaxws = layerCountJaxws;
 	}
 
+	// ********* Layer sql *************
+	
+	@JsonProperty("layer_sql_responsetime")
 	public Long getResponseTimeLayerSql() {
 		return responseTimeLayerSql;
 	}
@@ -72,6 +81,7 @@ public class EventTransaction extends NudgeEvent {
 		this.responseTimeLayerSql = responseTimeLayerSql;
 	}
 
+	@JsonProperty("layer_sql_name")
 	public String getLayerNameSql() {
 		return layerNameSql;
 	}
@@ -80,6 +90,7 @@ public class EventTransaction extends NudgeEvent {
 		this.layerNameSql = layerNameSql;
 	}
 
+	@JsonProperty("layer_sql_count")
 	public Long getLayerCountSql() {
 		return layerCountSql;
 	}
@@ -88,6 +99,9 @@ public class EventTransaction extends NudgeEvent {
 		this.layerCountSql = layerCountSql;
 	}
 
+	// ******** Layer jms **************
+	
+	@JsonProperty("layer_jms_responsetime")
 	public Long getResponseTimeLayerJms() {
 		return responseTimeLayerJms;
 	}
@@ -96,6 +110,7 @@ public class EventTransaction extends NudgeEvent {
 		this.responseTimeLayerJms = responseTimeLayerJms;
 	}
 
+	@JsonProperty("layer_jms_name")
 	public String getLayerNameJms() {
 		return layerNameJms;
 	}
@@ -104,6 +119,7 @@ public class EventTransaction extends NudgeEvent {
 		this.layerNameJms = layerNameJms;
 	}
 
+	@JsonProperty("layer_jms_count")
 	public Long getLayerCountJms() {
 		return layerCountJms;
 	}
@@ -112,6 +128,9 @@ public class EventTransaction extends NudgeEvent {
 		this.layerCountJms = layerCountJms;
 	}
 
+	// ********** Layer java **************
+	
+	@JsonProperty("layer_java_responsetime")
 	public long getResponseTimeLayerJava() {
 		return responseTimeLayerJava;
 	}
@@ -120,6 +139,7 @@ public class EventTransaction extends NudgeEvent {
 		this.responseTimeLayerJava = responseTimeLayerJava;
 	} 
 
+	@JsonProperty("layer_java_name")
 	public String getLayerNameJava() {
 		return layerNameJava;
 	}
@@ -128,6 +148,7 @@ public class EventTransaction extends NudgeEvent {
 		this.layerNameJava = layerNameJava;
 	}
 
+	@JsonProperty("layer_java_count")
 	public Long getLayerCountJava() {
 		return layerCountJava;
 	}

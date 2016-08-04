@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.json.bean;
+package mapping;
 
 /**
  * @author : Sarah Bourgeois 
@@ -32,7 +32,8 @@ public class MappingProperties {
 	public class Properties {
 
 		private Name name;
-
+		
+		@JsonProperty("transaction_name")
 		public Name getName() {
 			return name;
 		}
@@ -67,6 +68,7 @@ public class MappingProperties {
 				private FieldAttribute name;
 				private FieldAttribute raw;
 
+				@JsonProperty("transaction_name")
 				public FieldAttribute getName() {
 					return name;
 				}
