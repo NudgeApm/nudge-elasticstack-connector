@@ -1,4 +1,4 @@
-package type;
+package org.nudge.elasticstack.type;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class Mbean {
 
-	private static final Logger LOG = Logger.getLogger("Mbean type : ");
+	private static final Logger LOG = Logger.getLogger("Mbean org.nudge.elasticstack.type : ");
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 

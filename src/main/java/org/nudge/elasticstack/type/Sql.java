@@ -1,4 +1,4 @@
-package type;
+package org.nudge.elasticstack.type;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public class Sql {
 
-	private static final Logger LOG = Logger.getLogger("Sql type :");
+	private static final Logger LOG = Logger.getLogger("Sql org.nudge.elasticstack.type :");
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 

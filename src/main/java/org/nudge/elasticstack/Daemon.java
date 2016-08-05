@@ -7,35 +7,23 @@ package org.nudge.elasticstack;
  * Description : Class which permits to send rawdatas to elasticSearch with -startDeamon
  */
 
-import mapping.Mapping;
-import mapping.MappingProperties;
-import mapping.MappingPropertiesBuilder;
-import type.Mbean;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
-import type.Sql;
-import type.TransactionLayer;
+import mapping.Mapping;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
 import org.nudge.elasticstack.json.bean.EventMBean;
 import org.nudge.elasticstack.json.bean.EventSQL;
 import org.nudge.elasticstack.json.bean.EventTransaction;
-import org.nudge.elasticstack.json.bean.NudgeEvent;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import org.nudge.elasticstack.type.Mbean;
+import org.nudge.elasticstack.type.Sql;
+import org.nudge.elasticstack.type.TransactionLayer;
+
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;

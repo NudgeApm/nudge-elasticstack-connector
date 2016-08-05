@@ -1,4 +1,15 @@
-package type;
+package org.nudge.elasticstack.type;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.json.bean.EventTransaction;
+import org.nudge.elasticstack.json.bean.NudgeEvent;
 
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -9,21 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventTransaction;
-import org.nudge.elasticstack.json.bean.NudgeEvent;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
-
 
 public class TransactionLayer {
 	
-	private static final Logger LOG = Logger.getLogger("Transaction type : ");
+	private static final Logger LOG = Logger.getLogger("Transaction org.nudge.elasticstack.type : ");
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 

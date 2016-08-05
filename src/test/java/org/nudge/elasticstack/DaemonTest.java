@@ -9,8 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import mapping.Mapping;
-
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -59,7 +57,7 @@ public class DaemonTest {
         HttpURLConnection connection = (HttpURLConnection) elasticTest.openConnection();
         connection.setRequestMethod("GET");
         if (connection.getResponseCode() == Response.Status.BAD_REQUEST.getStatusCode()
-                && analyseResponse(connection.getErrorStream(), "{\"type\":\"illegal_argument_exception\",\"reason\":\"No feature for name [transaction]\"}")) {
+                && analyseResponse(connection.getErrorStream(), "{\"org.nudge.elasticstack.type\":\"illegal_argument_exception\",\"reason\":\"No feature for name [transaction]\"}")) {
             putTransaction();
         }
     }
