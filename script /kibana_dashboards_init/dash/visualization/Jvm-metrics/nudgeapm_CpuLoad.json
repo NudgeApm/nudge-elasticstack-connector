@@ -1,0 +1,10 @@
+{
+    "title": "CPU Load",
+    "visState": "{\"title\":\"Open file descriptors\",\"type\":\"area\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"interpolate\":\"linear\",\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mbean_value\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}",
+    "uiStateJSON": "{}",
+    "description": "",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"nudge\",\"query\":{\"query_string\":{\"query\":\"mbean_name:\\\"java.lang:type=OperatingSystem\\\" AND mbean_attributename:\\\"ProcessCPULoad\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+    }
+  }

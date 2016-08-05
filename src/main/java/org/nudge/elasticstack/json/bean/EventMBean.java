@@ -19,7 +19,6 @@ public class EventMBean {
 	private int countAttribute;
 	private String collectingTime;
 
-	// Constructor
 	public EventMBean(String nameMbean, String objectName, String type, double valueMbean, String collectingTime,
 			int countAttribute) {
 		this.setNameMbean(nameMbean);

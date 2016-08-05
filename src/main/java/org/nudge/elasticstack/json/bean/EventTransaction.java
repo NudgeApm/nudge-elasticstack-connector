@@ -32,7 +32,6 @@ public class EventTransaction extends NudgeEvent {
 	private Long layerCountJava;
 
 
-	// Constructor
 	public EventTransaction(String name, Long responseTime, String date, Long count) {
 		super(name, responseTime, date, count, "transaction");
 	}

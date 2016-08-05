@@ -1,0 +1,14 @@
+ {
+      "title": "Petclinic overview dasboard JVM-Metrics",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"id\":\"nudgeapm_CpuLoad\",\"type\":\"visualization\",\"panelIndex\":1,\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":1},{\"id\":\"nudgeapm_FreeMemoryDisk\",\"type\":\"visualization\",\"panelIndex\":2,\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":7},{\"id\":\"nudgeapm_HeapMemoryUsage\",\"type\":\"visualization\",\"panelIndex\":3,\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":1},{\"id\":\"nudgeapm_NonHeadMemory\",\"type\":\"visualization\",\"panelIndex\":4,\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":4},{\"id\":\"nudgeapm_OpenFileDescriptor\",\"type\":\"visualization\",\"panelIndex\":5,\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":4},{\"id\":\"nudgeapm_ActiveThread\",\"type\":\"visualization\",\"panelIndex\":6,\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":7}]",
+      "optionsJSON": "{\"darkTheme\":true}",
+      "uiStateJSON": "{\"P-1\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-3\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-5\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-4\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-2\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-6\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}}}",
+      "version": 1,
+      "timeRestore": false,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+      }
+    }
+ 
