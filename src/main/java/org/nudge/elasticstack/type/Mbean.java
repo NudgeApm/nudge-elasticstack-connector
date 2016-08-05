@@ -98,7 +98,7 @@ public class Mbean {
 			// Handle data event
 			String jsonEvent = jsonSerializer.writeValueAsString(event);
 			jsonEvents2.add(jsonEvent + lineBreak);
-		}
+        }
 		LOG.debug(jsonEvents2);
 		return jsonEvents2;
 	}
