@@ -100,7 +100,6 @@ public class Mbean {
 			jsonEvents2.add(jsonEvent + lineBreak);
 		}
 		LOG.debug(jsonEvents2);
-		System.out.println(jsonEvents2);
 		return jsonEvents2;
 	}
 

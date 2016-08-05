@@ -57,7 +57,7 @@ public class EventSQL {
 		this.countSql = countSql;
 	}
 
-	@JsonProperty("sql_responseTime")
+	@JsonProperty("sql_responsetime")
 	public long getTimeSql() {
 		return timeSql;
 	}

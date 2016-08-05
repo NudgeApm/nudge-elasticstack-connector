@@ -55,7 +55,7 @@ public abstract class NudgeEvent {
 		this.name = name;
 	}
 	
-
+	@JsonProperty("_type")
 	public String getType() {
 		return type;
 	}

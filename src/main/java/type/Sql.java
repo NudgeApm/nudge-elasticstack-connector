@@ -125,11 +125,7 @@ public class Sql {
 		httpCon2.setDoOutput(true);
 		httpCon2.setRequestMethod("PUT");
 		OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
-		if (sb.length() == 0) {
-			return;
-		} else {
-			out.write(sb.toString());
-		}
+		out.write(sb.toString());
 		out.close();
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;
