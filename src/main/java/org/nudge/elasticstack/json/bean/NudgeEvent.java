@@ -14,7 +14,7 @@ public abstract class NudgeEvent {
 	//Attributs
 	private String date;
 	private String name;
-	protected long responseTime;
+	private long responseTime;
 	private long count;
 	private String type;
 	
@@ -55,7 +55,6 @@ public abstract class NudgeEvent {
 		this.name = name;
 	}
 	
-
 	public String getType() {
 		return type;
 	}
