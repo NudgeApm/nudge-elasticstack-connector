@@ -1,5 +1,16 @@
 package type;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.LayerDetail;
+import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.json.bean.EventSQL;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -8,16 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventSQL;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.LayerDetail;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 
 public class Sql {
 
@@ -68,11 +69,11 @@ public class Sql {
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
-		for (EventSQL event : eventSqls) {
-			String jsonMetadata = generateMetaDataSQL(event.getCodeSql());
+		for (EventSQL eventSql : eventSqls) {
+			String jsonMetadata = generateMetaDataSQL(eventSql.getName());
 			jsonEventsSql.add(jsonMetadata + lineBreak);
-			// Handle data event
-			String jsonEvent = jsonSerializer.writeValueAsString(event);
+			// Handle data eventSql
+			String jsonEvent = jsonSerializer.writeValueAsString(eventSql);
 			jsonEventsSql.add(jsonEvent + lineBreak);
 		}
 		LOG.debug(jsonEventsSql);

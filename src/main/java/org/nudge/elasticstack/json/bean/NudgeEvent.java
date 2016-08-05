@@ -14,7 +14,7 @@ public abstract class NudgeEvent {
 	//Attributs
 	private String date;
 	private String name;
-	protected long responseTime;
+	private long responseTime;
 	private long count;
 	private String type;
 	
@@ -54,8 +54,7 @@ public abstract class NudgeEvent {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	@JsonProperty("_type")
+
 	public String getType() {
 		return type;
 	}
