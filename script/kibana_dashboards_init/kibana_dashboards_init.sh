@@ -9,11 +9,11 @@ NAME_ELASTIC_INDEX=".kibana"
 CURL=curl
 DIR=dash
 
-echo "\n"
+printf "\n"
 echo "-------------------------------------------------"
 echo "              kibana_dashboard_init              "
 echo "-------------------------------------------------"
-echo "\n"
+printf "\n"
 
 # Help to use correctly arguments
 help_command () {
@@ -22,21 +22,21 @@ help_command () {
   delete_all   ==> to delete Nudge vizualisations and dashboards which are in your .kibana:
   delete_visu  ==> to delete vizualisations one per one
   delete_dash  ==> to delete dashboards one per one"
-  echo "\n"
+  printf "\n"
 }
 
 # Import Nudge vizualisations, Nudge index-pattern and Nudge dasboards
 import () {
   echo "Processing... "
   echo "Loading to $ELASTICSEARCH_HOST in $NAME_ELASTIC_INDEX ... "
-  echo "\n"
+  printf "\n"
 
   for file in $DIR/visualization/*.json
   do
     name=`basename $file .json`
     echo "Loading visualization called $name: "
     curl -XPUT $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name -d @$file ||exit 1
-    echo "\n"
+    printf "\n"
   done
 
   for file in $DIR/index-pattern/*.json
@@ -45,7 +45,7 @@ import () {
     echo "Loading index pattern $name:"
     curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name  \
     -d @$file
-    echo "\n"
+    printf "\n"
   done
 
   for file in $DIR/dashboards/*.json
@@ -56,7 +56,7 @@ import () {
     -d @$file
     echo
   done
-  echo "\n"
+  printf "\n"
 }
 
 # Delete all : vizualisations, index-pattern and dasboards
@@ -66,7 +66,7 @@ delete_all () {
     name=`basename $file .json`
     echo "Supressing visualization called $name: "
     curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name -d @$file ||exit 1
-    echo "\n"
+    printf "\n"
   done
 
   for file in $DIR/dashboards/*.json
@@ -74,7 +74,7 @@ delete_all () {
     name=`basename $file .json`
     echo "Supressing dashboards called $name: "
     curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
-    echo "\n"
+    printf "\n"
   done
 
   for file in $DIR/index-pattern/*.json
@@ -82,7 +82,7 @@ delete_all () {
     name=`basename $file .json`
     echo "Supressing index-pattern called $name: "
     curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name -d @$file ||exit 1
-    echo "\n"
+    printf "\n"
   done
 }
 
@@ -95,7 +95,7 @@ delete_visu () {
     read -p 'Which vizualisation do you want to delete ? (example : nudgeapm_ResponsetimeLayers)  ' name
     curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name \
     -d @$file
-    echo "\n"
+    printf "\n"
   done
 }
 
@@ -108,7 +108,7 @@ delete_dash() {
   do
     read -p 'Which dashboard do you want to delete ? (example : nudgeapm_petclinicDashboards)  ' name
     curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
-    echo  "\n"
+    printf "\n"
   done
 }
 
