@@ -43,7 +43,7 @@ import () {
   do
     name=`awk '$1 == "\"title\":" {gsub(/"/, "", $2); print $2}' $file`
     echo "Loading index pattern $name:"
-    $CURL -XPUT $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name  \
+    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name  \
     -d @$file
     echo "\n"
   done
@@ -52,7 +52,7 @@ import () {
   do
     name=`basename $file .json`
     echo "Loading dashboard $name:"
-    $CURL -XPUT $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$name \
+    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$name \
     -d @$file
     echo
   done
@@ -65,7 +65,7 @@ delete_all () {
   do
     name=`basename $file .json`
     echo "Supressing visualization called $name: "
-    curl -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name -d @$file ||exit 1
+    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name -d @$file ||exit 1
     echo "\n"
   done
 
@@ -73,7 +73,7 @@ delete_all () {
   do
     name=`basename $file .json`
     echo "Supressing dashboards called $name: "
-    curl -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
+    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
     echo "\n"
   done
 
@@ -81,7 +81,7 @@ delete_all () {
   do
     name=`basename $file .json`
     echo "Supressing index-pattern called $name: "
-    curl -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name -d @$file ||exit 1
+    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name -d @$file ||exit 1
     echo "\n"
   done
 }
@@ -93,7 +93,7 @@ delete_visu () {
   for file in $DIR/visualization/*
   do
     read -p 'Which vizualisation do you want to delete ? (example : nudgeapm_ResponsetimeLayers)  ' name
-    $CURL -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name \
+    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name \
     -d @$file
     echo "\n"
   done
@@ -107,7 +107,7 @@ delete_dash() {
   for file in $DIR/dashboards/*.json
   do
     read -p 'Which dashboard do you want to delete ? (example : nudgeapm_petclinicDashboards)  ' name
-    curl -XDELETE $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
+    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
     echo  "\n"
   done
 }
