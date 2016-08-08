@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Author : Sarah Bourgeois
 # Description : import visualizations and dashboards directly on your Kibana thanks to the Nudge connector.
 
