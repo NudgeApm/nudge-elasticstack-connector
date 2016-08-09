@@ -7,6 +7,11 @@
 
 The Nudge ElasticStack Plugin is a very simple daemon connector that let you integrate your applications performance measures analyzed by [Nudge APM](https://www.nudge-apm.com/) into your Elastic stack.
 ***
+
+###**Live demo**###
+To view a live demo follow this link :
+[http://kibana.nudgeapm.io](http://kibana.nudgeapm.io/app/kibana#/dashboard/nudgeapm_PetclinicOverviewDashboardTransaction)
+
 ###**Requirements**###
 ***
 1. A [Nudge APM](https://www.nudge-apm.com/) account (login, password) and the token of the app (allowed for this account) you want to view in Kibana. You can find this token in the application settings screen.
@@ -18,8 +23,8 @@ The Nudge ElasticStack Plugin is a very simple daemon connector that let you int
 ***
 First download and unpack our archive.
 
-	$ wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.0.0/nudge-elasticstack-connector-1.0.0.zip
-	$ unzip nudge-elasticstack-connector-1.0.0.zip
+	$ wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.1.0/nudge-elasticstack-connector-1.1.0.zip
+	$ unzip nudge-elasticstack-connector-1.1.0.zip
 
 Then edit the properties file and set your own properties.
 These are the mandatory properties you have to specify :
@@ -35,7 +40,7 @@ These are the mandatory properties you have to specify :
 
 Finally start the service.
 
-	$ java -jar nudge-elasticstack-connector-1.0.0-jar-with-dependencies.jar -startDaemon
+	$ java -jar nudge-elasticstack-connector-1.1.0.jar -startDaemon
 
 The plugin is now fetching live data from [Nudge APM](https://www.nudge-apm.com/) and writing them to your Elastic.
 You can easily set up a initial Kibana dashboard using the shell script provided in the archive : `kibana_dashboard_init.sh`.
@@ -44,6 +49,3 @@ You can easily set up a initial Kibana dashboard using the shell script provided
 
 For more informations about this script, read the related documentation page.
 
-###**Live demo**###
-To view a live demo follow this link :
-http://kibana.nudgeapm.io/app/kibana#/dashboard/nudgeapm_petclinicDashboards
