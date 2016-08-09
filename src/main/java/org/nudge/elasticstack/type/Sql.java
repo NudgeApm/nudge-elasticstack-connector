@@ -77,7 +77,6 @@ public class Sql {
 			jsonEventsSql.add(jsonEvent + lineBreak);
 		}
 		LOG.debug(jsonEventsSql);
-		System.out.println(jsonEventsSql);
 		return jsonEventsSql;
 	}
 
