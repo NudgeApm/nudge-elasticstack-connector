@@ -1,38 +1,29 @@
-###***kibana_dashboard_init.sh***###
+#**kibana_dashboard_init.sh**
 -----------------------
 
-It directly imports  visualizations and dashboards in you Kibana. They are based on the data of the software of accessible demonstration of Nudge after your registration on the site. 
-So you can see how to build your own visualisations and dashboards very easily.
+It directly imports visualizations and dashboards in you Kibana, and will display you imported Nudge data from your monitored application.
 
+From these visualizations and dashboards, you can easily build your own. 
 
-####***Requirements ***####
+##***Requirements***
 -----------------------
-Before anything else, you have to execute the Nudge plugin. 
-It is by this way that the script can get back the data of the application of Nudge. 
+Before anything else, you have to execute the Nudge plugin, in order to import Nudge probe data.
 
-####***Configuration***####
+##***Configuration***
 -----------------------
- If you had changed the field " elastic.index " by another name in the properties file of the Nudge plugin, put again "nudge.index". 
 
-The only configuration which you can modify in the script without impacting its using  is the hosts of elasticSearch.
+| Tables                  | Value                                                               |
+| ----------------------- | ------------------------------------------------------------------- |
+| ELASTICSEARCH_HOST      | URL of your elasticsearchLogin (by default _http://localhost:9200_) |
 
-####***Getting started***####
+
+The only configuration which you can modify in the script without impacting its using is the hosts of elasticSearch.
+
+##***Getting started***
 -----------------------
-Without argument :
+Without argument, the help section is displayed.
 
 	 $ ./kibana_dashboard_init.sh 
-
-You access to the help, and view all arguments of the script that you can use.
-
-If you have an error message like : 
-
-
-	 $ bash : kibana_dashboard_init.sh : Permission denied
-do this :
-
-
-	 $ chmod +x kibana_dashboard_init.sh
-	 $ ./kibana_dashboard_init.sh
 
 ----
 
@@ -40,17 +31,21 @@ do this :
 
 	 $ ./kibana_dashboard_init.sh import
 
-All visualisations and dashboards  will import in your kibana.
+All Nudge visualisations and dashboards will be imported in your Kibana.
 
 ----
 #####**Suppress the import**
 
-It is possible  to delete visualisations, dashboards and index-pattern generated.
-For that purpose, you have to launch the script with the parameters presented in the help.
+It is possible to delete visualisations, dashboards and index-pattern generated.
+For this purpose, you have to launch the script with the parameters presented in the help.
 
 	  $ kibana_dashboard_init.sh delete_all    
       $ kibana_dashboard_init.sh delete_visu
       $ kibana_dashboard_init.sh delete_dash
+
+##***Restrictions***
+-----------------------
+If you have changed the Nudge connector property **elastic.index** by an another, the import will not work.
 
 **************
 **Have a good execution !** 
