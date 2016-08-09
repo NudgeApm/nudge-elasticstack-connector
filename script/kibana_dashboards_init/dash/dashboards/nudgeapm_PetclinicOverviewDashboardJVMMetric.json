@@ -2,13 +2,12 @@
       "title": "Petclinic overview dasboard JVM-Metrics",
       "hits": 0,
       "description": "",
-      "panelsJSON": "[{\"id\":\"nudgeapm_CpuLoad\",\"type\":\"visualization\",\"panelIndex\":1,\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":1},{\"id\":\"nudgeapm_FreeMemoryDisk\",\"type\":\"visualization\",\"panelIndex\":2,\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":7},{\"id\":\"nudgeapm_HeapMemoryUsage\",\"type\":\"visualization\",\"panelIndex\":3,\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":1},{\"id\":\"nudgeapm_NonHeadMemory\",\"type\":\"visualization\",\"panelIndex\":4,\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":4},{\"id\":\"nudgeapm_OpenFileDescriptor\",\"type\":\"visualization\",\"panelIndex\":5,\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":4},{\"id\":\"nudgeapm_ActiveThread\",\"type\":\"visualization\",\"panelIndex\":6,\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":7}]",
+      "panelsJSON": "[{\"col\":1,\"id\":\"nudgeapm_FreeMemoryDisk\",\"panelIndex\":2,\"row\":5,\"size_x\":7,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"nudgeapm_HeapMemoryUsage\",\"panelIndex\":3,\"row\":8,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\"},{\"col\":8,\"id\":\"nudgeapm_OpenFileDescriptor\",\"panelIndex\":5,\"row\":5,\"size_x\":5,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"nudgeapm_ActiveThread\",\"panelIndex\":6,\"row\":12,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"nudgeapm_Navigation\",\"panelIndex\":7,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":6,\"id\":\"nudgeapm_NonHeadMemory\",\"panelIndex\":9,\"row\":8,\"size_x\":7,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"nudgeapm_CpuLoad\",\"panelIndex\":10,\"row\":1,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"}]",
       "optionsJSON": "{\"darkTheme\":true}",
-      "uiStateJSON": "{\"P-1\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-3\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-5\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-4\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-2\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}},\"P-6\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#447EBC\"}}}}",
+      "uiStateJSON": "{\"P-10\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#890F02\"},\"legendOpen\":false}},\"P-2\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#584477\"},\"legendOpen\":false}},\"P-3\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#64B0C8\"},\"legendOpen\":true}},\"P-5\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#2F575E\"},\"legendOpen\":true}},\"P-6\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#F9BA8F\"},\"legendOpen\":false}},\"P-9\":{\"vis\":{\"colors\":{\"Average mbean_value\":\"#64B0C8\"},\"legendOpen\":true}}}",
       "version": 1,
       "timeRestore": false,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
       }
     }
- 
