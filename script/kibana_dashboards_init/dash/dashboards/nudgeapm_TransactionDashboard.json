@@ -1,0 +1,14 @@
+ {
+      "title": "Transaction Dashboard",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"col\":4,\"id\":\"nudgeapm_ResponsetimeLayer\",\"panelIndex\":1,\"row\":1,\"size_x\":9,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"nudgeapm_CountTransaction\",\"panelIndex\":5,\"row\":5,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"nudgeapm_TransactionEvolution\",\"panelIndex\":7,\"row\":12,\"size_x\":8,\"size_y\":2,\"type\":\"visualization\"},{\"col\":9,\"id\":\"nudgeapm_TransactionResponseTimeNumber\",\"panelIndex\":8,\"row\":12,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"nudgeapm_SqlResponseTimeEvolution\",\"panelIndex\":9,\"row\":18,\"size_x\":8,\"size_y\":2,\"type\":\"visualization\"},{\"col\":9,\"id\":\"nudgeapm_SqlResponseTimeNumber\",\"panelIndex\":13,\"row\":18,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"nudgeapm_Navigation\",\"panelIndex\":19,\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"nudgeapm_TopTransactionsCount\",\"panelIndex\":24,\"row\":8,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"nudgeapm_TopTransactions\",\"panelIndex\":26,\"row\":8,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"id\":\"nudgeapm_TopSql\",\"type\":\"visualization\",\"panelIndex\":27,\"size_x\":8,\"size_y\":4,\"col\":1,\"row\":14},{\"id\":\"nudgeapm_TopSqlCount\",\"type\":\"visualization\",\"panelIndex\":28,\"size_x\":4,\"size_y\":4,\"col\":9,\"row\":14}]",
+      "optionsJSON": "{\"darkTheme\":true}",
+      "uiStateJSON": "{\"P-1\":{\"vis\":{\"legendOpen\":true}},\"P-5\":{\"vis\":{\"legendOpen\":false}},\"P-7\":{\"vis\":{\"legendOpen\":false}},\"P-9\":{\"vis\":{\"legendOpen\":false}}}",
+      "version": 1,
+      "timeRestore": false,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+      }
+    }
+ 
