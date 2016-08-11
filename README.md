@@ -1,30 +1,27 @@
 
 #**Nudge Elastic Stack connector**#
 
-***
-###**Overview**###
-***
+##Overview
 
 The Nudge ElasticStack Plugin is a very simple daemon connector that let you integrate your applications performance measures analyzed by [Nudge APM](https://www.nudge-apm.com/) into your Elastic stack.
-***
 
-###**Live demo**###
+##Live demo
 To view a live demo follow this link :
 [http://kibana.nudgeapm.io](http://kibana.nudgeapm.io/app/kibana#/dashboard/nudgeapm_PetclinicOverviewDashboardTransaction)
 
-###**Requirements**###
-***
+##Requirements
 1. A [Nudge APM](https://www.nudge-apm.com/) account (login, password) and the token of the app (allowed for this account) you want to view in Kibana. You can find this token in the application settings screen.
 2. Elastic >= 2.3.
 3. Kibana >= 4.5.0.
 4. Java >= 1.7 (Open JDK and Oracle JVM have been tested).
 
-###**Getting started**###
-***
+##Getting started
 First download and unpack our archive.
 
-	$ wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.1.0/nudge-elasticstack-connector-1.1.0.zip
-	$ unzip nudge-elasticstack-connector-1.1.0.zip
+```
+$ wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.1.0/nudge-elasticstack-connector-1.1.0.zip
+$ unzip nudge-elasticstack-connector-1.1.0.zip
+```
 
 Then edit the properties file and set your own properties.
 These are the mandatory properties you have to specify :
@@ -40,12 +37,16 @@ These are the mandatory properties you have to specify :
 
 Finally start the service.
 
-	$ java -jar nudge-elasticstack-connector-1.1.0.jar -startDaemon
+```
+$ java -jar nudge-elasticstack-connector-1.1.0.jar -startDaemon
+```
 
 The plugin is now fetching live data from [Nudge APM](https://www.nudge-apm.com/) and writing them to your Elastic.
 After running the connector, you can easily set up an initial Kibana dashboard using the shell script provided in the archive : `kibana_dashboard_init.sh`.
 
-	$ ./script/kibana_dashboard_init.sh import
+```
+$ ./script/kibana_dashboard_init.sh import
+```
 
 For more information about this script, read the [related documentation page](https://github.com/NudgeApm/nudge-elasticstack-connector/blob/master/script/kibana_dashboards_init/README.md).
 
