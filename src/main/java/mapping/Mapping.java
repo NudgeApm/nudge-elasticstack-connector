@@ -44,7 +44,6 @@ public class Mapping {
 				"analyzed", "string", "not_analyzed");
 		jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		String jsonEvent = jsonSerializer.writeValueAsString(mappingProperies);
-
 		switch (mod) {
 		// ***** Case transaction update mapping ******
 		case typeTransaction:

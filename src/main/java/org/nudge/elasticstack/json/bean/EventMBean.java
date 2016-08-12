@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
  * 
- * Description : Build Manage-Bean insertion
+ *         Description : Build Manage-Bean insertion
  */
 
 public class EventMBean {

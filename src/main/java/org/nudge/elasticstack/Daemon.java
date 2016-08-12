@@ -15,21 +15,20 @@ import mapping.Mapping;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
+import org.nudge.elasticstack.json.bean.EventGeoLocation;
 import org.nudge.elasticstack.json.bean.EventMBean;
 import org.nudge.elasticstack.json.bean.EventSQL;
 import org.nudge.elasticstack.json.bean.EventTransaction;
+import org.nudge.elasticstack.type.Location;
 import org.nudge.elasticstack.type.Mbean;
 import org.nudge.elasticstack.type.Sql;
 import org.nudge.elasticstack.type.TransactionLayer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-
-@SuppressWarnings("unused")
 
 public class Daemon {
 	private static final Logger LOG = Logger.getLogger("Connector : ");
@@ -117,6 +116,14 @@ public class Daemon {
 							s.sendSqltoElk(jsonEventsSql);
 
 							// ===========================
+							// Type : Location
+							// ===========================
+							Location uip = new Location();
+							List<EventGeoLocation> userIp = uip.buildLocationEvent(transactions);
+							List<String> jsonEventsUserIp = uip.parseJsonUserIp(userIp);
+							uip.sendElk(jsonEventsUserIp);
+							
+							// ===========================
 							// Mapping
 							// ===========================
 							Mapping mapping = new Mapping();
@@ -125,7 +132,7 @@ public class Daemon {
 							// Sql update mapping
 							mapping.pushMapping(config, 2);
 							// Mbean update mapping
-							mapping.pushMapping(config, 3);
+							mapping.pushMapping(config, 3);	
 						}
 					}
 					analyzedFilenames = rawdataList;

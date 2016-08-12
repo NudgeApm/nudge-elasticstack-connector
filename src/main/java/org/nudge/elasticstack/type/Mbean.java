@@ -55,7 +55,7 @@ public class Mbean {
 				type = "Mbean";
 				try {
 					valueMbean = Double.parseDouble(mBeanAttributeInfo.getValue());
-				} catch (NumberFormatException nfe) {
+				} catch (NumberFormatException nfe) { 
 					if (LOG.isDebugEnabled()) {
 						LOG.debug("Impossible to get the value of a mbean, it will not be inserted to ELK. MBean from rawdata : " + mBeanAttributeInfo);
 					}
