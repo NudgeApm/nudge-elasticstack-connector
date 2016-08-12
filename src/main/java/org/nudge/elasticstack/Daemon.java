@@ -130,7 +130,8 @@ public class Daemon {
                                 GeoLocation geoLocation = geoLocationService.requestGeoLocationFromIp(transaction.getUserIp());
                                 geoLocations.add(geoLocation);
                             }
-                            gep.sendElk(geoLocations);
+                            gep.pushGeoLocation(geoLocations);
+//                            gep.sendElk(geoLocations);
 
 							// ===========================
 							// Mapping
