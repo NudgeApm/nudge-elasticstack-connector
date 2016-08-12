@@ -13,16 +13,19 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import mapping.Mapping;
 import org.apache.log4j.Logger;
+import org.nudge.elasticstack.bean.GeoLocation;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
-import org.nudge.elasticstack.json.bean.EventGeoLocation;
 import org.nudge.elasticstack.json.bean.EventMBean;
 import org.nudge.elasticstack.json.bean.EventSQL;
 import org.nudge.elasticstack.json.bean.EventTransaction;
-import org.nudge.elasticstack.type.Location;
+import org.nudge.elasticstack.service.GeoLocationService;
+import org.nudge.elasticstack.service.impl.GeoFreeGeoIpImpl;
+import org.nudge.elasticstack.type.GeoLocationElasticPusher;
 import org.nudge.elasticstack.type.Mbean;
 import org.nudge.elasticstack.type.Sql;
 import org.nudge.elasticstack.type.TransactionLayer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -36,7 +39,7 @@ public class Daemon {
 	private static List<String> analyzedFilenames = new ArrayList<>();
 	private static final long ONE_MIN = 60000;
 
-	/**
+    /**
 	 * Description : Launcher Deamon.
 	 * 
 	 * @param config
@@ -65,8 +68,11 @@ public class Daemon {
 	protected static class DaemonTask implements Runnable {
 		private Configuration config;
 
+        GeoLocationService geoLocationService;
+
 		DaemonTask(Configuration config) {
 			this.config = config;
+            geoLocationService = new GeoFreeGeoIpImpl();
 		}
 
 		/**
@@ -118,11 +124,14 @@ public class Daemon {
 							// ===========================
 							// Type : Location
 							// ===========================
-							Location uip = new Location();
-							List<EventGeoLocation> userIp = uip.buildLocationEvent(transactions);
-							List<String> jsonEventsUserIp = uip.parseJsonUserIp(userIp);
-							uip.sendElk(jsonEventsUserIp);
-							
+							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
+                            List<GeoLocation> geoLocations = new ArrayList<>();
+                            for (Transaction transaction : transactions) {
+                                GeoLocation geoLocation = geoLocationService.requestGeoLocationFromIp(transaction.getUserIp());
+                                geoLocations.add(geoLocation);
+                            }
+                            gep.sendElk(geoLocations);
+
 							// ===========================
 							// Mapping
 							// ===========================
