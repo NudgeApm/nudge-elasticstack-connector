@@ -131,30 +131,27 @@ public class Location {
 	}
 
 	// methode qui permet de convertir l'inputStream en Str
-	 protected List<String> parseUserIpResponse(InputStream stream) {
-	 List<String> content = new ArrayList<String>();
-	String var = convertStreamToString(stream);
+	protected List<String> parseUserIpResponse(InputStream stream) {
+		List<String> content = new ArrayList<String>();
+		String var = convertStreamToString(stream);
 		String var2 = var.substring(1, var.length() - 1);
 		if (var2.length() == 0) {
 			return content;
-		}		
+		}
 		String[] var3 = var2.split(",");
 		for (String s : var3) {
 			String s1 = s.substring(1, s.length() - 1);
 			content.add(s1);
 		}
-	 return content;
-	 }
+		return content;
+	}
 
 	// Methode qui converti les inputstream en string
-		private static String convertStreamToString(java.io.InputStream is) {
-			try (java.util.Scanner s = new java.util.Scanner(is)) {
-				s.useDelimiter("\\A");
-				return s.hasNext() ? s.next() : "";
-			}
+	private static String convertStreamToString(java.io.InputStream is) {
+		try (java.util.Scanner s = new java.util.Scanner(is)) {
+			s.useDelimiter("\\A");
+			return s.hasNext() ? s.next() : "";
 		}
-
-	
-
+	}
 
 } // End of class
