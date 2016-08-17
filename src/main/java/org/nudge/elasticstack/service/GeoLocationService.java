@@ -1,11 +1,15 @@
 package org.nudge.elasticstack.service;
 
-import org.nudge.elasticstack.bean.GeoLocation;
-
 import java.io.IOException;
 
+import org.nudge.elasticstack.json.bean.GeoLocation;
+
+
 /**
- * Created by Fred on 12/08/2016.
+ * 
+ * @author Sarah Bourgeois
+ * @author Frederic Massart
+ *
  */
 public interface GeoLocationService {
 
