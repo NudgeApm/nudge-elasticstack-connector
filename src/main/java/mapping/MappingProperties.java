@@ -4,7 +4,7 @@ package mapping;
  * @author : Sarah Bourgeois 
  * @author : Frederic Massart
  * 
- * Description : properties of the new mapping which will be send to elasticsearch
+ * Description : properties of the update mapping for type : sql, transaction and Mbean
  */
 
 import com.fasterxml.jackson.annotation.JsonProperty;

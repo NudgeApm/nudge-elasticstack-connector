@@ -54,7 +54,6 @@ public class BulkFormat {
 			}
 			public void setId(String id) {
 				this.id = id;
-			}		
-			
+			}				
 		}	
 	}

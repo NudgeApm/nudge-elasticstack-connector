@@ -9,26 +9,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GeoLocation {
-	private String ip;
-	private double  latitude;
+
+	private double latitude;
 	private double longitude;
-	private String location;
+	private String clientlocation;
+	private long responseTime;
 	private String type;
 
+	// =====================
+	// Getters and Setters
+	// =====================
 
-	// =====================
-	// Getters and Setters 
-	// =====================
-	// Ip adress
-	public String getIp() {
-		return ip;
+	public String getType() {
+		return type;
 	}
 
-	public void setIp(String ip) {
-		this.ip = ip;
+	public void setType(String type) {
+		this.type = type;
 	}
-
-	// Latitude
 
 	public double getLatitude() {
 		return latitude;
@@ -38,8 +36,6 @@ public class GeoLocation {
 		this.latitude = latitude;
 	}
 
-	// longitude
-
 	public double getLongitude() {
 		return longitude;
 	}
@@ -47,27 +43,21 @@ public class GeoLocation {
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
-	
-//	@JsonProperty("geolocation")
-//	public String getLocation() {
-//		return latitude + longitude;
-//	}
 
-	
-	@JsonProperty("type")
-	public String getType() {
-		return "geolocation";
+	public long getResponseTime() {
+		return responseTime;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setResponseTime(long responseTime) {
+		this.responseTime = responseTime;
 	}
 
-	public void setLocation(String location) {
-		this.location = location;
+	public String getClientlocation() {
+		return latitude + "," + longitude;
 	}
-	
-	
 
+	public String setClientlocation(String clientlocation) {
+		return this.clientlocation = clientlocation;
+	}
 
 } // End of class

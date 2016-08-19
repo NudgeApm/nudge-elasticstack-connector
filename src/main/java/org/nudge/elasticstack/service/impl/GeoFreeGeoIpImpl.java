@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.json.bean.GeoLocation;
+import org.nudge.elasticstack.json.bean.GeoLocationWriter;
 import org.nudge.elasticstack.service.GeoLocationService;
-import org.nudge.elasticstack.type.GeoLocationWriter;
 
 import java.io.IOException;
 import java.io.InputStream;

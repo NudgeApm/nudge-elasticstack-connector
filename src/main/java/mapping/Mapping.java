@@ -11,7 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.config.Configuration;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -33,6 +32,10 @@ public class Mapping {
 		pushMapping(elasticURL, config.getElasticIndex(), mod);
 	}
 
+	public void pushGeolocationMapping(Configuration config) throws IOException {
+		String elasticURL = config.getOutputElasticHosts();
+		pushGeolocationMapping(elasticURL, config.getElasticIndex());
+	}
 	/**
 	 * Description : update default elasticsearch mapping
 	 * 
@@ -99,5 +102,23 @@ public class Mapping {
 
 		} // end switch
 	}
+	
+	public  void pushGeolocationMapping(String elasticURL, String index) throws IOException {
+		ObjectMapper jsonSerializer = new ObjectMapper();
+		MappingPropertiesGeoLocation mpgl = MappingPropertiesGeolocationBuilder.buildGeolocationMappingProperties("geo_point", true, true, 7);
+		jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
+		String jsonEvent = jsonSerializer.writeValueAsString(mpgl);
+			URL URL = new URL(elasticURL + index + "/location/_mapping");
+			HttpURLConnection httpConTrans = (HttpURLConnection) URL.openConnection();
+			httpConTrans.setDoOutput(true);
+			httpConTrans.setRequestMethod("PUT");
+			OutputStreamWriter outTrans = new OutputStreamWriter(httpConTrans.getOutputStream());
+			outTrans.write(jsonEvent);
+			outTrans.close();
+			LOG.debug(" GeoLocation Mapping Flushed : " + httpConTrans.getResponseCode() + " - "
+					+ httpConTrans.getResponseMessage());
+		
+	}
+	
 
 }

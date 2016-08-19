@@ -19,6 +19,7 @@ import org.nudge.elasticstack.json.bean.EventMBean;
 import org.nudge.elasticstack.json.bean.EventSQL;
 import org.nudge.elasticstack.json.bean.EventTransaction;
 import org.nudge.elasticstack.json.bean.GeoLocation;
+import org.nudge.elasticstack.json.bean.GeoLocationWriter;
 import org.nudge.elasticstack.service.GeoLocationService;
 import org.nudge.elasticstack.service.impl.GeoFreeGeoIpImpl;
 import org.nudge.elasticstack.type.GeoLocationElasticPusher;
@@ -39,7 +40,7 @@ public class Daemon {
 	private static List<String> analyzedFilenames = new ArrayList<>();
 	private static final long ONE_MIN = 60000;
 
-    /**
+	/**
 	 * Description : Launcher Deamon.
 	 * 
 	 * @param config
@@ -68,11 +69,11 @@ public class Daemon {
 	protected static class DaemonTask implements Runnable {
 		private Configuration config;
 
-        GeoLocationService geoLocationService;
+		GeoLocationService geoLocationService;
 
 		DaemonTask(Configuration config) {
 			this.config = config;
-            geoLocationService = new GeoFreeGeoIpImpl();
+			geoLocationService = new GeoFreeGeoIpImpl();
 		}
 
 		/**
@@ -120,19 +121,7 @@ public class Daemon {
 							List<EventSQL> sql = s.buildSqlEvents(transactions);
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
-
-							// ===========================
-							// Type : Location
-							// ===========================
-							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
-                            List<GeoLocation> geoLocations = new ArrayList<>();
-                            for (Transaction transaction : transactions) {
-                                GeoLocation geoLocation = geoLocationService.requestGeoLocationFromIp(transaction.getUserIp());
-                                geoLocations.add(geoLocation);
-                            }
-                            gep.pushGeoLocation(geoLocations);
-//                            gep.sendElk(geoLocations);
-
+							
 							// ===========================
 							// Mapping
 							// ===========================
@@ -142,7 +131,21 @@ public class Daemon {
 							// Sql update mapping
 							mapping.pushMapping(config, 2);
 							// Mbean update mapping
-							mapping.pushMapping(config, 3);	
+							mapping.pushMapping(config, 3);
+							// GeoLocation mapping
+							mapping.pushGeolocationMapping(config);
+
+							List<GeoLocation> geoLocations = new ArrayList<>();
+							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
+							for (Transaction transaction : transactions) {
+								GeoLocation geoLocation = geoLocationService
+										.requestGeoLocationFromIp(transaction.getUserIp());
+								geoLocations.add(geoLocation);
+							}
+							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactions);
+							List<String> json = gep.parseJsonLocation(location);
+							gep.sendElk(json);
+
 						}
 					}
 					analyzedFilenames = rawdataList;
