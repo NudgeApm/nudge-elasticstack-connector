@@ -22,16 +22,24 @@ import java.util.UUID;
  * @author Sarah Bourgeois
  * @author Frederic Massart
  */
+
 public class GeoLocationElasticPusher {
 
-	private static final Logger LOG = Logger.getLogger(GeoLocationElasticPusher.class);
+	private static final Logger LOG = Logger.getLogger("Geolocation" + GeoLocationElasticPusher.class);
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
+	/**
+	 * Description : Retrieve data from List Geolocalisation and write it in a
+	 * new bean
+	 * 
+	 * @param geolocation
+	 * @param transaction
+	 * @return
+	 */
 	public List<GeoLocationWriter> buildLocationEvents(List<GeoLocation> geolocation, List<Transaction> transaction) {
 		List<GeoLocationWriter> geowriter = new ArrayList<>();
 		for (GeoLocation geo : geolocation) {
-			// String ip = geo.getIp();
 			String timestamp = null;
 			double latitude = geo.getLatitude();
 			double longitude = geo.getLongitude();
@@ -48,16 +56,20 @@ public class GeoLocationElasticPusher {
 		return geowriter;
 	}
 
+	/**
+	 *  
+	 * @param eventList
+	 * @return
+	 * @throws JsonProcessingException
+	 */
 	public List<String> parseJsonLocation(List<GeoLocationWriter> eventList) throws JsonProcessingException {
 		List<String> jsonEvent2 = new ArrayList<String>();
 		ObjectMapper jsonSerializer = new ObjectMapper();
-
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
-
 		for (GeoLocationWriter event : eventList) {
-			String jsonMetadata = generateMetaDataMbean(event.getType());
+			String jsonMetadata = generateMetaDataGeoLocation(event.getType());
 			jsonEvent2.add(jsonMetadata + lineBreak);
 			// Handle data event
 			String jsonEvent = jsonSerializer.writeValueAsString(event);
@@ -68,13 +80,13 @@ public class GeoLocationElasticPusher {
 	}
 
 	/**
-	 * Description : generate Mbean for Bulk api
-	 *
+	 * Description : generate Geolocation data for Bulk api
+	 * 
 	 * @param mbean
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public String generateMetaDataMbean(String mbean) throws JsonProcessingException {
+	public String generateMetaDataGeoLocation(String mbean) throws JsonProcessingException {
 		Configuration conf = new Configuration();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
@@ -88,7 +100,7 @@ public class GeoLocationElasticPusher {
 	}
 
 	/**
-	 * Description : Send MBean into elasticSearch
+	 * Description : Send Geolocation data into elasticSearch
 	 *
 	 * @param jsonEvents2
 	 * @throws IOException

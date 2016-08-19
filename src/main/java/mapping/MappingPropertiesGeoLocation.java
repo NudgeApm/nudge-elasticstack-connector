@@ -2,7 +2,6 @@ package mapping;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
  * 
  * @author Sarah Bourgeois
@@ -84,8 +83,7 @@ public class MappingPropertiesGeoLocation {
 				this.geohash_precision = geohash_precision;
 			}
 
-		} // End of name Geopoint
-
-	} // End of class Properties
+		}
+	}
 
 } // End of class

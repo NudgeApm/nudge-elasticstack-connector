@@ -15,12 +15,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class Mapping {
-
+	Configuration config = new Configuration();
 	private static final Logger LOG = Logger.getLogger("Update mapping : ");
 	public static final int typeTransaction = 1;
 	public static final int typeSql = 2;
 	public static final int typeMbean = 3;
-
+	String elasticURL = config.getOutputElasticHosts();
 	/**
 	 * 
 	 * @param config
@@ -28,12 +28,10 @@ public class Mapping {
 	 * @throws IOException
 	 */
 	public void pushMapping(Configuration config, int mod) throws IOException {
-		String elasticURL = config.getOutputElasticHosts();
 		pushMapping(elasticURL, config.getElasticIndex(), mod);
 	}
 
 	public void pushGeolocationMapping(Configuration config) throws IOException {
-		String elasticURL = config.getOutputElasticHosts();
 		pushGeolocationMapping(elasticURL, config.getElasticIndex());
 	}
 	/**
@@ -117,7 +115,6 @@ public class Mapping {
 			outTrans.close();
 			LOG.debug(" GeoLocation Mapping Flushed : " + httpConTrans.getResponseCode() + " - "
 					+ httpConTrans.getResponseMessage());
-		
 	}
 	
 
