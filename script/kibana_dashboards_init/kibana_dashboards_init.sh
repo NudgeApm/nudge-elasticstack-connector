@@ -4,8 +4,9 @@
 
 #Elastic Stack parameters
 ELASTICSEARCH_HOST="http://localhost:9200"
-NAME_ELASTIC_INDEX=".kibana"
+
 #Internal script command
+NAME_ELASTIC_INDEX=".kibana"
 CURL=curl
 DIR=dash
 
