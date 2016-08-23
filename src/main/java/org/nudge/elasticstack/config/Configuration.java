@@ -65,6 +65,8 @@ public class Configuration {
 		loadPropertiesFile(pathFile);
 	}
 
+
+
 	/**
 	 * Load properties with the default conf file, must be placed next to the
 	 * jar program.

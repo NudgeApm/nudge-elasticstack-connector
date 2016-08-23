@@ -16,7 +16,8 @@ public class GeoLocationWriter {
 	private String responseTime;
 	private String type;
 
-	public GeoLocationWriter(double latitude, double longitude, String location, String type, String responseTime) {
+	public GeoLocationWriter(double latitude, double longitude, String location, String type, String responseTime)
+	{
 		this.setLatitude(latitude);
 		this.setLongitude(longitude);
 		this.setLocation(location);

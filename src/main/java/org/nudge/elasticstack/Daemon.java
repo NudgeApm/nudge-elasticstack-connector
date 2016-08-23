@@ -91,7 +91,20 @@ public class Daemon {
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
+							// ===========================
+							// Mapping
+							// ===========================
+							Mapping mapping = new Mapping();
+							// Transaction update mapping
+							mapping.pushMapping(config, 1);
+							// Sql update mapping
+							mapping.pushMapping(config, 2);
+							// Mbean update mapping
+							mapping.pushMapping(config, 3);
+							// GeoLocation mapping
+							mapping.pushGeolocationMapping(config);
 
+							
 							// ==============================
 							// Type : Transaction and Layer
 							// ==============================
@@ -122,19 +135,10 @@ public class Daemon {
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
 							
+					
 							// ===========================
-							// Mapping
+							// GeoLocalation
 							// ===========================
-							Mapping mapping = new Mapping();
-							// Transaction update mapping
-							mapping.pushMapping(config, 1);
-							// Sql update mapping
-							mapping.pushMapping(config, 2);
-							// Mbean update mapping
-							mapping.pushMapping(config, 3);
-							// GeoLocation mapping
-							mapping.pushGeolocationMapping(config);
-
 							List<GeoLocation> geoLocations = new ArrayList<>();
 							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
 							for (Transaction transaction : transactions) {

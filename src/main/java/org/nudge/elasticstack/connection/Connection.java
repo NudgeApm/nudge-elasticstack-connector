@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.connection;
+  package org.nudge.elasticstack.connection;
 
 /**
  * @author : Sarah Bourgeois.

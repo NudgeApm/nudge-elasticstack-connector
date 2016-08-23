@@ -47,9 +47,11 @@ public class GeoLocationElasticPusher {
 			GeoLocationWriter geolocationwriter = new GeoLocationWriter(latitude, longitude, Location, "location",
 					timestamp);
 			for (Transaction trans : transaction) {
+			
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				String date = sdfr.format(trans.getStartTime());
 				timestamp = geolocationwriter.setResponseTime(date);
+				
 			}
 			geowriter.add(geolocationwriter);
 		}
@@ -132,5 +134,7 @@ public class GeoLocationElasticPusher {
 		LOG.info(" Flush " + jsonEvents2.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
 		LOG.debug(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
+	
+
 
 } // End of class
