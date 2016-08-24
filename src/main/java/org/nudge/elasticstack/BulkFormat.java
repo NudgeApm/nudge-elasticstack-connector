@@ -1,11 +1,12 @@
 package org.nudge.elasticstack;
 
-import org.nudge.elasticstack.config.Configuration;
 
 /**
- * Convert data for the Bulk API 
+ * 
  * @author Sarah Bourgeois
  * @author Frederic Massart
+ * 
+ * Description : Convert data for the Bulk API 
  */
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,11 +36,12 @@ public class BulkFormat {
 
 		@JsonProperty("_index")
 		public String getIndex() {
-			String format = "dd/MM/yy";
+			String format = "dd-MM-yy";
 			java.text.SimpleDateFormat formater = new java.text.SimpleDateFormat(format);
 			java.util.Date date = new java.util.Date();
 			String dateFormater = formater.format(date);
 			return index + "-" + dateFormater;
+			
 		}
 
 		public void setIndex(String index) {
