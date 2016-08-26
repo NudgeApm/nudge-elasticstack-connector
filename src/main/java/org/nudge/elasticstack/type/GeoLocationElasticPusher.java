@@ -51,7 +51,6 @@ public class GeoLocationElasticPusher {
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				String date = sdfr.format(trans.getStartTime());
 				timestamp = geolocationwriter.setResponseTime(date);
-				
 			}
 			geowriter.add(geolocationwriter);
 		}

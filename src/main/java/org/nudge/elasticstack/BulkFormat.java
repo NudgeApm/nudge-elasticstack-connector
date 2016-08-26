@@ -36,11 +36,11 @@ public class BulkFormat {
 
 		@JsonProperty("_index")
 		public String getIndex() {
-			String format = "dd-MM-yy";
+			String format = "yyyy-MM-dd";
 			java.text.SimpleDateFormat formater = new java.text.SimpleDateFormat(format);
 			java.util.Date date = new java.util.Date();
 			String dateFormater = formater.format(date);
-			return index + "-" + dateFormater;
+			return index  + "-" + dateFormater;
 			
 		}
 
