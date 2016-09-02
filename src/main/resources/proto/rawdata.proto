@@ -1,0 +1,607 @@
+package org.nudge.buffer;
+
+option java_package = "com.nudge.apm.buffer.probe";
+option java_outer_classname = "RawDataProtocol";
+option optimize_for = SPEED;
+
+// ****  DONNEE BRUTE  ****
+// ce message constitue le protocole de communication entre
+// les sondes et le portail nudge
+// il est envoye par la sonde dans le body d'un message HTTP
+// de type PUT a destintation du portail
+message RawData {
+
+	// compteur de paquets encoyes par une meme sonde
+	required int64 id = 1;
+
+	// id unique produit pas une sonde a son demarrage
+	required string agentId = 2;
+
+	// informations de configuration serveur
+	optional ServerConfig serverConfig = 3;
+
+	// Java: informations sur la heap (java)
+	optional HeapMemory heapMemory = 4;
+
+	// Java: informations sur le GC (java)
+	optional GcActivity gcActivity = 5;
+
+	// Java: activite des threads
+	optional ThreadActivity threadActivity = 6;
+
+	// obsolete
+	optional SessionActivity sessionActivity = 7;
+
+	// liste des appels de transactions observees
+	repeated Transaction transactions = 8;
+
+	// obsolete
+	repeated MethodCallSamplig samples = 9  [deprecated = true];
+
+	// obsolete
+	repeated ItemMetric metrics = 10 [deprecated = true];
+
+	// hostname
+	optional string hostname = 11;
+
+	// cle d'identification de la sonde
+	// combinee au hostname, cette cle doit etre unique pour identifier les
+	// instances distinctes d'un meme service
+	optional int64 hostkey = 12;
+
+	// echantillonnage des threads
+	repeated ThreadInfo threadInfos = 13;
+
+	// liste des temps de reponse percus par l'utilisateur
+	// informations collectées via les cookies alimentées par
+	// l'injection javascript dans les pages web
+	repeated string endUserTiming = 14;
+
+	// Java: echantillonnage JMX
+	repeated MBean mBean = 15;
+
+	// les dictionnaires servent a diminuer la taille les rawdata
+	// en remplacant les textes les plus repititifs par des cles numeriques
+	// si les cles sont specifiees dans les messages alors le portail
+	// considerera automatiquement les valeurs pour les messages en question
+
+	// dictionnaire de segments
+	// cle: Transaction.urlId
+	// valeur: Transaction.url
+	optional Dictionary segmentDictionary = 16;
+
+	// dictionnaire de requetes
+	// cle: SqlRequest.sqlId | SqlRequest.urlId
+	// valeur: SqlRequest.sql | SqlRequest.serverUrl
+	optional Dictionary queryDictionary = 17;
+
+	// dictionnaire de classes
+	// cle: StackTraceElement.classNameId
+	// valeur: StackTraceElement.className
+	optional Dictionary classDictionary = 18;
+
+	// dictionnaire de methodes
+	// cle: StackTraceElement.methodNameId
+	// valeur: StackTraceElement.methodName
+	optional Dictionary methodDictionary = 19;
+
+	// dictionnaire de user-agent
+	// cle: Transaction.useragentId
+	// valeur: Transaction.userAgent
+	optional Dictionary userAgent = 20;
+
+	// dictionnaire de mbean
+	// cle: MBeanAttributeInfo.descriptionId | MBeanAttributeInfo.typeId
+	// valeur: MBeanAttributeInfo.description | MBeanAttributeInfo.type
+	optional Dictionary mbeanDictionary = 21;
+
+	// dictionnaire d'appels jms
+	// cle: JMSMessage.queueId | JMSMessage.urlId
+	// valeur: JMSMessage.queueName | JMSMessage.urlName
+	optional Dictionary jmsDictionary = 22;
+
+	// evenements exceptionnels detectes par l'agent (ex: OOME en Java)
+	repeated TroubleshootingEvents troubleshootingEvents = 23;
+}
+
+// ****  SERVER CONFIGURATION  ****
+message ServerConfig {
+	optional string osArch = 1 [deprecated = true]; // use jvmInfo.systemProperties
+	optional string osName = 2 [deprecated = true]; // use jvmInfo.systemProperties
+	optional string osVersion = 3 [deprecated = true]; // use jvmInfo.systemProperties
+	optional int32 availableProcessors = 4;
+	optional string vmName = 5;
+	optional string vmVersion = 6 [deprecated = true]; // use jvmInfo.systemProperties
+	optional string vmVendor = 7 [deprecated = true]; // use jvmInfo.systemProperties
+	optional int64 startTime = 8;
+	optional string bootClassPath = 9;
+	optional string systemProperties = 10 [deprecated = true]; // use jvmInfo.systemProperties
+	optional string servletContextName = 11;
+	optional string serverInfo = 12;
+	optional string canonicalHostName = 13;
+	optional string hostAddress = 14;
+	optional string hostName = 15 [deprecated = true]; // use jvmInfo.hostName
+	optional string appName = 16;
+	optional string environment = 17;
+	optional string serverName = 18;
+	optional int32 serverPort = 19;
+	optional string inputArguments = 20;
+	optional string diagnosticConfig = 21;
+	optional string nudgeVersion = 22;
+	optional JvmInfo jvmInfo = 23;
+}
+
+message JvmInfo {
+	optional string hostName = 1;
+	repeated KeyValue components = 2;
+	repeated KeyValue systemProperties = 3;
+}
+
+message KeyValue {
+	required string key = 1;
+	required string value = 2;
+}
+
+// ****  HEAP MEMORY USAGE  ****
+message HeapMemory {
+	// instance start time
+	required int64 startTime = 1;
+	// heap memory sampling time
+	required int64 endTime = 2;
+	// heap memory used
+	required int64 used = 3;
+}
+
+// ****  GARBAGE COLLECTOR  ****
+message GcActivity {
+	// instance start time
+	required int64 startTime = 1;
+	// cpu sampling time
+	required int64 endTime = 2;
+	// number of collections
+	required int32 collectionCount = 3;
+	// collection elapsed time (cumulated)
+	required int64 collectionTime = 4;
+}
+
+// ****  THREADS STATISTICS  ****
+message ThreadActivity {
+	// instance start time
+	required int64 startTime = 1;
+	// threads sampling time
+	required int64 endTime = 2;
+	// number of live threads
+	required int32 count = 3;
+	// number of live daemon threads
+	required int32 daemonThreadCount = 4;
+	// number of new threads created since last sampling
+	required int32 newThreadCount = 5;
+	// cpu time (ThreadMXBean.getThreadCpuTime)
+	required int64 cpuTime = 6;
+	// user time (ThreadMXBean.getThreadUserTime)
+	required int64 userTime = 7;
+}
+
+// ****  STACKTRACE  ****
+message ThreadInfo {
+	required string uuid = 1; // Identifiant de la transaction
+	required string url = 2;
+	required int64 timeStamp = 3;
+	enum State {
+		NEW = 0;
+		RUNNABLE = 1;
+		BLOCKED = 2;
+		WAITING = 3;
+		TIMED_WAITING = 4;
+		TERMINATED = 5;
+	}
+
+	required State state = 4;
+	message StackTraceElement {
+		optional string className = 1;
+		optional string methodName = 2;
+		optional int32 lineNumber = 3;
+		optional int32 classNameId = 4;
+		optional int32 methodNameId = 5;
+	}
+
+	repeated StackTraceElement frames = 5;
+	optional int64 blockedCount = 6;
+	optional int64 blockedTime = 7 [default = -1];
+	optional int64 waitedCount = 8;
+	optional int64 waitedTime = 9 [default = -1];
+}
+
+message ThreadInfoList {
+	repeated ThreadInfo threads = 1;
+}
+
+message CallTree {
+	optional CallTreeNode rootNode = 1;
+}
+
+message CallTreeNode {
+	required string name = 1;
+	required int64 time = 2;
+	repeated CallTreeNode childs = 3;
+}
+
+// ****  SESSION USAGE  ****
+message SessionActivity {
+	required int64 startTime = 1;
+	optional int64 endTime = 2;
+	optional int32 count = 3;
+	optional int32 newSessionCount = 4;
+}
+
+// ****  TRANSACTION  ****
+message Transaction {
+	// use 'code' instead
+	optional string url = 1 [deprecated = true]; // l'URL pour une requête HTTP, le nom de la methode principale pour un batch
+	optional int64 id = 2 [deprecated = true]; // obsolete
+	optional string sessionId = 3 ;
+	optional string seg1Id = 4 [deprecated = true]; // obsolete
+	optional string seg2Id = 5 [deprecated = true]; // obsolete
+	optional string seg3Id = 6 [deprecated = true]; // obsolete
+
+	optional int64 startTime = 7; // timestamp EPOCH de debut en ms
+	optional int64 endTime = 8; // timestamp EPOCH de fin en ms
+
+	// Parametres de la requete HTTP ou du BATCH
+	repeated Param params = 9;
+	enum Status {
+		OK = 0;
+		KO = 1;
+	}
+
+	optional Status status = 10 [default = OK];
+	repeated Error errors = 11;
+
+	// Statistiques sur l'activite generee par la transaction sur la(les) base(s) de donnees
+	optional int32 dbCnxCount = 12 [default = 0, deprecated=true];
+	optional int64 dbCnxAvg = 13 [default = 0, deprecated=true];
+	optional int64 dbCnxMin = 14 [default = 0, deprecated=true];
+	optional int64 dbCnxMax = 15 [default = 0, deprecated=true];
+	optional int32 dbQueryCount = 16 [default = 0, deprecated=true];
+	optional int64 dbQueryAvg = 17 [default = 0, deprecated=true];
+	optional int64 dbQueryMin = 18 [default = 0, deprecated=true];
+	optional int64 dbQueryMax = 19 [default = 0, deprecated=true];
+	optional int32 dbFetchCount = 20 [default = 0, deprecated=true];
+	repeated SqlRequest sqlRequests = 21 [deprecated=true];
+	optional int32 dbCommitCount = 22 [default = 0, deprecated=true];
+	optional int64 dbCommitAvg = 23 [default = 0, deprecated=true];
+	optional int64 dbCommitMin = 24 [default = 0, deprecated=true];
+	optional int64 dbCommitMax = 25 [default = 0, deprecated=true];
+	optional int32 dbRollbackCount = 26 [default = 0, deprecated=true];
+	optional int64 dbRollbackAvg = 27 [default = 0, deprecated=true];
+	optional int64 dbRollbackMin = 28 [default = 0, deprecated=true];
+	optional int64 dbRollbackMax = 29 [default = 0, deprecated=true];
+
+	// Origine de la transaction
+	enum Type {
+		TRANSACTION = 0;
+		SUB_TRANSACTION = 1;
+		SQL_REQUEST = 2;
+	}
+
+	optional Type type = 30 [default = TRANSACTION, deprecated = true];
+
+	optional string fromServerUrl = 31 [deprecated= true];
+	optional string fromServerId = 32 [deprecated= true];
+	optional string fromTransactionUrl = 33 [deprecated= true];
+	optional int64 fromTransactionId = 34 [deprecated= true]; // l'Id associée à l'URL
+
+	// X-JVM purpose
+	// Must match Rawdata.serverId of upstream probe
+	optional string upstreamAgentId = 35;
+	// Must match Transaction.uuid of upstream Transaction
+	optional string upstreamTxId = 36;
+	// Must match an id of LayerDetail.correlationIds of upstream Transaction
+	optional uint32 upstreamCorrelationId = 37;
+
+	// transaction type
+	optional string txType = 40;
+
+	// code (default tx name) + extended codes (for protocol-spectific values)
+	optional string code = 41;
+	repeated KeyValue extendedCodes = 42;
+
+	// Champ libre pour passer des informations complémentaires
+	repeated Metric metrics = 50;
+	optional int64 dbFetchAvg = 60 [default = 0, deprecated= true];
+	optional int64 dbFetchMin = 61 [default = 0, deprecated= true];
+	optional int64 dbFetchMax = 62 [default = 0, deprecated= true];
+
+	// Impact de la sonde
+	optional int64 cpuOverhead = 70;
+	optional int64 memoryOverhead = 71;
+
+	// la liste headers ne contient que des headers de la réponse
+	// TODO : utiliser Transaction.extendedCodes + système de filtrage similaire aux headers de requête ?
+	repeated Param headers = 80;
+	optional string protocol = 81;
+	optional string uuid = 82;
+
+	// TODO utiliser Transaction.extendedCodes ?
+	optional string userAgent = 83;
+	optional string userIp = 84;
+	optional int32 respStatusCode = 85;
+
+	//deprecated: ce champ peut àªtre alimenté dans l'objet headers (id 80)
+	optional string respContentType = 86 [deprecated = true];
+	optional string methodName = 87;
+	enum ReqMethod {
+		CONNECT = 0;
+		DELETE = 1;
+		GET = 2;
+		HEAD = 3;
+		OPTIONS = 4;
+		POST = 5;
+		PUT = 6;
+		TRACE = 7;
+	}
+
+	// use Transaction.extendedCodes key/value instead
+	optional ReqMethod reqMethod = 88 [deprecated=true];
+	optional int32 urlID = 89;
+	optional int32 useragentID = 90;
+
+	// Statistiques sur l'activité générée par la transaction sur le(s) webservice(s)
+	optional int32 wsCount = 91 [default = 0, deprecated=true];
+	optional int64 wsAvg = 92 [default = 0, deprecated=true];
+	optional int64 wsMin = 93 [default = 0, deprecated=true];
+	optional int64 wsMax = 94 [default = 0, deprecated=true];
+	repeated WSRequest wsRequests = 95 [deprecated=true];
+
+	// JMS
+	repeated JMSMessage consumedJMS = 96 [deprecated = true];
+	repeated JMSMessage producedJMS = 97 [deprecated = true];
+	// Statistiques sur l'activité générée par les messages JMSâ€
+	optional int32 consJMSCount = 98 [default = 0, deprecated=true];
+	optional int64 consJMSAvg = 99 [default = 0, deprecated=true];
+	optional int64 consJMSMin = 100 [default = 0, deprecated=true];
+	optional int64 consJMSMax = 101 [default = 0, deprecated=true];
+	optional int32 prodJMSCount = 102 [default = 0, deprecated=true];
+	optional int64 prodJMSAvg = 103 [default = 0, deprecated=true];
+	optional int64 prodJMSMin = 104 [default = 0, deprecated=true];
+	optional int64 prodJMSMax = 105 [default = 0, deprecated=true];
+	optional int64 dbQueryTotal = 106 [default = 0, deprecated=true];
+	repeated CustomNumericValue numericValues = 107;
+	repeated CustomSegmentValues segmentValues = 108;
+
+	// generic layers
+	// in the future ws, jms and cache calls could become generic layers
+	repeated Layer layers = 109;
+
+	// specify the type of transaction
+	// could be http, rmi, jms ...
+	// can contains several values for multiple layers like "ejb" over "rmi" ou "rpc/gwt" over "http"
+	// the first element in the list is the first met by the application
+	// for example, if there is ejb over rmi, inputLayers = {"rmi","ejb"}
+	// TODO : duplication avec txType et pertinence >1 valeur ?
+	repeated string types = 110;
+
+	optional CallTree callTree = 111;
+
+	// Valeurs des paramètres de headers http
+	// TODO : à  déprécier et utiliser Transaction.extendedCodes
+	repeated Param reqHeaders = 112;
+}
+
+// for generic layers purpose
+message Layer {
+	// layer name such as: Model,View,Controler
+	// or interactions with external tools: ldap, lucene, elasticsearch, github ...
+	optional string layerName = 1;
+	// global number of calls to the layer
+	optional int64 count = 2;
+	// global number of errors
+	optional int64 errors = 3;
+	// global time spent inside the layer
+	optional int64 time = 4;
+	optional int64 max = 5;
+	optional int64 min = 6;
+	// layer calls details
+	repeated LayerDetail calls = 7;
+}
+
+// for generic layers purpose
+// one layer detail for several calls to the same "code"
+message LayerDetail {
+	// agregated timestamp (timestamp floored to minute)
+	optional int64 timestamp = 1;
+	// call code
+	optional string code = 2;
+	// number of calls to the same code
+	optional int64 count = 3;
+	// number of errors
+	optional int64 errors = 4;
+	// global time spent for this code
+	optional int64 time = 5;
+	optional int64 max = 6;
+	optional int64 min = 7;
+	// list of all measures
+	repeated int64 values = 8;
+
+	// used as a key-value storage, thus you should use 'extCodes' instead
+	repeated string extendedCodes = 9 [deprecated = true]; // should have been defined as 'key-value'
+
+	repeated KeyValue extCodes = 10;
+
+	// detail id to correlate between this layer detail and downstream transactions
+	// values must be unique for a given transaction
+	repeated uint32 correlationIds = 11;
+}
+
+message CustomNumericValue {
+	optional string key = 1;
+	optional double value = 2;
+}
+
+message CustomSegmentValues {
+	optional string key = 1;
+	repeated string values = 2;
+}
+
+// ****  SQL  ****
+message SqlRequest {
+	optional int64 id = 1;
+	optional string sql = 2;
+	optional int64 startTime = 3;
+	optional int64 endTime = 4;
+	optional int32 count = 5;
+	optional int64 queryAvg = 6;
+	optional int64 queryMin = 7;
+	optional int64 queryMax = 8;
+	optional string serverUrl = 9;
+	optional int32 fetchCount = 10 [default = 0];
+	optional int64 fetchAvg = 11 [default = 0];
+	optional int64 fetchMin = 12 [default = 0];
+	optional int64 fetchMax = 13 [default = 0];
+	optional int32 sqlId = 14;
+	optional int32 urlId = 15;
+	optional string reqUuid = 16; // t.uuid + "-" + req.id
+	enum RequestType {
+		JDBC = 0;
+		CACHE = 1;
+	}
+
+	optional RequestType requestType = 17;
+	repeated string parameters = 18;
+}
+
+// **** JMS ****
+message JMSMessage {
+	optional int64 id = 1;
+	optional int32 queueId = 2;
+	optional string queueName = 3;
+	optional int32 urlId = 4;
+	optional string urlName = 5;
+	optional int64 startTime = 6;
+	optional int64 endTime = 7;
+	optional Status status = 8 [default = OK];
+	enum JMSType {
+		QUEUE = 0;
+		TOPIC = 1;
+	}
+
+	optional JMSType jmsType = 9;
+	optional string jmsUuid = 10;
+}
+
+// **** WebService ****
+message WSRequest {
+	optional int64 id = 1;
+	optional string url = 2;
+	optional string method = 3;
+	optional string codeInvoker = 4;
+	optional int64 startTime = 5;
+	optional int64 endTime = 6;
+	optional Status status = 7 [default = OK];
+	enum WSType {
+		SOAP = 0;
+		REST = 1;
+		SOAPJAXRPC = 2;
+	}
+
+	optional WSType wsType = 8;
+	optional string wsUuid = 9;
+}
+
+enum Status {
+	OK = 0;
+	KO = 1;
+}
+
+// ****  GENERIC METRIC  ****
+message Metric {
+	optional string group = 1;
+	required string name = 2;
+	required int32 callCount = 3;
+	required int32 errorCount = 4;
+	required int64 maxTime = 5;
+	required int64 minTime = 6;
+	required int64 avgTime = 7;
+	required int64 firstCall = 8;
+	required int64 lastCall = 9;
+}
+
+// ****  GENERIC PARAM  ****
+message Param {
+	required string key = 1;
+	optional string value = 2;
+	optional string type = 3;
+}
+
+// ****  ERROR  ****
+message Error {
+	optional string serverId = 1;
+	optional string code = 2;
+	optional int64 startTime = 3;
+	optional string message = 4;
+
+	// stack trace in old format : splitted with # and without cause(s)
+	optional string stacktrace = 5 [deprecated = true];
+
+	// stack trace as string, as provided by JVM
+	optional string jvmStacktrace = 6;
+}
+
+// ****  STACKTRACE SAMPLING  ****
+message MethodCallSamplig {
+	required string url = 1;
+	required int64 timeStamp = 2;
+	optional string status = 3;
+	optional string frame1 = 4;
+	optional string frame2 = 5;
+	optional string frame3 = 6;
+}
+
+// ****  METRIC (system, JMX..)  ****
+message ItemMetric {
+	required string key = 1;
+	required int64 timeStamp = 2;
+	required string value = 3;
+}
+
+// ****  JMX  ****
+message MBean {
+	required string objectName = 1;
+	repeated MBeanAttributeInfo attributeInfo = 2;
+	required int64 collectingTime = 3;
+}
+
+message MBeanAttributeInfo {
+	optional string name = 1;
+	required string value = 2;
+	optional string description = 3;
+	optional string type = 4;
+	optional bool isReadable = 5;
+	optional bool isWritable = 6;
+	optional bool isIs = 7;
+	optional int32 nameId = 8;
+	optional int32 typeId = 9;
+	optional int32 descriptionId = 10;
+}
+
+message Dictionary {
+	message DictionaryEntry {
+		required string name = 1;
+		required int32 id = 2;
+	}
+
+	repeated DictionaryEntry dictionary = 1;
+}
+
+// ****  Troubleshooting Events (Full GC, Memory leaks...)  ****
+message TroubleshootingEvents {
+	required EventType type = 1;
+	required int64 timestamp = 2;
+	optional string uuidAssociated = 3; // uuid d'une transaction associé à l'event
+	repeated ThreadInfo threadInfos = 4; // Echantillonnage des stackTraces
+	enum EventType {
+		ConnectionLeak = 0;
+		OutOfMemory = 1;
+	}
+
+}
