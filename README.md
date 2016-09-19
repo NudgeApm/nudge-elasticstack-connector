@@ -1,5 +1,5 @@
 
-#**Nudge Elastic Stack connector**#
+#**Nudge Elastic Stack connector**
 
 ##Overview
 
@@ -7,7 +7,7 @@ The Nudge ElasticStack Plugin is a very simple daemon connector that let you int
 
 ##Live demo
 To view a live demo follow this link :
-[http://kibana.nudgeapm.io](http://bit.ly/2bzcEVe)
+<a href="http://bit.ly/2bzcEVe" target="_blank">http://kibana.nudgeapm.io</a>
 
 ##Requirements
 1. A [Nudge APM](https://www.nudge-apm.com/) account (login, password) and the token of the app (allowed for this account) you want to view in Kibana. You can find this token in the application settings screen.
