@@ -41,7 +41,7 @@ public class DaemonTest {
         Mapping mapping = new Mapping();
 
         mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, TYPE);
-        mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, 1);
+        mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, Mapping.MappingType.Transaction);
 
         // then
         URL elasticTest = new URL(URL_ELASTIC_TEST + "/" + INDEX_TEST + "/transaction/_mapping");
