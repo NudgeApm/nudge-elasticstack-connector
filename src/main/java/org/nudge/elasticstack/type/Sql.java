@@ -17,7 +17,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
 
 public class Sql {
 
@@ -94,7 +94,6 @@ public class Sql {
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
-		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
 		elasticMetaData.getIndexElement().setType("sql");
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}

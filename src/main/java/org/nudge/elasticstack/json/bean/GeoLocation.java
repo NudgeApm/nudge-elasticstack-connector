@@ -1,7 +1,7 @@
 package org.nudge.elasticstack.json.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 /**
  * @author Sarah Bourgeois
@@ -12,7 +12,6 @@ public class GeoLocation {
 
 	private double latitude;
 	private double longitude;
-	private String clientlocation;
 	private long responseTime;
 	private String type;
 
@@ -56,8 +55,5 @@ public class GeoLocation {
 		return latitude + "," + longitude;
 	}
 
-	public String setClientlocation(String clientlocation) {
-		return this.clientlocation = clientlocation;
-	}
 
 } // End of class

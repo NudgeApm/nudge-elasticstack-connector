@@ -12,6 +12,8 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import mapping.Mapping;
+import mapping.Mapping.MappingType;
+
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
@@ -129,11 +131,11 @@ public class Daemon {
 							// ===========================
 							Mapping mapping = new Mapping();
 							// Transaction update mapping
-							mapping.pushMapping(config, 1);
+							mapping.pushMapping(config, MappingType.Transaction);
 							// Sql update mapping
-							mapping.pushMapping(config, 2);
+							mapping.pushMapping(config, MappingType.Sql);
 							// Mbean update mapping
-							mapping.pushMapping(config, 3);
+							mapping.pushMapping(config, MappingType.Mbean);
 							// GeoLocation mapping
 							mapping.pushGeolocationMapping(config);
 							

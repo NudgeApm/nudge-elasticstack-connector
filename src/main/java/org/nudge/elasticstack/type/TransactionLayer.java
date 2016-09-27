@@ -18,7 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
 
 
 public class TransactionLayer {
@@ -168,7 +168,6 @@ public class TransactionLayer {
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
-		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
 		elasticMetaData.getIndexElement().setType(type);
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}

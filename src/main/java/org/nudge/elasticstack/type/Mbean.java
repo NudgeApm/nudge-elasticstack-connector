@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventMBean;
-
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -19,7 +18,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
 
 public class Mbean {
 
@@ -118,7 +117,6 @@ public class Mbean {
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
-		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
 		elasticMetaData.getIndexElement().setType("mbean");
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}

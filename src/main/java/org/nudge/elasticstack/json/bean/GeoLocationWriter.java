@@ -12,7 +12,6 @@ public class GeoLocationWriter {
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	private double latitude;
 	private double longitude;
-	private String location;
 	private String responseTime;
 	private String type;
 
@@ -20,7 +19,6 @@ public class GeoLocationWriter {
 	{
 		this.setLatitude(latitude);
 		this.setLongitude(longitude);
-		this.setLocation(location);
 		this.setResponseTime(responseTime);
 		this.setType(type);
 	}
@@ -69,8 +67,5 @@ public class GeoLocationWriter {
 		this.type = type;
 	}
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
 
 } // End of class

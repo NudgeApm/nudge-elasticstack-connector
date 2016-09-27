@@ -16,7 +16,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
 
 /**
  * @author Sarah Bourgeois
@@ -95,7 +95,6 @@ public class GeoLocationElasticPusher {
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
-		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
 		elasticMetaData.getIndexElement().setType("location");
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
