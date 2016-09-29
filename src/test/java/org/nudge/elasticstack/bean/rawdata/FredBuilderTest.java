@@ -7,10 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  *
@@ -41,8 +38,14 @@ public class FredBuilderTest {
         Assert.assertEquals(expectedTrans.getCode(), transaction.getCode());
         Assert.assertEquals(expectedTrans.getStartTime(), transaction.getStartTime());
         Assert.assertEquals(expectedTrans.getEndTime(), transaction.getEndTime());
+        Assert.assertEquals(expectedTrans.getUserIp(), transaction.getUserIp());
+        Assert.assertEquals(expectedTrans.getLayersList().size(), transaction.getLayers().size());
 
-
+        RawDataProtocol.Layer expectedLayer = expectedTrans.getLayersList().get(0);
+        LayerFred layer = transaction.getLayers().get(0);
+        Assert.assertEquals(expectedLayer.getLayerName(), layer.getLayerName());
+        Assert.assertEquals(expectedLayer.getTime(), layer.getTime());
+        Assert.assertEquals(expectedLayer.getCount(), layer.getCount());
     }
 
     @Test
