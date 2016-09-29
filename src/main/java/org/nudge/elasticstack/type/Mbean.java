@@ -90,7 +90,6 @@ public class Mbean {
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
-
 		for (EventMBean event : eventList) {
 			String jsonMetadata = generateMetaDataMbean(event.getType());
 			jsonEvents2.add(jsonMetadata + lineBreak);

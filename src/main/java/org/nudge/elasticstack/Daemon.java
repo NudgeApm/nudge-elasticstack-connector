@@ -13,8 +13,8 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import mapping.Mapping;
 import mapping.Mapping.MappingType;
-
 import org.apache.log4j.Logger;
+import org.nudge.elasticstack.bean.rawdata.TransactionFRED;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
 import org.nudge.elasticstack.json.bean.EventMBean;
@@ -28,13 +28,13 @@ import org.nudge.elasticstack.type.GeoLocationElasticPusher;
 import org.nudge.elasticstack.type.Mbean;
 import org.nudge.elasticstack.type.Sql;
 import org.nudge.elasticstack.type.TransactionLayer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
 
 public class Daemon {
 	private static final Logger LOG = Logger.getLogger("Connector : ");
@@ -93,14 +93,20 @@ public class Daemon {
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
-						
-
-							
+													
 							// ==============================
 							// Type : Transaction and Layer
 							// ==============================
 							TransactionLayer tl = new TransactionLayer();
-							List<Transaction> transactions = rawdata.getTransactionsList();
+							List<Transaction> transactionsRawdata = rawdata.getTransactionsList();
+							
+							List<TransactionFRED> transactions; // TODO mapping 
+							
+							// objet bean java transaction et copier les données transactions qui nous interessent et les mettre dedans. 
+							// on a nos connecteurs transaction avec champs ID et une fois insérés hop on met les ID et sur les methodes d'après on a pas besoin de passer d'autres objets.
+							// TransactionMapping -> get de transaction pour faire des set. 
+							// transaction à 
+							
 							List<EventTransaction> events = tl.buildTransactionEvents(transactions);
 							for (EventTransaction eventTrans : events) {
 								tl.nullLayer(eventTrans);
@@ -108,6 +114,9 @@ public class Daemon {
 							List<String> jsonEvents = tl.parseJson(events);
 							tl.sendToElastic(jsonEvents);
 
+							// ID request
+							
+							
 							// ===========================
 							// Type : MBean
 							// ===========================
@@ -142,16 +151,16 @@ public class Daemon {
 							// ===========================
 							// GeoLocalation
 							// ===========================
-							List<GeoLocation> geoLocations = new ArrayList<>();
-							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
-							for (Transaction transaction : transactions) {
-								GeoLocation geoLocation = geoLocationService
-										.requestGeoLocationFromIp(transaction.getUserIp());
-								geoLocations.add(geoLocation);
-							}
-							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactions);
-							List<String> json = gep.parseJsonLocation(location);
-							gep.sendElk(json);
+//							List<GeoLocation> geoLocations = new ArrayList<>();
+//							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
+//							for (Transaction transaction : transactions) {
+//								GeoLocation geoLocation = geoLocationService
+//										.requestGeoLocationFromIp(transaction.getUserIp());
+//								geoLocations.add(geoLocation);
+//							}
+//							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactions);
+//							List<String> json = gep.parseJsonLocation(location);
+//							gep.sendElk(json);
 
 						}
 					}

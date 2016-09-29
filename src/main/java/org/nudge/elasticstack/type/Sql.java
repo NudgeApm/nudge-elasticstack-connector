@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
 import com.nudge.apm.buffer.probe.RawDataProtocol.LayerDetail;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.bean.rawdata.TransactionFRED;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventSQL;
 import java.io.IOException;
@@ -28,18 +28,11 @@ public class Sql {
 	/**
 	 * Description : retrieve SQL request
 	 */
-	public List<EventSQL> buildSqlEvents(List<Transaction> transaction) {
+	public List<EventSQL> buildSqlEvents(List<TransactionFRED> transaction) {
 		List<EventSQL> eventSqls = new ArrayList<>();
 		List<Layer> layer = new ArrayList<>();
 		List<LayerDetail> layerDetail = new ArrayList<>();
-		for (Transaction trans : transaction) {
-			trans.getLayersList();
-			layer.addAll(trans.getLayersList());
-		}
-		for (Layer lay : layer) {
-			lay.getCallsList();
-			layerDetail.addAll(lay.getCallsList());
-		}
+		for (TransactionFRED trans : transaction) {
 		for (LayerDetail layd : layerDetail) {
 			String sqlCode = null, sqlTimestamp;
 			long sqlCount = 0, sqlTime = 0;
@@ -48,8 +41,11 @@ public class Sql {
 			sqlTime = layd.getTime();
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			sqlTimestamp = sdfr.format(layd.getTimestamp());
-			EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime);
+		//	EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime);
+		
+			EventSQL sqlevent = new EventSQL(trans.getSqlTimeStamp(), trans.getSqlCode(), trans.getSqlCount(), trans.getSqlTime());
 			eventSqls.add(sqlevent);
+		}	
 		}
 		return eventSqls;
 	}
@@ -124,6 +120,7 @@ public class Sql {
 		httpCon2.setRequestMethod("PUT");
 		OutputStreamWriter out = new OutputStreamWriter(httpCon2.getOutputStream());
 		out.write(sb.toString());
+		System.out.println("Sql avec mapppping " +sb.toString());
 		out.close();
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;

@@ -1,6 +1,5 @@
 package org.nudge.elasticstack.json.bean;
 
-
 /**
  * 
  * @author : Sarah Bourgeois
@@ -11,14 +10,13 @@ package org.nudge.elasticstack.json.bean;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class NudgeEvent {
-	//Attributs
+
 	private String date;
 	private String name;
 	private long responseTime;
 	private long count;
 	private String type;
-	
-	//Constructors
+
 	public NudgeEvent(String name, long responseTime, String date, long count, String type) {
 		setName(name);
 		this.date = date;
@@ -27,15 +25,14 @@ public abstract class NudgeEvent {
 		this.type = type;
 	}
 
-	// Method
 	public String toString() {
 		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count;
 	}
 
 	// =========================
-	//  Getters and Setters
+	// Getters and Setters
 	// =========================
-	
+
 	@JsonProperty("@timestamp")
 	public String getDate() {
 		return date;
@@ -49,7 +46,6 @@ public abstract class NudgeEvent {
 	public String getName() {
 		return name;
 	}
-
 
 	public void setName(String name) {
 		this.name = name;
@@ -80,7 +76,5 @@ public abstract class NudgeEvent {
 	public void setCount(long count) {
 		this.count = count;
 	}
-	
-
 
 } // end of class

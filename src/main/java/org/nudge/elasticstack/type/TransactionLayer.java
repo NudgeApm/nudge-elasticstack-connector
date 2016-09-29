@@ -4,13 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.bean.rawdata.TransactionFRED;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventTransaction;
 import org.nudge.elasticstack.json.bean.NudgeEvent;
-
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -36,18 +35,18 @@ public class TransactionLayer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
+	public List<EventTransaction> buildTransactionEvents(List<TransactionFRED> transactionList)
 			throws ParseException, JsonProcessingException {
 		List<EventTransaction> events = new ArrayList<EventTransaction>();
-		for (Transaction trans : transactionList) {
-			String name = trans.getCode();
-			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			String date = sdfr.format(trans.getStartTime());
-			long response_time = trans.getEndTime() - trans.getStartTime();
-			EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
+		for (TransactionFRED trans : transactionList) {
+//			String name = trans.getCode(); 
+//			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+//			String date = sdfr.format(trans.getStartTime());
+//			long response_time = trans.getEndTime() - trans.getStartTime();
+			EventTransaction transactionEvent = new EventTransaction(trans.getLayerName(), trans.getLayerResponseTime(), trans.getLayerDate(), 1L);
 			events.add(transactionEvent);
 			// handle layers
-			buildLayerEvents(trans.getLayersList(), transactionEvent);
+		//	buildLayerEvents(trans.getLayersList(), transactionEvent);
 			events.add(transactionEvent);
 		}
 		return events;

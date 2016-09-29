@@ -33,7 +33,7 @@ public class EventSQL extends NudgeEvent {
 	@JsonProperty("sql_responseTime")
 	public long getResponseTime() {
 		return super.getResponseTime();
-
 	}
 
+	
 }
