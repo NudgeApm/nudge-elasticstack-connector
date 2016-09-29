@@ -7,6 +7,8 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.bean.rawdata.LayerFred;
+import org.nudge.elasticstack.bean.rawdata.TransactionFred;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventTransaction;
 import org.nudge.elasticstack.json.bean.NudgeEvent;
@@ -36,10 +38,10 @@ public class TransactionLayer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
+	public List<EventTransaction> buildTransactionEvents(List<TransactionFred> transactionList)
 			throws ParseException, JsonProcessingException {
 		List<EventTransaction> events = new ArrayList<EventTransaction>();
-		for (Transaction trans : transactionList) {
+		for (TransactionFred trans : transactionList) {
 			String name = trans.getCode();
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdfr.format(trans.getStartTime());
@@ -47,7 +49,7 @@ public class TransactionLayer {
 			EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
 			events.add(transactionEvent);
 			// handle layers
-			buildLayerEvents(trans.getLayersList(), transactionEvent);
+			buildLayerEvents(trans.getLayers(), transactionEvent);
 			events.add(transactionEvent);
 		}
 		return events;
@@ -86,9 +88,9 @@ public class TransactionLayer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public void buildLayerEvents(List<Layer> rawdataLayers, EventTransaction eventTrans)
+	public void buildLayerEvents(List<LayerFred> rawdataLayers, EventTransaction eventTrans)
 			throws ParseException, JsonProcessingException {
-		for (Layer layer : rawdataLayers) {
+		for (LayerFred layer : rawdataLayers) {
 			if (layer.getLayerName().equals("SQL")) {
 				eventTrans.setResponseTimeLayerSql(layer.getTime());
 				eventTrans.setLayerCountSql(layer.getCount());

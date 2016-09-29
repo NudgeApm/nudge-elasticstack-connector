@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.bean.rawdata.TransactionFred;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.GeoLocation;
 import org.nudge.elasticstack.json.bean.GeoLocationWriter;
@@ -37,7 +38,7 @@ public class GeoLocationElasticPusher {
 	 * @param transaction
 	 * @return
 	 */
-	public List<GeoLocationWriter> buildLocationEvents(List<GeoLocation> geolocation, List<Transaction> transaction) {
+	public List<GeoLocationWriter> buildLocationEvents(List<GeoLocation> geolocation, List<TransactionFred> transaction) {
 		List<GeoLocationWriter> geowriter = new ArrayList<>();
 		for (GeoLocation geo : geolocation) {
 			String timestamp = null;
@@ -46,7 +47,7 @@ public class GeoLocationElasticPusher {
 			String Location = geo.getClientlocation();
 			GeoLocationWriter geolocationwriter = new GeoLocationWriter(latitude, longitude, Location, "location",
 					timestamp);
-			for (Transaction trans : transaction) {
+			for (TransactionFred trans : transaction) {
 			
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				String date = sdfr.format(trans.getStartTime());

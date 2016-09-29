@@ -3,11 +3,10 @@ package org.nudge.elasticstack.type;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.LayerDetail;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.bean.rawdata.LayerFred;
+import org.nudge.elasticstack.bean.rawdata.TransactionFred;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventSQL;
 import java.io.IOException;
@@ -28,24 +27,22 @@ public class Sql {
 	/**
 	 * Description : retrieve SQL request
 	 */
-	public List<EventSQL> buildSqlEvents(List<Transaction> transaction) {
+	public List<EventSQL> buildSqlEvents(List<TransactionFred> transaction) {
 		List<EventSQL> eventSqls = new ArrayList<>();
-		List<Layer> layer = new ArrayList<>();
-		List<LayerDetail> layerDetail = new ArrayList<>();
-		for (Transaction trans : transaction) {
-			trans.getLayersList();
-			layer.addAll(trans.getLayersList());
+		List<LayerFred> layer = new ArrayList<>();
+		List<LayerFred.LayerDetail> layerDetail = new ArrayList<>();
+		for (TransactionFred trans : transaction) {
+			layer.addAll(trans.getLayers());
 		}
-		for (Layer lay : layer) {
-			lay.getCallsList();
-			layerDetail.addAll(lay.getCallsList());
+		for (LayerFred lay : layer) {
+			layerDetail.addAll(lay.getLayerDetails());
 		}
-		for (LayerDetail layd : layerDetail) {
+		for (LayerFred.LayerDetail layd : layerDetail) {
 			String sqlCode = null, sqlTimestamp;
 			long sqlCount = 0, sqlTime = 0;
 			sqlCode = layd.getCode();
 			sqlCount = layd.getCount();
-			sqlTime = layd.getTime();
+			sqlTime = layd.getResponseTime();
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			sqlTimestamp = sdfr.format(layd.getTimestamp());
 			EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime);
@@ -57,7 +54,7 @@ public class Sql {
 	/**
 	 * Description : Parse SQL to send to Elastic
 	 *
-	 * @param eventList
+	 * @param eventSqls
 	 * @return
 	 * @throws Exception
 	 */
@@ -82,7 +79,7 @@ public class Sql {
 	/**
 	 * Description : generate SQL for Bulk api
 	 *
-	 * @param mbean
+	 * @param sql
 	 * @return
 	 * @throws JsonProcessingException
 	 */
@@ -101,7 +98,7 @@ public class Sql {
 	/**
 	 * Description : Send MBean into elasticSearch
 	 *
-	 * @param jsonEvents2
+	 * @param jsonEventsSql
 	 * @throws IOException
 	 */
 	public void sendSqltoElk(List<String> jsonEventsSql) throws IOException {

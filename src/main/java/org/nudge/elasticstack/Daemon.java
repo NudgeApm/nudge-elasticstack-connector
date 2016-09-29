@@ -15,6 +15,9 @@ import mapping.Mapping;
 import mapping.Mapping.MappingType;
 
 import org.apache.log4j.Logger;
+import org.nudge.elasticstack.bean.rawdata.MBeanFred;
+import org.nudge.elasticstack.bean.rawdata.TransactionFred;
+import org.nudge.elasticstack.bean.rawdata.FredBuilder;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
 import org.nudge.elasticstack.json.bean.EventMBean;
@@ -101,7 +104,10 @@ public class Daemon {
 							// ==============================
 							TransactionLayer tl = new TransactionLayer();
 							List<Transaction> transactions = rawdata.getTransactionsList();
-							List<EventTransaction> events = tl.buildTransactionEvents(transactions);
+							// TODO FMA builder
+							List<TransactionFred> transactionsFred = FredBuilder.buildTransactions(transactions);
+
+							List<EventTransaction> events = tl.buildTransactionEvents(transactionsFred);
 							for (EventTransaction eventTrans : events) {
 								tl.nullLayer(eventTrans);
 							}
@@ -113,8 +119,12 @@ public class Daemon {
 							// ===========================
 							Mbean mb = new Mbean();
 							List<MBean> mbean = rawdata.getMBeanList();
+
+
+							List<MBeanFred> mBeansFred = FredBuilder.buildMbeans(mbean);
+
 							Dictionary dictionary = rawdata.getMbeanDictionary();
-							List<EventMBean> eventsMBeans = mb.buildMbeanEvents(mbean, dictionary);
+							List<EventMBean> eventsMBeans = mb.buildMbeanEvents(mBeansFred, dictionary);
 							List<String> jsonEvents2 = mb.parseJsonMBean(eventsMBeans);
 							mb.sendElk(jsonEvents2);
 
@@ -122,7 +132,7 @@ public class Daemon {
 							// Type : SQL
 							// ===========================
 							Sql s = new Sql();
-							List<EventSQL> sql = s.buildSqlEvents(transactions);
+							List<EventSQL> sql = s.buildSqlEvents(transactionsFred);
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
 							
@@ -144,12 +154,12 @@ public class Daemon {
 							// ===========================
 							List<GeoLocation> geoLocations = new ArrayList<>();
 							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
-							for (Transaction transaction : transactions) {
+							for (TransactionFred transaction : transactionsFred) {
 								GeoLocation geoLocation = geoLocationService
 										.requestGeoLocationFromIp(transaction.getUserIp());
 								geoLocations.add(geoLocation);
 							}
-							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactions);
+							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactionsFred);
 							List<String> json = gep.parseJsonLocation(location);
 							gep.sendElk(json);
 
