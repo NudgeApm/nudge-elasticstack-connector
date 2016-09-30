@@ -47,9 +47,6 @@ public class LayerFred {
     }
 
 
-
-
-
     public class LayerDetail {
 
         private String code;

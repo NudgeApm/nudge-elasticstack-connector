@@ -1,6 +1,5 @@
 package org.nudge.elasticstack.bean.rawdata;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -10,18 +9,18 @@ import java.util.List;
 public class MBeanFred {
 
 
-    private Date collectingTime;
+    private long collectingTime;
     private String objectName;
     private int attributeInfoCount;
 
     List<AttributeInfo> attributeInfos;
 
-    public Date getCollectingTime() {
+    public long getCollectingTime() {
         return collectingTime;
     }
 
-    public void setCollectingTime(Date collectingTime) {
-        this.collectingTime = collectingTime;
+    public void setCollectingTime(long l) {
+        this.collectingTime = l;
     }
 
     public String getObjectName() {
@@ -48,11 +47,6 @@ public class MBeanFred {
     public void setAttributeInfos(List<AttributeInfo> attributeInfos) {
         this.attributeInfos = attributeInfos;
     }
-
-
-
-
-
 
 
     public class AttributeInfo {
