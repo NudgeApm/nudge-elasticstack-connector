@@ -43,11 +43,12 @@ public class FredBuilderTest {
 		Assert.assertEquals(expectedTrans.getUserIp(), transaction.getUserIp());
 		Assert.assertEquals(expectedTrans.getLayersList().size(), transaction.getLayers().size());
 
+		// Layers
 		RawDataProtocol.Layer expectedLayer = expectedTrans.getLayersList().get(0);
 		LayerFred layer = transaction.getLayers().get(0);
 		Assert.assertEquals(expectedLayer.getLayerName(), layer.getLayerName());
 		Assert.assertEquals(expectedLayer.getTime(), layer.getTime());
-		Assert.assertEquals(expectedLayer.getCount(), layer.getCount());
+		Assert.assertEquals(expectedLayer.getCount(), layer.getCount());		
 	}
 
 	@Test
@@ -60,6 +61,9 @@ public class FredBuilderTest {
 		Assert.assertEquals(expectedMbean.getAttributeInfoCount(), mbean.getAttributeInfoCount());
 		Assert.assertEquals(expectedMbean.getCollectingTime(), mbean.getCollectingTime());
 		Assert.assertEquals(expectedMbean.getObjectName(), mbean.getObjectName());
+		
+		
+		Assert.assertEquals(expectedMbean.getAttributeInfo(0), mbean.getAttributeInfos());
 
 	}
 

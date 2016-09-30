@@ -32,6 +32,7 @@ public class BulkFormat {
 	public class Index {
 		private String index;
 		private String type;
+		private String id;
 
 		@JsonProperty("_index")
 		public String getIndex() {
@@ -54,6 +55,15 @@ public class BulkFormat {
 
 		public void setType(String type) {
 			this.type = type;
+		}
+
+		@JsonProperty("_id")
+		public String getId() {
+			return id;
+		}
+
+		public void setId(String id) {
+			this.id = id;
 		}
 	}
 }

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.nudge.elasticstack.type.Mbean;
+
 /**
  * Created by Fred on 29/09/2016.
  */
@@ -37,24 +39,20 @@ public class FredBuilder {
 		return transactions;
 	}
 
-	//
-	//
-	//
-	// transactions.add(transaction);
-	// }
-	// }
-	//
+
 
 	public static List<MBeanFred> buildMbeans(List<RawDataProtocol.MBean> rawdataMbeans) {
 		List<MBeanFred> mbeanList = new ArrayList<>(rawdataMbeans.size());
 		for (RawDataProtocol.MBean rawdataMbean : rawdataMbeans) {
 			MBeanFred mbean = new MBeanFred();
 			mbean.setAttributeInfoCount(rawdataMbean.getAttributeInfoCount());
-			// mbean.setAttributeInfos(rawdataMbean.getAttributeInfoList());
 			mbean.setCollectingTime(rawdataMbean.getCollectingTime());
 			mbean.setObjectName(rawdataMbean.getObjectName());
+			
+			List<MBeanFred> mbeanattribute = new ArrayList<>();
+	
+			
 			mbeanList.add(mbean);
-
 		}
 
 		return mbeanList;

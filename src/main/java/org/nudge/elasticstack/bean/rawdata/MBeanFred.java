@@ -1,6 +1,6 @@
 package org.nudge.elasticstack.bean.rawdata;
 
-import java.util.Date;
+
 import java.util.List;
 
 /**
