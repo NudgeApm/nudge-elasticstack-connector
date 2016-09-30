@@ -5,13 +5,12 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.nudge.elasticstack.type.Mbean;
 
 import java.io.IOException;
 import java.util.List;
 
 /**
- *
+ * Test class for {@link FredBuilder}
  */
 public class FredBuilderTest {
 
@@ -19,6 +18,9 @@ public class FredBuilderTest {
 
 	private RawDataProtocol.RawData rawData;
 
+	/**
+	 * Prepare the test by reading a sample example of a Nudge APM rawdata.
+	 */
 	@Before
 	public void readRawdata() {
 		try {
@@ -33,7 +35,6 @@ public class FredBuilderTest {
 	public void buildTransactions() throws Exception {
 		List<TransactionFred> transactionFredList = FredBuilder.buildTransactions(rawData.getTransactionsList());
 
-		// test -assertions
 		RawDataProtocol.Transaction expectedTrans = rawData.getTransactionsList().get(0);
 		TransactionFred transaction = transactionFredList.get(0);
 
@@ -51,16 +52,19 @@ public class FredBuilderTest {
 	}
 
 	@Test
-	public void buildMbeans() throws Exception {
-		List<MBeanFred> mbeanFredList = FredBuilder.buildMbeans(rawData.getMBeanList());
+	public void buildMBeans() throws Exception {
+		List<MBeanFred> mbeanFredList = FredBuilder.buildMBeans(rawData.getMBeanList());
 
-		// test -assertions
 		RawDataProtocol.MBean expectedMbean = rawData.getMBeanList().get(0);
 		MBeanFred mbean = mbeanFredList.get(0);
 		Assert.assertEquals(expectedMbean.getAttributeInfoCount(), mbean.getAttributeInfoCount());
 		Assert.assertEquals(expectedMbean.getCollectingTime(), mbean.getCollectingTime());
 		Assert.assertEquals(expectedMbean.getObjectName(), mbean.getObjectName());
 
+		RawDataProtocol.MBeanAttributeInfo expectedAttributeInfo = expectedMbean.getAttributeInfoList().get(0);
+		MBeanFred.AttributeInfo attributeInfo = mbean.getAttributeInfos().get(0);
+		Assert.assertEquals(expectedAttributeInfo.getNameId(), attributeInfo.getNameId());
+		Assert.assertEquals(expectedAttributeInfo.getValue(), attributeInfo.getValue());
 	}
 
 }

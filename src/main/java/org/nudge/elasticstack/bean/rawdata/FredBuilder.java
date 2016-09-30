@@ -4,11 +4,13 @@ import com.nudge.apm.buffer.probe.RawDataProtocol;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Fred on 29/09/2016.
+ * Mapping builder for Nudge APM rawdata objects.
+ *
+ * @author Sarah Bourgeois
+ * @author Frederic Massart
  */
 public class FredBuilder {
 
@@ -37,26 +39,24 @@ public class FredBuilder {
 		return transactions;
 	}
 
-	//
-	//
-	//
-	// transactions.add(transaction);
-	// }
-	// }
-	//
-
-	public static List<MBeanFred> buildMbeans(List<RawDataProtocol.MBean> rawdataMbeans) {
+	public static List<MBeanFred> buildMBeans(List<RawDataProtocol.MBean> rawdataMbeans) {
 		List<MBeanFred> mbeanList = new ArrayList<>(rawdataMbeans.size());
 		for (RawDataProtocol.MBean rawdataMbean : rawdataMbeans) {
 			MBeanFred mbean = new MBeanFred();
 			mbean.setAttributeInfoCount(rawdataMbean.getAttributeInfoCount());
-			// mbean.setAttributeInfos(rawdataMbean.getAttributeInfoList());
 			mbean.setCollectingTime(rawdataMbean.getCollectingTime());
 			mbean.setObjectName(rawdataMbean.getObjectName());
 			mbeanList.add(mbean);
 
+			ArrayList<MBeanFred.AttributeInfo> attributeInfos = new ArrayList<>(rawdataMbean.getAttributeInfoCount());
+			mbean.setAttributeInfos(attributeInfos);
+			for (RawDataProtocol.MBeanAttributeInfo rawdataAttrInfo : rawdataMbean.getAttributeInfoList()) {
+				MBeanFred.AttributeInfo attrInfo = mbean.new AttributeInfo();
+				attrInfo.setNameId(rawdataAttrInfo.getNameId());
+				attrInfo.setValue(rawdataAttrInfo.getValue());
+				attributeInfos.add(attrInfo);
+			}
 		}
-
 		return mbeanList;
 	}
 }
