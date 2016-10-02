@@ -38,13 +38,11 @@ public class Sql {
 			layerDetail.addAll(lay.getLayerDetails());
 		}
 		for (LayerFred.LayerDetail layd : layerDetail) {
-			String sqlCode = null, sqlTimestamp;
-			long sqlCount = 0, sqlTime = 0;
-			sqlCode = layd.getCode();
-			sqlCount = layd.getCount();
-			sqlTime = layd.getResponseTime();
+			String sqlCode = layd.getCode();
+			long sqlCount = layd.getCount();
+			long sqlTime = layd.getResponseTime();
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			sqlTimestamp = sdfr.format(layd.getTimestamp());
+			String sqlTimestamp = sdfr.format(layd.getTimestamp());
 			EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime);
 			eventSqls.add(sqlevent);
 		}

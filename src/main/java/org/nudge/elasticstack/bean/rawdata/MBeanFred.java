@@ -13,6 +13,7 @@ public class MBeanFred {
     private String objectName;
     private int attributeInfoCount;
 
+
     List<AttributeInfo> attributeInfos;
 
     public long getCollectingTime() {
