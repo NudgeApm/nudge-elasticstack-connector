@@ -50,7 +50,7 @@ public class LayerFred {
     public class LayerDetail {
 
         private String code;
-        private int count;
+        private long count;
         private long responseTime;
         private long timestamp;
 
@@ -62,11 +62,11 @@ public class LayerFred {
             this.code = code;
         }
 
-        public int getCount() {
+        public long getCount() {
             return count;
         }
 
-        public void setCount(int count) {
+        public void setCount(long count) {
             this.count = count;
         }
 

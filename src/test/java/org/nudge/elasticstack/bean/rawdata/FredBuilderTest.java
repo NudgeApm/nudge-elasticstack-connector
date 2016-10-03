@@ -35,20 +35,29 @@ public class FredBuilderTest {
 	public void buildTransactions() throws Exception {
 		List<TransactionFred> transactionFredList = FredBuilder.buildTransactions(rawData.getTransactionsList());
 
+		// First test : transaction stuff
 		RawDataProtocol.Transaction expectedTrans = rawData.getTransactionsList().get(0);
 		TransactionFred transaction = transactionFredList.get(0);
-
 		Assert.assertEquals(expectedTrans.getCode(), transaction.getCode());
 		Assert.assertEquals(expectedTrans.getStartTime(), transaction.getStartTime());
 		Assert.assertEquals(expectedTrans.getEndTime(), transaction.getEndTime());
 		Assert.assertEquals(expectedTrans.getUserIp(), transaction.getUserIp());
 		Assert.assertEquals(expectedTrans.getLayersList().size(), transaction.getLayers().size());
 
+		// second test : layer stuff belongs to a transaction
 		RawDataProtocol.Layer expectedLayer = expectedTrans.getLayersList().get(0);
 		LayerFred layer = transaction.getLayers().get(0);
 		Assert.assertEquals(expectedLayer.getLayerName(), layer.getLayerName());
 		Assert.assertEquals(expectedLayer.getTime(), layer.getTime());
 		Assert.assertEquals(expectedLayer.getCount(), layer.getCount());
+
+		// third test : layer detail stuff belongs to a layer
+		RawDataProtocol.LayerDetail expectedLayerDetail = expectedLayer.getCallsList().get(0);
+		LayerFred.LayerDetail layerDetails = layer.getLayerDetails().get(0);
+		Assert.assertEquals(expectedLayerDetail.getTimestamp(), layerDetails.getTimestamp());
+		Assert.assertEquals(expectedLayerDetail.getCode(), layerDetails.getCode());
+		Assert.assertEquals(expectedLayerDetail.getCount(), layerDetails.getCount());
+		Assert.assertEquals(expectedLayerDetail.getTime(), layerDetails.getResponseTime());
 	}
 
 	@Test

@@ -31,6 +31,18 @@ public class FredBuilder {
 				layer.setTime(lay.getTime());
 				layer.setCount(lay.getCount());
 				layers.add(layer);
+
+				if (lay.getCallsList() != null) {
+					layer.setLayerDetails(new ArrayList<LayerFred.LayerDetail>());
+					for (RawDataProtocol.LayerDetail rawDataLayerDetail : lay.getCallsList()) {
+						LayerFred.LayerDetail layerDetail = layer.new LayerDetail();
+						layerDetail.setTimestamp(rawDataLayerDetail.getTimestamp());
+						layerDetail.setCode(rawDataLayerDetail.getCode());
+						layerDetail.setCount(rawDataLayerDetail.getCount());
+						layerDetail.setResponseTime(rawDataLayerDetail.getTime());
+						layer.getLayerDetails().add(layerDetail);
+					}
+				}
 			}
 			transaction.setLayers(layers);
 			transactions.add(transaction);
