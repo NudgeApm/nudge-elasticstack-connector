@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class EventSQL extends NudgeEvent {
 
-	private static String transactionId;
+	private  String transactionId;
 	
 	
 	public EventSQL(String timestamp, String name, long count, long responseTime, String transactionId) {
@@ -29,12 +29,12 @@ public class EventSQL extends NudgeEvent {
 		return super.getName();
 	}
 
-	public static String getTransactionId() {
+	public  String getTransactionId() {
 		return transactionId;
 	}
 
-	public static void setTransactionId(String transactionId) {
-		EventSQL.transactionId = transactionId;
+	public  void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
 	}
 
 	@JsonProperty("sql_count")
