@@ -5,13 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.bean.rawdata.LayerFred;
-import org.nudge.elasticstack.bean.rawdata.TransactionFred;
+import org.nudge.elasticstack.bean.rawdata.LayerDTO;
+import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
 import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventMBean;
-import org.nudge.elasticstack.json.bean.EventSQL;
 import org.nudge.elasticstack.json.bean.EventTransaction;
-import org.nudge.elasticstack.json.bean.GeoLocation;
 import org.nudge.elasticstack.json.bean.NudgeEvent;
 
 import java.io.OutputStreamWriter;
@@ -37,10 +34,10 @@ public class TransactionLayer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<EventTransaction> buildTransactionEvents(List<TransactionFred> transactionList)
+	public List<EventTransaction> buildTransactionEvents(List<TransactionDTO> transactionList)
 			throws ParseException, JsonProcessingException {
 		List<EventTransaction> events = new ArrayList<EventTransaction>();
-		for (TransactionFred trans : transactionList) {
+		for (TransactionDTO trans : transactionList) {
 			String name = trans.getCode();
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdfr.format(trans.getStartTime());
@@ -87,9 +84,9 @@ public class TransactionLayer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public void buildLayerEvents(List<LayerFred> rawdataLayers, EventTransaction eventTrans)
+	public void buildLayerEvents(List<LayerDTO> rawdataLayers, EventTransaction eventTrans)
 			throws ParseException, JsonProcessingException {
-		for (LayerFred layer : rawdataLayers) {
+		for (LayerDTO layer : rawdataLayers) {
 			if (layer.getLayerName().equals("SQL")) {
 				eventTrans.setResponseTimeLayerSql(layer.getTime());
 				eventTrans.setLayerCountSql(layer.getCount());
@@ -169,15 +166,6 @@ public class TransactionLayer {
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
-
-		// retrieve Id transaction and insert it into other type
-		EventTransaction event;
-		event.setTransactionId(elasticMetaData.getIndexElement().getId());
-		GeoLocation geo = new GeoLocation();
-		geo.setTransactionId(elasticMetaData.getIndexElement().getId());
-		EventMBean.setTransactionId(elasticMetaData.getIndexElement().getId());
-		EventSQL.setTransactionId(elasticMetaData.getIndexElement().getId());
-			
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
 		elasticMetaData.getIndexElement().setType(type);
 		return jsonSerializer.writeValueAsString(elasticMetaData);

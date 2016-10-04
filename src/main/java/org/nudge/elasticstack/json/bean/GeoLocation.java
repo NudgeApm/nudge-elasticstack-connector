@@ -65,4 +65,4 @@ public class GeoLocation {
 	}
 
 
-} // End of class
+}

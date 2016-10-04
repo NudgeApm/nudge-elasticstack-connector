@@ -3,14 +3,12 @@ package org.nudge.elasticstack.bean.rawdata;
 import java.util.List;
 
 /**
- * Layer Bean of a {@link TransactionFred}.
+ * Layer Bean of a {@link TransactionDTO}.
  *
- * @author : Sarah Bourgeois
- * @author : Frederic Massart
+ * @author Sarah Bourgeois
+ * @author Frederic Massart
  */
-
-
-public class LayerFred {
+public class LayerDTO {
 
     private String layerName;
     private long time;

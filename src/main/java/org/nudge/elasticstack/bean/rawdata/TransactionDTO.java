@@ -8,7 +8,7 @@ import java.util.List;
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
  */
-public class TransactionFred {
+public class TransactionDTO {
 
     private String code;
     private long startTime;
@@ -16,7 +16,7 @@ public class TransactionFred {
 
     private String userIp;
 
-    private List<LayerFred> layers;
+    private List<LayerDTO> layers;
 
     public String getCode() {
         return code;
@@ -50,12 +50,12 @@ public class TransactionFred {
         this.userIp = userIp;
     }
 
-    public List<LayerFred> getLayers() {
+    public List<LayerDTO> getLayers() {
         return layers;
     }
 
-    public void setLayers(List<LayerFred> layers) {
+    public void setLayers(List<LayerDTO> layers) {
         this.layers = layers;
     }
     
-} // end of class
+}

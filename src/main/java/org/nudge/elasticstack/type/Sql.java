@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.bean.rawdata.LayerFred;
-import org.nudge.elasticstack.bean.rawdata.TransactionFred;
+import org.nudge.elasticstack.bean.rawdata.LayerDTO;
+import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventSQL;
 
@@ -28,17 +28,17 @@ public class Sql {
 	/**
 	 * Description : retrieve SQL request
 	 */
-	public List<EventSQL> buildSqlEvents(List<TransactionFred> transaction) {
+	public List<EventSQL> buildSqlEvents(List<TransactionDTO> transaction) {
 		List<EventSQL> eventSqls = new ArrayList<>();
-		List<LayerFred> layer = new ArrayList<>();
-		List<LayerFred.LayerDetail> layerDetail = new ArrayList<>();
-		for (TransactionFred trans : transaction) {
+		List<LayerDTO> layer = new ArrayList<>();
+		List<LayerDTO.LayerDetail> layerDetail = new ArrayList<>();
+		for (TransactionDTO trans : transaction) {
 			layer.addAll(trans.getLayers());
 		}
-		for (LayerFred lay : layer) {
+		for (LayerDTO lay : layer) {
 			layerDetail.addAll(lay.getLayerDetails());
 		}
-		for (LayerFred.LayerDetail layd : layerDetail) {
+		for (LayerDTO.LayerDetail layd : layerDetail) {
 			String sqlCode = layd.getCode();
 			long sqlCount = layd.getCount();
 			long sqlTime = layd.getResponseTime();
@@ -127,4 +127,4 @@ public class Sql {
 		LOG.debug(" Sending Sql : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 
-} // End of class
+}

@@ -9,7 +9,7 @@ import java.util.List;
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
  */
-public class MBeanFred {
+public class MBeanDTO {
 
     private long collectingTime;
     private String objectName;

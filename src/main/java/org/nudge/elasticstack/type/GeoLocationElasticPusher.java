@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.bean.rawdata.TransactionFred;
+import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.GeoLocation;
 import org.nudge.elasticstack.json.bean.GeoLocationWriter;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -37,7 +38,7 @@ public class GeoLocationElasticPusher {
 	 * @param transaction
 	 * @return
 	 */
-	public List<GeoLocationWriter> buildLocationEvents(List<GeoLocation> geolocation, List<TransactionFred> transaction) {
+	public List<GeoLocationWriter> buildLocationEvents(List<GeoLocation> geolocation, List<TransactionDTO> transaction) {
 		List<GeoLocationWriter> geowriter = new ArrayList<>();
 		for (GeoLocation geo : geolocation) {
 			String timestamp = null;
@@ -47,7 +48,7 @@ public class GeoLocationElasticPusher {
 			String id = "";
 			GeoLocationWriter geolocationwriter = new GeoLocationWriter(latitude, longitude, Location, "location",
 					timestamp, id);
-			for (TransactionFred trans : transaction) {
+			for (TransactionDTO trans : transaction) {
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				String date = sdfr.format(trans.getStartTime());
 				timestamp = geolocationwriter.setResponseTime(date);
@@ -135,4 +136,4 @@ public class GeoLocationElasticPusher {
 	
 
 
-} // End of class
+}

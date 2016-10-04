@@ -7,9 +7,10 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.bean.rawdata.MBeanFred;
+import org.nudge.elasticstack.bean.rawdata.MBeanDTO;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventMBean;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -33,20 +34,20 @@ public class Mbean {
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public List<EventMBean> buildMbeanEvents(List<MBeanFred> mbean, Dictionary dictionary) throws JsonProcessingException {
+	public List<EventMBean> buildMbeanEvents(List<MBeanDTO> mbean, Dictionary dictionary) throws JsonProcessingException {
 		List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
 		List<DictionaryEntry> dico = dictionary.getDictionaryList();
 
 		// TODO FMA extract SDF to builder
 		SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		// retrieve MBean
-		for (MBeanFred mb : mbean) {
+		for (MBeanDTO mb : mbean) {
 
 			String collectingTime = sdfr.format(mb.getCollectingTime());
 			String objectName = mb.getObjectName();
 			int countAttribute = mb.getAttributeInfoCount();
 
-			for (MBeanFred.AttributeInfo mBeanAttributeInfo : mb.getAttributeInfos()) {
+			for (MBeanDTO.AttributeInfo mBeanAttributeInfo : mb.getAttributeInfos()) {
 				String nameMbean = null;
 				double valueMbean = 0;
 			int	nameId = mBeanAttributeInfo.getNameId();
@@ -154,4 +155,4 @@ public class Mbean {
 		LOG.debug(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 
-} // End of class
+}

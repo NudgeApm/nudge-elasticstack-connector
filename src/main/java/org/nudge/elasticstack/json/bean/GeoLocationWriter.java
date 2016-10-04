@@ -78,4 +78,4 @@ public class GeoLocationWriter {
 	}
 
 
-} // End of class
+}

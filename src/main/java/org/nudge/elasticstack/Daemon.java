@@ -14,9 +14,9 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import mapping.Mapping;
 import mapping.Mapping.MappingType;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.bean.rawdata.FredBuilder;
-import org.nudge.elasticstack.bean.rawdata.MBeanFred;
-import org.nudge.elasticstack.bean.rawdata.TransactionFred;
+import org.nudge.elasticstack.bean.rawdata.DTOBuilder;
+import org.nudge.elasticstack.bean.rawdata.MBeanDTO;
+import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
 import org.nudge.elasticstack.json.bean.EventMBean;
@@ -104,7 +104,7 @@ public class Daemon {
 							TransactionLayer tl = new TransactionLayer();
 							List<Transaction> transactions = rawdata.getTransactionsList();
 							// TODO FMA builder
-							List<TransactionFred> transactionsFred = FredBuilder.buildTransactions(transactions);
+							List<TransactionDTO> transactionsFred = DTOBuilder.buildTransactions(transactions);
 
 							List<EventTransaction> events = tl.buildTransactionEvents(transactionsFred);
 							for (EventTransaction eventTrans : events) {
@@ -120,7 +120,7 @@ public class Daemon {
 							List<MBean> mbean = rawdata.getMBeanList();
 
 
-							List<MBeanFred> mBeansFred = FredBuilder.buildMBeans(mbean);
+							List<MBeanDTO> mBeansFred = DTOBuilder.buildMBeans(mbean);
 
 							Dictionary dictionary = rawdata.getMbeanDictionary();
 							List<EventMBean> eventsMBeans = mb.buildMbeanEvents(mBeansFred, dictionary);
@@ -153,7 +153,7 @@ public class Daemon {
 							// ===========================
 							List<GeoLocation> geoLocations = new ArrayList<>();
 							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
-							for (TransactionFred transaction : transactionsFred) {
+							for (TransactionDTO transaction : transactionsFred) {
 								GeoLocation geoLocation = geoLocationService
 										.requestGeoLocationFromIp(transaction.getUserIp());
 								geoLocations.add(geoLocation);
@@ -183,4 +183,4 @@ public class Daemon {
 		}
 	}
 
-} // End of class
+}

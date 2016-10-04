@@ -7,22 +7,22 @@ import java.util.List;
  */
 public class RawdataFred {
 
-    private List<TransactionFred> transactions;
-    private List<MBeanFred> mBeans;
+    private List<TransactionDTO> transactions;
+    private List<MBeanDTO> mBeans;
 
-    public List<TransactionFred> getTransactions() {
+    public List<TransactionDTO> getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(List<TransactionFred> transactions) {
+    public void setTransactions(List<TransactionDTO> transactions) {
         this.transactions = transactions;
     }
 
-    public List<MBeanFred> getmBeans() {
+    public List<MBeanDTO> getmBeans() {
         return mBeans;
     }
 
-    public void setmBeans(List<MBeanFred> mBeans) {
+    public void setmBeans(List<MBeanDTO> mBeans) {
         this.mBeans = mBeans;
     }
 }
