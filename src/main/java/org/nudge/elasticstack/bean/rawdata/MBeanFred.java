@@ -4,17 +4,18 @@ package org.nudge.elasticstack.bean.rawdata;
 import java.util.List;
 
 /**
- * Created by Fred on 29/09/2016.
+ * Entity corresponding to a MBean Java object, originally coming from Nudge APM data.
+ *
+ * @author : Sarah Bourgeois
+ * @author : Frederic Massart
  */
 public class MBeanFred {
-
 
     private long collectingTime;
     private String objectName;
     private int attributeInfoCount;
 
-
-    List<AttributeInfo> attributeInfos;
+    private List<AttributeInfo> attributeInfos;
 
     public long getCollectingTime() {
         return collectingTime;

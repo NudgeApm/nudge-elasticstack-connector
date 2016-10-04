@@ -12,7 +12,6 @@ import java.util.List;
  * @author Sarah Bourgeois
  * @author Frederic Massart
  */
-
 public class FredBuilder {
 
 	public static List<TransactionFred> buildTransactions(List<RawDataProtocol.Transaction> rawdataTransactions) {

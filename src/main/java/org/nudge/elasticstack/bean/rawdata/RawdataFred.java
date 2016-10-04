@@ -3,12 +3,12 @@ package org.nudge.elasticstack.bean.rawdata;
 import java.util.List;
 
 /**
- * Created by Fred on 29/09/2016.
+ * // TODO use it o skip it
  */
 public class RawdataFred {
 
-    List<TransactionFred> transactions;
-    List<MBeanFred> mBeans;
+    private List<TransactionFred> transactions;
+    private List<MBeanFred> mBeans;
 
     public List<TransactionFred> getTransactions() {
         return transactions;

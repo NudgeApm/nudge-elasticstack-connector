@@ -1,11 +1,12 @@
 package org.nudge.elasticstack.bean.rawdata;
 
-import com.nudge.apm.buffer.probe.RawDataProtocol;
-
 import java.util.List;
 
 /**
- * Created by Fred on 29/09/2016.
+ * Transaction entity coming from Nudge APM data.
+ *
+ * @author : Sarah Bourgeois
+ * @author : Frederic Massart
  */
 public class TransactionFred {
 

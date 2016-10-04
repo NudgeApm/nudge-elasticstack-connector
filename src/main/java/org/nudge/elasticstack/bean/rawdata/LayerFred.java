@@ -3,10 +3,12 @@ package org.nudge.elasticstack.bean.rawdata;
 import java.util.List;
 
 /**
- * Created by Fred on 29/09/2016.
+ * Layer Bean of a {@link TransactionFred}.
+ *
+ * @author : Sarah Bourgeois
+ * @author : Frederic Massart
  */
 public class LayerFred {
-
 
     private String layerName;
     private long time;
