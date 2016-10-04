@@ -17,19 +17,21 @@ public abstract class NudgeEvent {
 	private long responseTime;
 	private long count;
 	private String type;
+	protected  String transactionId;
 	
 	//Constructors
-	public NudgeEvent(String name, long responseTime, String date, long count, String type) {
+	public NudgeEvent(String name, long responseTime, String date, long count, String type, String transactionId) {
 		setName(name);
 		this.date = date;
 		this.responseTime = responseTime;
 		this.count = count;
 		this.type = type;
+		this.transactionId=transactionId;
 	}
 
 	// Method
 	public String toString() {
-		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count;
+		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count + "transactionId =" + transactionId;
 	}
 
 	// =========================
@@ -81,6 +83,13 @@ public abstract class NudgeEvent {
 		this.count = count;
 	}
 	
+	public  void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
+
+	public  String getTransactionId() {
+		return transactionId;
+	}
 
 
 } // end of class

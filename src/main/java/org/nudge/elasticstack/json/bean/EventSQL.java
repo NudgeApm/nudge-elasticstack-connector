@@ -10,18 +10,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class EventSQL extends NudgeEvent {
 
-	public EventSQL(String timestamp, String name, long count, long responseTime) {
-		super(name, responseTime, timestamp, count, "sql");
+	private  String transactionId;
+	
+	
+	public EventSQL(String timestamp, String name, long count, long responseTime, String transactionId) {
+		super(name, responseTime, timestamp, count, "sql", transactionId);
+		this.setTransactionId(transactionId);
 	}
 
 	// ===========================
 	// Getters and Setters
 	// ===========================
-
+	
+	
 	@Override
 	@JsonProperty("sql_code")
 	public String getName() {
 		return super.getName();
+	}
+
+	public  String getTransactionId() {
+		return transactionId;
+	}
+
+	public  void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
 	}
 
 	@JsonProperty("sql_count")
@@ -33,7 +46,11 @@ public class EventSQL extends NudgeEvent {
 	@JsonProperty("sql_responseTime")
 	public long getResponseTime() {
 		return super.getResponseTime();
-
 	}
+	
+	
+	
+	
+	
 
 }

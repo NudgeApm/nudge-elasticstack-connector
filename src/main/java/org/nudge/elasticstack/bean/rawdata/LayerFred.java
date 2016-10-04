@@ -8,6 +8,8 @@ import java.util.List;
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
  */
+
+
 public class LayerFred {
 
     private String layerName;
@@ -49,6 +51,7 @@ public class LayerFred {
     }
 
 
+    // sql
     public class LayerDetail {
 
         private String code;
@@ -56,7 +59,8 @@ public class LayerFred {
         private long responseTime;
         private long timestamp;
 
-        public String getCode() {
+
+		public String getCode() {
             return code;
         }
 
@@ -87,5 +91,6 @@ public class LayerFred {
         public void setTimestamp(long timestamp) {
             this.timestamp = timestamp;
         }
+
     }
 }

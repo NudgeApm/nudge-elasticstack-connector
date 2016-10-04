@@ -46,6 +46,7 @@ public class FredBuilder {
 			}
 			transaction.setLayers(layers);
 			transactions.add(transaction);
+
 		}
 		return transactions;
 	}
@@ -70,6 +71,5 @@ public class FredBuilder {
 		}
 		return mbeanList;
 	}
-	
-}
 
+}

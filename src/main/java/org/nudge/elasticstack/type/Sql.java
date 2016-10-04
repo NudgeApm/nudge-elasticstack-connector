@@ -44,7 +44,7 @@ public class Sql {
 			long sqlTime = layd.getResponseTime();
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String sqlTimestamp = sdfr.format(layd.getTimestamp());
-			EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime);
+			EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime, );
 			eventSqls.add(sqlevent);
 		}
 		return eventSqls;

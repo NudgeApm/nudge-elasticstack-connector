@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
 import org.nudge.elasticstack.bean.rawdata.MBeanFred;
@@ -49,13 +47,10 @@ public class Mbean {
 			int countAttribute = mb.getAttributeInfoCount();
 
 			for (MBeanFred.AttributeInfo mBeanAttributeInfo : mb.getAttributeInfos()) {
-				String nameMbean = null, type = null;
-				int nameId = 0;
+				String nameMbean = null;
 				double valueMbean = 0;
-
-
-				nameId = mBeanAttributeInfo.getNameId();
-				type = "Mbean";
+			int	nameId = mBeanAttributeInfo.getNameId();
+			String	type = "Mbean";
 				try {
 					valueMbean = Double.parseDouble(mBeanAttributeInfo.getValue());
 				} catch (NumberFormatException nfe) { 
@@ -64,7 +59,7 @@ public class Mbean {
 					}
 				}
 				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, valueMbean,
-						collectingTime, countAttribute);
+						collectingTime, countAttribute, EventMBean.getTransactionId());
 				// retrieve nameMbean with Dictionary
 				for (DictionaryEntry dictionaryEntry : dico) {
 					String name = dictionaryEntry.getName();

@@ -57,4 +57,5 @@ public class TransactionFred {
     public void setLayers(List<LayerFred> layers) {
         this.layers = layers;
     }
-}
+    
+} // end of class
