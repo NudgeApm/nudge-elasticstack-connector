@@ -2,23 +2,15 @@ package org.nudge.elasticstack.bean.rawdata;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.nudge.elasticstack.bean.rawdata.MBeanFred.AttributeInfo;
-import org.nudge.elasticstack.type.Mbean;
-
 /**
- * 
+ * Mapping builder for Nudge APM rawdata objects.
+ *
  * @author Sarah Bourgeois
  * @author Frederic Massart
- *
  */
-
 public class FredBuilder {
 
 	public static List<TransactionFred> buildTransactions(List<RawDataProtocol.Transaction> rawdataTransactions) {
@@ -38,16 +30,27 @@ public class FredBuilder {
 				layer.setTime(lay.getTime());
 				layer.setCount(lay.getCount());
 				layers.add(layer);
+
+				if (lay.getCallsList() != null) {
+					layer.setLayerDetails(new ArrayList<LayerFred.LayerDetail>());
+					for (RawDataProtocol.LayerDetail rawDataLayerDetail : lay.getCallsList()) {
+						LayerFred.LayerDetail layerDetail = layer.new LayerDetail();
+						layerDetail.setTimestamp(rawDataLayerDetail.getTimestamp());
+						layerDetail.setCode(rawDataLayerDetail.getCode());
+						layerDetail.setCount(rawDataLayerDetail.getCount());
+						layerDetail.setResponseTime(rawDataLayerDetail.getTime());
+						layer.getLayerDetails().add(layerDetail);
+					}
+				}
 			}
 			transaction.setLayers(layers);
 			transactions.add(transaction);
+
 		}
 		return transactions;
 	}
 
-
-
-	public static List<MBeanFred> buildMbeans(List<RawDataProtocol.MBean> rawdataMbeans) {
+	public static List<MBeanFred> buildMBeans(List<RawDataProtocol.MBean> rawdataMbeans) {
 		List<MBeanFred> mbeanList = new ArrayList<>(rawdataMbeans.size());
 		for (RawDataProtocol.MBean rawdataMbean : rawdataMbeans) {
 			MBeanFred mbean = new MBeanFred();
@@ -55,28 +58,16 @@ public class FredBuilder {
 			mbean.setCollectingTime(rawdataMbean.getCollectingTime());
 			mbean.setObjectName(rawdataMbean.getObjectName());
 			mbeanList.add(mbean);
-			mbeanList.add(mbean);
-		
-		List<AttributeInfo> attributelist = new ArrayList<>();
-		    for(MBean mb: rawdataMbeans){
-			List<MBeanAttributeInfo> gni =	mb.getAttributeInfoList();
-				for(MBeanAttributeInfo mba : gni){
-					MBeanFred.AttributeInfo attribute = mbean.new AttributeInfo();
-					attribute.setNameId(mba.getNameId());
-					attribute.setValue(mba.getValue());
-					attributelist.add(attribute);		
-				}
-				}
-		    mbean.setAttributeInfos(attributelist);
-		    mbeanList.add(mbean);
-		}
-		    
-		    
 
+			ArrayList<MBeanFred.AttributeInfo> attributeInfos = new ArrayList<>(rawdataMbean.getAttributeInfoCount());
+			mbean.setAttributeInfos(attributeInfos);
+			for (RawDataProtocol.MBeanAttributeInfo rawdataAttrInfo : rawdataMbean.getAttributeInfoList()) {
+				MBeanFred.AttributeInfo attrInfo = mbean.new AttributeInfo();
+				attrInfo.setNameId(rawdataAttrInfo.getNameId());
+				attrInfo.setValue(rawdataAttrInfo.getValue());
+				attributeInfos.add(attrInfo);
+			}
+		}
 		return mbeanList;
 	}
-	
-	
-} // end of class
-	
-
+}

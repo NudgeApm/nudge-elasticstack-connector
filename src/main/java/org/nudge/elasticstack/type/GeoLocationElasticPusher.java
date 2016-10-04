@@ -3,7 +3,6 @@ package org.nudge.elasticstack.type;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
 import org.nudge.elasticstack.bean.rawdata.TransactionFred;
@@ -45,10 +44,10 @@ public class GeoLocationElasticPusher {
 			double latitude = geo.getLatitude();
 			double longitude = geo.getLongitude();
 			String Location = geo.getClientlocation();
+			String id = "";
 			GeoLocationWriter geolocationwriter = new GeoLocationWriter(latitude, longitude, Location, "location",
-					timestamp);
+					timestamp, id);
 			for (TransactionFred trans : transaction) {
-			
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				String date = sdfr.format(trans.getStartTime());
 				timestamp = geolocationwriter.setResponseTime(date);

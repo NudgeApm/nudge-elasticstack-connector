@@ -1,18 +1,5 @@
 package org.nudge.elasticstack.type;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.bean.rawdata.LayerFred;
-import org.nudge.elasticstack.bean.rawdata.TransactionFred;
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventTransaction;
-import org.nudge.elasticstack.json.bean.NudgeEvent;
-
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -21,18 +8,28 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.bean.rawdata.LayerFred;
+import org.nudge.elasticstack.bean.rawdata.TransactionFred;
+import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.json.bean.EventMBean;
+import org.nudge.elasticstack.json.bean.EventSQL;
+import org.nudge.elasticstack.json.bean.EventTransaction;
+import org.nudge.elasticstack.json.bean.GeoLocation;
+import org.nudge.elasticstack.json.bean.NudgeEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class TransactionLayer {
-	
+
 	private static final Logger LOG = Logger.getLogger("Transaction org.nudge.elasticstack.type : ");
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
 	/**
-	 * Description : retrieve Transaction data from rawdata and add it to
-	 * parse.
+	 * Description : retrieve Transaction data from rawdata and add it to parse.
 	 *
 	 * @param transactionList
 	 * @return
@@ -156,8 +153,8 @@ public class TransactionLayer {
 	}
 
 	/**
-	 * Description : Use bulk API to send huge rawdatas in ElasticSearch To
-	 * use this API it must be to format Json in the Bulk Format.
+	 * Description : Use bulk API to send huge rawdatas in ElasticSearch To use
+	 * this API it must be to format Json in the Bulk Format.
 	 *
 	 * @param type
 	 * @return
@@ -171,15 +168,23 @@ public class TransactionLayer {
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
+
+		// retrieve Id transaction and insert it into other type
+		EventTransaction event;
+		event.setTransactionId(elasticMetaData.getIndexElement().getId());
+		GeoLocation geo = new GeoLocation();
+		geo.setTransactionId(elasticMetaData.getIndexElement().getId());
+		EventMBean.setTransactionId(elasticMetaData.getIndexElement().getId());
+		EventSQL.setTransactionId(elasticMetaData.getIndexElement().getId());
+			
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
 		elasticMetaData.getIndexElement().setType(type);
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
 
 	/**
-	 * Description : It permits to index huge rawdata in elasticSearch with
-	 * HTTP request
-	 *
+	 * Description : It permits to index huge rawdata in elasticSearch with HTTP
+	 * request
 	 * @param jsonEvents
 	 * @throws Exception
 	 */
@@ -213,6 +218,5 @@ public class TransactionLayer {
 		httpCon.getResponseCode();
 		httpCon.getResponseMessage();
 	}
-	
-	  
+
 }

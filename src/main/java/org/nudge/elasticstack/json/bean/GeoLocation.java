@@ -14,6 +14,7 @@ public class GeoLocation {
 	private double longitude;
 	private long responseTime;
 	private String type;
+	private  String transactionId;
 
 	// =====================
 	// Getters and Setters
@@ -53,6 +54,14 @@ public class GeoLocation {
 
 	public String getClientlocation() {
 		return latitude + "," + longitude;
+	}
+	
+	public  String getTransactionId() {
+		return transactionId;
+	}
+
+	public  void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
 	}
 
 

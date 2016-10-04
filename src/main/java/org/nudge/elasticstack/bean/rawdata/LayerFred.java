@@ -3,8 +3,13 @@ package org.nudge.elasticstack.bean.rawdata;
 import java.util.List;
 
 /**
- * Created by Fred on 29/09/2016.
+ * 
+ * @author Sarah Bourgeois
+ * @author Frederic Massart
+ *
  */
+
+
 public class LayerFred {
 
 
@@ -47,14 +52,16 @@ public class LayerFred {
     }
 
 
+    // sql
     public class LayerDetail {
 
         private String code;
-        private int count;
+        private long count;
         private long responseTime;
         private long timestamp;
 
-        public String getCode() {
+
+		public String getCode() {
             return code;
         }
 
@@ -62,11 +69,11 @@ public class LayerFred {
             this.code = code;
         }
 
-        public int getCount() {
+        public long getCount() {
             return count;
         }
 
-        public void setCount(int count) {
+        public void setCount(long count) {
             this.count = count;
         }
 
@@ -85,5 +92,6 @@ public class LayerFred {
         public void setTimestamp(long timestamp) {
             this.timestamp = timestamp;
         }
+
     }
 }

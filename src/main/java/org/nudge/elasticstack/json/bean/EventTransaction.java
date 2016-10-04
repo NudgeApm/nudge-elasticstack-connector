@@ -33,7 +33,7 @@ public class EventTransaction extends NudgeEvent {
 
 
 	public EventTransaction(String name, Long responseTime, String date, Long count) {
-		super(name, responseTime, date, count, "transaction");
+		super(name, responseTime, date, count, "transaction", transactionId);
 	}
 
 	// ========================

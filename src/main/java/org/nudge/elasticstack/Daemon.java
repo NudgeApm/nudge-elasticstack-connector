@@ -13,11 +13,10 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import mapping.Mapping;
 import mapping.Mapping.MappingType;
-
 import org.apache.log4j.Logger;
+import org.nudge.elasticstack.bean.rawdata.FredBuilder;
 import org.nudge.elasticstack.bean.rawdata.MBeanFred;
 import org.nudge.elasticstack.bean.rawdata.TransactionFred;
-import org.nudge.elasticstack.bean.rawdata.FredBuilder;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
 import org.nudge.elasticstack.json.bean.EventMBean;
@@ -121,7 +120,7 @@ public class Daemon {
 							List<MBean> mbean = rawdata.getMBeanList();
 
 
-							List<MBeanFred> mBeansFred = FredBuilder.buildMbeans(mbean);
+							List<MBeanFred> mBeansFred = FredBuilder.buildMBeans(mbean);
 
 							Dictionary dictionary = rawdata.getMbeanDictionary();
 							List<EventMBean> eventsMBeans = mb.buildMbeanEvents(mBeansFred, dictionary);

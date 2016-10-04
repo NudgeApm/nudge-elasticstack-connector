@@ -1,21 +1,16 @@
 package org.nudge.elasticstack.bean.rawdata;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.nudge.elasticstack.bean.rawdata.MBeanFred.AttributeInfo;
-import org.nudge.elasticstack.type.Mbean;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Test class for {@link FredBuilder}
  */
 public class FredBuilderTest {
 
@@ -23,6 +18,9 @@ public class FredBuilderTest {
 
 	private RawDataProtocol.RawData rawData;
 
+	/**
+	 * Prepare the test by reading a sample example of a Nudge APM rawdata.
+	 */
 	@Before
 	public void readRawdata() {
 		try {
@@ -37,37 +35,45 @@ public class FredBuilderTest {
 	public void buildTransactions() throws Exception {
 		List<TransactionFred> transactionFredList = FredBuilder.buildTransactions(rawData.getTransactionsList());
 
-		// test -assertions
+		// First test : transaction stuff
 		RawDataProtocol.Transaction expectedTrans = rawData.getTransactionsList().get(0);
 		TransactionFred transaction = transactionFredList.get(0);
-
 		Assert.assertEquals(expectedTrans.getCode(), transaction.getCode());
 		Assert.assertEquals(expectedTrans.getStartTime(), transaction.getStartTime());
 		Assert.assertEquals(expectedTrans.getEndTime(), transaction.getEndTime());
 		Assert.assertEquals(expectedTrans.getUserIp(), transaction.getUserIp());
 		Assert.assertEquals(expectedTrans.getLayersList().size(), transaction.getLayers().size());
 
-		// Layers
+		// second test : layer stuff belongs to a transaction
 		RawDataProtocol.Layer expectedLayer = expectedTrans.getLayersList().get(0);
 		LayerFred layer = transaction.getLayers().get(0);
 		Assert.assertEquals(expectedLayer.getLayerName(), layer.getLayerName());
 		Assert.assertEquals(expectedLayer.getTime(), layer.getTime());
 		Assert.assertEquals(expectedLayer.getCount(), layer.getCount());
+
+		// third test : layer detail stuff belongs to a layer
+		RawDataProtocol.LayerDetail expectedLayerDetail = expectedLayer.getCallsList().get(0);
+		LayerFred.LayerDetail layerDetails = layer.getLayerDetails().get(0);
+		Assert.assertEquals(expectedLayerDetail.getTimestamp(), layerDetails.getTimestamp());
+		Assert.assertEquals(expectedLayerDetail.getCode(), layerDetails.getCode());
+		Assert.assertEquals(expectedLayerDetail.getCount(), layerDetails.getCount());
+		Assert.assertEquals(expectedLayerDetail.getTime(), layerDetails.getResponseTime());
 	}
 
 	@Test
-	public void buildMbeans() throws Exception {
-		List<MBeanFred> mbeanFredList = FredBuilder.buildMbeans(rawData.getMBeanList());
+	public void buildMBeans() throws Exception {
+		List<MBeanFred> mbeanFredList = FredBuilder.buildMBeans(rawData.getMBeanList());
 
-		// test -assertions
 		RawDataProtocol.MBean expectedMbean = rawData.getMBeanList().get(0);
 		MBeanFred mbean = mbeanFredList.get(0);
 		Assert.assertEquals(expectedMbean.getAttributeInfoCount(), mbean.getAttributeInfoCount());
 		Assert.assertEquals(expectedMbean.getCollectingTime(), mbean.getCollectingTime());
 		Assert.assertEquals(expectedMbean.getObjectName(), mbean.getObjectName());
 
-		//Assert.assertEquals(expectedMbean.getAttributeInfo(0), mbean.getAttributeInfos());
-		//Assert.assertEquals(expectedMbean.getAttributeInfo(0).getValue(), mbean.getAttributeInfos());
+		RawDataProtocol.MBeanAttributeInfo expectedAttributeInfo = expectedMbean.getAttributeInfoList().get(0);
+		MBeanFred.AttributeInfo attributeInfo = mbean.getAttributeInfos().get(0);
+		Assert.assertEquals(expectedAttributeInfo.getNameId(), attributeInfo.getNameId());
+		Assert.assertEquals(expectedAttributeInfo.getValue(), attributeInfo.getValue());
 	}
 
 }

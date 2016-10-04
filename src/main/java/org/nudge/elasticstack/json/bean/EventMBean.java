@@ -18,16 +18,22 @@ public class EventMBean {
 	private String objectName;
 	private int countAttribute;
 	private String collectingTime;
+	private static String transactionId;
 
 	public EventMBean(String nameMbean, String objectName, String type, double valueMbean, String collectingTime,
-			int countAttribute) {
+			int countAttribute, String transactionId) {
 		this.setNameMbean(nameMbean);
 		this.setValueMbean(valueMbean);
 		this.setCollectingTime(collectingTime);
 		this.setCountAttribute(countAttribute);
 		this.setObjectName(objectName);
 		this.setType(type);
+		EventMBean.getTransactionId();
 	}
+	
+public	String toString() {
+	return "transactionId" + transactionId;
+}
 
 	// ===========================
 	// Getters and Setters
@@ -35,6 +41,14 @@ public class EventMBean {
 
 	public String getType() {
 		return type;
+	}
+
+	public static String getTransactionId() {
+		return transactionId;
+	}
+
+	public static void setTransactionId(String transactionId) {
+		EventMBean.transactionId = transactionId;
 	}
 
 	public String setType(String type) {
