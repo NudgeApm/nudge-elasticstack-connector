@@ -1,6 +1,6 @@
 package org.nudge.elasticstack.bean.rawdata;
 
-import java.util.Date;
+
 import java.util.List;
 
 /**
@@ -12,6 +12,7 @@ public class MBeanFred {
     private long collectingTime;
     private String objectName;
     private int attributeInfoCount;
+
 
     List<AttributeInfo> attributeInfos;
 

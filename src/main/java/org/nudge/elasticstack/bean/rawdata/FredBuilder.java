@@ -2,9 +2,14 @@ package org.nudge.elasticstack.bean.rawdata;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
+import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.nudge.elasticstack.bean.rawdata.MBeanFred.AttributeInfo;
+import org.nudge.elasticstack.type.Mbean;
 
 /**
  * Mapping builder for Nudge APM rawdata objects.
@@ -12,6 +17,7 @@ import java.util.List;
  * @author Sarah Bourgeois
  * @author Frederic Massart
  */
+
 public class FredBuilder {
 
 	public static List<TransactionFred> buildTransactions(List<RawDataProtocol.Transaction> rawdataTransactions) {
@@ -46,7 +52,6 @@ public class FredBuilder {
 			}
 			transaction.setLayers(layers);
 			transactions.add(transaction);
-
 		}
 		return transactions;
 	}
@@ -71,4 +76,6 @@ public class FredBuilder {
 		}
 		return mbeanList;
 	}
+	
 }
+
