@@ -3,8 +3,6 @@ package org.nudge.elasticstack.type;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
 import org.nudge.elasticstack.bean.rawdata.LayerFred;

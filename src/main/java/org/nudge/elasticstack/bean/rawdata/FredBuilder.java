@@ -2,14 +2,9 @@ package org.nudge.elasticstack.bean.rawdata;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.nudge.elasticstack.bean.rawdata.MBeanFred.AttributeInfo;
-import org.nudge.elasticstack.type.Mbean;
 
 /**
  * Mapping builder for Nudge APM rawdata objects.

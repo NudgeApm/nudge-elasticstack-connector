@@ -9,6 +9,7 @@ import org.nudge.elasticstack.bean.rawdata.LayerFred;
 import org.nudge.elasticstack.bean.rawdata.TransactionFred;
 import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.json.bean.EventSQL;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
