@@ -33,14 +33,14 @@ public class DTOBuilder {
 				layers.add(layer);
 
 				if (lay.getCallsList() != null) {
-					layer.setLayerDetails(new ArrayList<LayerDTO.LayerDetail>());
+					layer.setCalls(new ArrayList<LayerDTO.Call>());
 					for (RawDataProtocol.LayerDetail rawDataLayerDetail : lay.getCallsList()) {
-						LayerDTO.LayerDetail layerDetail = layer.new LayerDetail();
-						layerDetail.setTimestamp(rawDataLayerDetail.getTimestamp());
-						layerDetail.setCode(rawDataLayerDetail.getCode());
-						layerDetail.setCount(rawDataLayerDetail.getCount());
-						layerDetail.setResponseTime(rawDataLayerDetail.getTime());
-						layer.getLayerDetails().add(layerDetail);
+						LayerDTO.Call layerCall = layer.new Call();
+						layerCall.setTimestamp(rawDataLayerDetail.getTimestamp());
+						layerCall.setCode(rawDataLayerDetail.getCode());
+						layerCall.setCount(rawDataLayerDetail.getCount());
+						layerCall.setResponseTime(rawDataLayerDetail.getTime());
+						layer.getCalls().add(layerCall);
 					}
 				}
 			}

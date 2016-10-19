@@ -16,7 +16,7 @@ public class LayerDTO {
     private String layerName;
     private long time;
     private long count;
-    private List<LayerDetail> layerDetails;
+    private List<Call> calls;
 
     /*** Getters and Setters ***/
 
@@ -44,39 +44,39 @@ public class LayerDTO {
         this.count = count;
     }
 
-    public List<LayerDetail> getLayerDetails() {
-        return layerDetails;
+    public List<Call> getCalls() {
+        return calls;
     }
 
-    public void setLayerDetails(List<LayerDetail> layerDetails) {
-        this.layerDetails = layerDetails;
+    public void setCalls(List<Call> calls) {
+        this.calls = calls;
     }
 
     /*** Utility methods ***/
-    public LayerDetail createAddLayerDetail() {
+    public Call createAddLayerDetail() {
         checkLayerDetailList();
-        LayerDetail layerDetail = new LayerDetail();
-        getLayerDetails().add(layerDetail);
-        return layerDetail;
+        Call layerCall = new Call();
+        getCalls().add(layerCall);
+        return layerCall;
     }
 
-    public LayerDetail addLayerDetail(LayerDetail layerDetail) {
-        if (layerDetail == null) {
-            throw new IllegalArgumentException("The layerDetail is invalid, must not be null");
+    public Call addLayerDetail(Call layerCall) {
+        if (layerCall == null) {
+            throw new IllegalArgumentException("The layerCall is invalid, must not be null");
         }
         checkLayerDetailList();
 
-        getLayerDetails().add(layerDetail);
-        return layerDetail;
+        getCalls().add(layerCall);
+        return layerCall;
     }
 
     private void checkLayerDetailList() {
-        if (getLayerDetails() == null) {
-            setLayerDetails(new ArrayList<LayerDetail>());
+        if (getCalls() == null) {
+            setCalls(new ArrayList<Call>());
         }
     }
 
-    public class LayerDetail {
+    public class Call {
         private String code;
         private long count;
         private long responseTime;

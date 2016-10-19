@@ -42,18 +42,18 @@ public class SQLLayerTest {
 	private TransactionDTO buildTransactionDTO(String sqlReq, long responseTime, int count, long time) {
 		TransactionDTO transactionDTO = new TransactionDTO();
 		LayerDTO layer = transactionDTO.addNewLayerDTO();
-		LayerDTO.LayerDetail layerDetail = layer.createAddLayerDetail();
+		LayerDTO.Call layerCall = layer.createAddLayerDetail();
 		layer.setLayerName("SQL");
 		layer.setCount(count);
 		layer.setTime(responseTime);
 
-		layerDetail.setCount(count);
-		layerDetail.setCode(sqlReq);
-		layerDetail.setResponseTime(responseTime);
-		layerDetail.setTimestamp(time);
+		layerCall.setCount(count);
+		layerCall.setCode(sqlReq);
+		layerCall.setResponseTime(responseTime);
+		layerCall.setTimestamp(time);
 
-		// add the layerDetail a second time
-		layer.addLayerDetail(layerDetail);
+		// add the layerCall a second time
+		layer.addLayerDetail(layerCall);
 		return transactionDTO;
 	}
 

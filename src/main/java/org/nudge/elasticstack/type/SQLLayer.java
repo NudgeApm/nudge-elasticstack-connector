@@ -33,12 +33,12 @@ public class SQLLayer {
 
 		for (TransactionDTO transaction : transactions) {
 			for (LayerDTO layer : transaction.getLayers()) {
-				for (LayerDTO.LayerDetail layerDetail : layer.getLayerDetails()) {
-					String sqlCode = layerDetail.getCode();
-					long sqlCount = layerDetail.getCount();
-					long sqlTime = layerDetail.getResponseTime();
+				for (LayerDTO.Call layerCall : layer.getCalls()) {
+					String sqlCode = layerCall.getCode();
+					long sqlCount = layerCall.getCount();
+					long sqlTime = layerCall.getResponseTime();
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-					String sqlTimestamp = sdfr.format(layerDetail.getTimestamp());
+					String sqlTimestamp = sdfr.format(layerCall.getTimestamp());
 					sqlEvents.add(new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime, transaction.getId()));
 				}
 			}
