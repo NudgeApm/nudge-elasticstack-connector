@@ -55,7 +55,7 @@ public class DTOBuilderTest {
 
 		// third test : layer detail stuff belongs to a layer
 		RawDataProtocol.LayerDetail expectedLayerDetail = expectedLayer.getCallsList().get(0);
-		LayerDTO.Call layerDetails = layer.getCalls().get(0);
+		LayerCallDTO layerDetails = layer.getCalls().get(0);
 		Assert.assertEquals(expectedLayerDetail.getTimestamp(), layerDetails.getTimestamp());
 		Assert.assertEquals(expectedLayerDetail.getCode(), layerDetails.getCode());
 		Assert.assertEquals(expectedLayerDetail.getCount(), layerDetails.getCount());

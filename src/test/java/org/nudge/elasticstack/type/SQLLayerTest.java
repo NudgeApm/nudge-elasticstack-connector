@@ -2,6 +2,7 @@ package org.nudge.elasticstack.type;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.nudge.elasticstack.bean.rawdata.LayerCallDTO;
 import org.nudge.elasticstack.bean.rawdata.LayerDTO;
 import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
 import org.nudge.elasticstack.json.bean.EventSQL;
@@ -42,7 +43,7 @@ public class SQLLayerTest {
 	private TransactionDTO buildTransactionDTO(String sqlReq, long responseTime, int count, long time) {
 		TransactionDTO transactionDTO = new TransactionDTO();
 		LayerDTO layer = transactionDTO.addNewLayerDTO();
-		LayerDTO.Call layerCall = layer.createAddLayerDetail();
+		LayerCallDTO layerCall = layer.createAddLayerDetail();
 		layer.setLayerName("SQL");
 		layer.setCount(count);
 		layer.setTime(responseTime);

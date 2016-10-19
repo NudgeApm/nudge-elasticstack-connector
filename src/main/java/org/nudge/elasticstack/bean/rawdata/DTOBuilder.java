@@ -33,9 +33,9 @@ public class DTOBuilder {
 				layers.add(layer);
 
 				if (lay.getCallsList() != null) {
-					layer.setCalls(new ArrayList<LayerDTO.Call>());
+					layer.setCalls(new ArrayList<LayerCallDTO>());
 					for (RawDataProtocol.LayerDetail rawDataLayerDetail : lay.getCallsList()) {
-						LayerDTO.Call layerCall = layer.new Call();
+						LayerCallDTO layerCall = new LayerCallDTO();
 						layerCall.setTimestamp(rawDataLayerDetail.getTimestamp());
 						layerCall.setCode(rawDataLayerDetail.getCode());
 						layerCall.setCount(rawDataLayerDetail.getCount());

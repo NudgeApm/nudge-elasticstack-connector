@@ -16,7 +16,7 @@ public class LayerDTO {
     private String layerName;
     private long time;
     private long count;
-    private List<Call> calls;
+    private List<LayerCallDTO> calls;
 
     /*** Getters and Setters ***/
 
@@ -44,23 +44,23 @@ public class LayerDTO {
         this.count = count;
     }
 
-    public List<Call> getCalls() {
+    public List<LayerCallDTO> getCalls() {
         return calls;
     }
 
-    public void setCalls(List<Call> calls) {
+    public void setCalls(List<LayerCallDTO> calls) {
         this.calls = calls;
     }
 
     /*** Utility methods ***/
-    public Call createAddLayerDetail() {
+    public LayerCallDTO createAddLayerDetail() {
         checkLayerDetailList();
-        Call layerCall = new Call();
+        LayerCallDTO layerCall = new LayerCallDTO();
         getCalls().add(layerCall);
         return layerCall;
     }
 
-    public Call addLayerDetail(Call layerCall) {
+    public LayerCallDTO addLayerDetail(LayerCallDTO layerCall) {
         if (layerCall == null) {
             throw new IllegalArgumentException("The layerCall is invalid, must not be null");
         }
@@ -72,47 +72,8 @@ public class LayerDTO {
 
     private void checkLayerDetailList() {
         if (getCalls() == null) {
-            setCalls(new ArrayList<Call>());
+            setCalls(new ArrayList<LayerCallDTO>());
         }
     }
 
-    public class Call {
-        private String code;
-        private long count;
-        private long responseTime;
-        private long timestamp;
-
-		public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-
-        public long getCount() {
-            return count;
-        }
-
-        public void setCount(long count) {
-            this.count = count;
-        }
-
-        public long getResponseTime() {
-            return responseTime;
-        }
-
-        public void setResponseTime(long responseTime) {
-            this.responseTime = responseTime;
-        }
-
-        public long getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(long timestamp) {
-            this.timestamp = timestamp;
-        }
-
-    }
 }

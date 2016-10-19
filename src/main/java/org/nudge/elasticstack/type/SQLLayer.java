@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.bean.rawdata.LayerCallDTO;
 import org.nudge.elasticstack.bean.rawdata.LayerDTO;
 import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
 import org.nudge.elasticstack.config.Configuration;
@@ -33,7 +34,7 @@ public class SQLLayer {
 
 		for (TransactionDTO transaction : transactions) {
 			for (LayerDTO layer : transaction.getLayers()) {
-				for (LayerDTO.Call layerCall : layer.getCalls()) {
+				for (LayerCallDTO layerCall : layer.getCalls()) {
 					String sqlCode = layerCall.getCode();
 					long sqlCount = layerCall.getCount();
 					long sqlTime = layerCall.getResponseTime();
