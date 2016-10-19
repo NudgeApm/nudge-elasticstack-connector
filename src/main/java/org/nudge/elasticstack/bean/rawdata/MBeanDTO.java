@@ -1,6 +1,7 @@
 package org.nudge.elasticstack.bean.rawdata;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,13 +42,21 @@ public class MBeanDTO {
         this.attributeInfoCount = attributeInfoCount;
     }
 
-
     public List<AttributeInfo> getAttributeInfos() {
         return attributeInfos;
     }
 
     public void setAttributeInfos(List<AttributeInfo> attributeInfos) {
         this.attributeInfos = attributeInfos;
+    }
+
+    public AttributeInfo addNewAttributeInfo() {
+        if (getAttributeInfos() == null) {
+            setAttributeInfos(new ArrayList<AttributeInfo>());
+        }
+        AttributeInfo attributeInfo = this.new AttributeInfo();
+        getAttributeInfos().add(attributeInfo);
+        return attributeInfo;
     }
 
 

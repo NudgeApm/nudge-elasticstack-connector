@@ -28,10 +28,6 @@ public class EventSQL extends NudgeEvent {
 		return super.getTransactionId();
 	}
 
-	public void setTransactionId(String transactionId) {
-		setTransactionId(transactionId);
-	}
-
 	@JsonProperty("sql_count")
 	public long getCount() {
 		return super.getCount();

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class GeoLocationElasticPusher {
 
-	private static final Logger LOG = Logger.getLogger("Geolocation" + GeoLocationElasticPusher.class);
+	private static final Logger LOG = Logger.getLogger(GeoLocationElasticPusher.class.getName());
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
@@ -131,7 +131,7 @@ public class GeoLocationElasticPusher {
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;
 		LOG.info(" Flush " + jsonEvents2.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
-		LOG.debug(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		LOG.debug(" Sending MBean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 	
 

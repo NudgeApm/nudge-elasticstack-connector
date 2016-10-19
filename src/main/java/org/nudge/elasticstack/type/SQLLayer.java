@@ -19,35 +19,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Sql {
+public class SQLLayer {
 
-	private static final Logger LOG = Logger.getLogger("Sql org.nudge.elasticstack.type :");
+	private static final Logger LOG = Logger.getLogger(SQLLayer.class.getName());
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
 	/**
-	 * Description : retrieve SQL request
+	 * Extract SQL events from transactions.
 	 */
-	public List<EventSQL> buildSqlEvents(List<TransactionDTO> transaction) {
-		List<EventSQL> eventSqls = new ArrayList<>();
-		List<LayerDTO> layer = new ArrayList<>();
-		List<LayerDTO.LayerDetail> layerDetail = new ArrayList<>();
-		for (TransactionDTO trans : transaction) {
-			layer.addAll(trans.getLayers());
+	public List<EventSQL> buildSQLEvents(List<TransactionDTO> transactions) {
+		List<EventSQL> sqlEvents = new ArrayList<>();
+
+		for (TransactionDTO transaction : transactions) {
+			for (LayerDTO layer : transaction.getLayers()) {
+				for (LayerDTO.LayerDetail layerDetail : layer.getLayerDetails()) {
+					String sqlCode = layerDetail.getCode();
+					long sqlCount = layerDetail.getCount();
+					long sqlTime = layerDetail.getResponseTime();
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+					String sqlTimestamp = sdfr.format(layerDetail.getTimestamp());
+					sqlEvents.add(new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime, transaction.getId()));
+				}
+			}
 		}
-		for (LayerDTO lay : layer) {
-			layerDetail.addAll(lay.getLayerDetails());
-		}
-		for (LayerDTO.LayerDetail layd : layerDetail) {
-			String sqlCode = layd.getCode();
-			long sqlCount = layd.getCount();
-			long sqlTime = layd.getResponseTime();
-			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			String sqlTimestamp = sdfr.format(layd.getTimestamp());
-			EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime, );
-			eventSqls.add(sqlevent);
-		}
-		return eventSqls;
+		return sqlEvents;
 	}
 
 	/**

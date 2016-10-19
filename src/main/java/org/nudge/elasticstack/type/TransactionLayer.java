@@ -22,12 +22,12 @@ import java.util.UUID;
 
 public class TransactionLayer {
 
-	private static final Logger LOG = Logger.getLogger("Transaction org.nudge.elasticstack.type : ");
+	private static final Logger LOG = Logger.getLogger(TransactionLayer.class.getName());
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
 	/**
-	 * Description : retrieve Transaction data from rawdata and add it to parse.
+	 * Retrieve transaction data from rawdata and add it to parse.
 	 *
 	 * @param transactionList
 	 * @return
@@ -42,7 +42,7 @@ public class TransactionLayer {
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdfr.format(trans.getStartTime());
 			long response_time = trans.getEndTime() - trans.getStartTime();
-			EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
+			EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L, trans.getId());
 			events.add(transactionEvent);
 			// handle layers
 			buildLayerEvents(trans.getLayers(), transactionEvent);
@@ -52,8 +52,21 @@ public class TransactionLayer {
 	}
 
 	/**
-	 * Description : retrieve layer from transaction
-	 * 
+	 * Temporary method, only used while we use our generation of the transaction id to ES.
+	 */
+	// WTF ??!
+	private void diffusionTransactionId(TransactionDTO transactionDTO) {
+//		UUID id = transactionDTO.getId();
+		if (transactionDTO.getLayers() != null) {
+			for (LayerDTO layerDTO : transactionDTO.getLayers()) {
+			//	layerDTO.
+			}
+		}
+	}
+
+	/**
+	 * Retrieve layer from transaction
+	 *
 	 * @param eventTrans
 	 * @return
 	 */

@@ -5,14 +5,15 @@ package mapping;
  * 
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.log4j.Logger;
+import org.nudge.elasticstack.config.Configuration;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.config.Configuration;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class Mapping {
 	private static final Logger LOG = Logger.getLogger("Update mapping : ");
@@ -68,10 +69,10 @@ public class Mapping {
 			outSql.write(jsonEvent);
 			outSql.close();
 			LOG.debug(
-					" Sql Mapping Flushed : " + httpConSql.getResponseCode() + " - " + httpConSql.getResponseMessage());
+					" SQLLayer Mapping Flushed : " + httpConSql.getResponseCode() + " - " + httpConSql.getResponseMessage());
 		}
 
-		// ******* Case Mbean update mapping *******
+		// ******* Case MBean update mapping *******
 		if (MappingType.Mbean == mod) {
 			// change mapping value : for attributeName
 			jsonEvent = jsonEvent.replaceAll("transaction_name", "mbean_attributename");
@@ -82,7 +83,7 @@ public class Mapping {
 			OutputStreamWriter outMbean1 = new OutputStreamWriter(httpConMbean1.getOutputStream());
 			outMbean1.write(jsonEvent);
 			outMbean1.close();
-			LOG.debug(" Mbean Mapping 1/2 Flushed : " + httpConMbean1.getResponseCode() + " - "
+			LOG.debug(" MBean Mapping 1/2 Flushed : " + httpConMbean1.getResponseCode() + " - "
 					+ httpConMbean1.getResponseMessage());
 			// change mapping value : for name
 			jsonEvent = jsonEvent.replaceAll("mbean_attributename", "mbean_name");
@@ -93,7 +94,7 @@ public class Mapping {
 			OutputStreamWriter outMbean2 = new OutputStreamWriter(httpConMbean2.getOutputStream());
 			outMbean2.write(jsonEvent);
 			outMbean2.close();
-			LOG.debug(" Mbean Mapping 2/2 Flushed : " + httpConMbean2.getResponseCode() + " - "
+			LOG.debug(" MBean Mapping 2/2 Flushed : " + httpConMbean2.getResponseCode() + " - "
 					+ httpConMbean2.getResponseMessage());
 		}
 	}

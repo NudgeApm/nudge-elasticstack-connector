@@ -15,19 +15,20 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.nudge.elasticstack.Utils.ES_DATE_FORMAT;
 
-public class Mbean {
 
-	private static final Logger LOG = Logger.getLogger("Mbean org.nudge.elasticstack.type : ");
+public class MBean {
+
+	private static final Logger LOG = Logger.getLogger(MBean.class.getName());
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
 	/**
-	 * Description : retrieve Mbean from rawdata
+	 * Description : retrieve MBean from rawdata
 	 *
 	 * @param mbean
 	 * @param dictionary
@@ -38,12 +39,10 @@ public class Mbean {
 		List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
 		List<DictionaryEntry> dico = dictionary.getDictionaryList();
 
-		// TODO FMA extract SDF to builder
-		SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		// retrieve MBean
 		for (MBeanDTO mb : mbean) {
 
-			String collectingTime = sdfr.format(mb.getCollectingTime());
+			String collectingTime = ES_DATE_FORMAT.format(mb.getCollectingTime());
 			String objectName = mb.getObjectName();
 			int countAttribute = mb.getAttributeInfoCount();
 
@@ -51,7 +50,6 @@ public class Mbean {
 				String nameMbean = null;
 				double valueMbean = 0;
 			int	nameId = mBeanAttributeInfo.getNameId();
-			String	type = "Mbean";
 				try {
 					valueMbean = Double.parseDouble(mBeanAttributeInfo.getValue());
 				} catch (NumberFormatException nfe) { 
@@ -59,14 +57,13 @@ public class Mbean {
 						LOG.debug("Impossible to get the value of a mbean, it will not be inserted to ELK. MBean from rawdata : " + mBeanAttributeInfo);
 					}
 				}
-				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, valueMbean,
-						collectingTime, countAttribute, EventMBean.getTransactionId());
+				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, EventType.MBEAN, valueMbean, collectingTime, countAttribute);
+				// TODO FMA export the dicotionary stuff at the place that mbean dto are created
 				// retrieve nameMbean with Dictionary
 				for (DictionaryEntry dictionaryEntry : dico) {
-					String name = dictionaryEntry.getName();
 					int id = dictionaryEntry.getId();
 					if (nameId == id) {
-						nameMbean = mbeanEvent.setNameMbean(name);
+						mbeanEvent.setNameMbean(dictionaryEntry.getName());
 					}
 				}
 				// add events
@@ -77,7 +74,7 @@ public class Mbean {
 	}
 
 	/**
-	 * Description : Parse Mbean to send to Elastic
+	 * Description : Parse MBean to send to Elastic
 	 *
 	 * @param eventList
 	 * @return
@@ -103,13 +100,13 @@ public class Mbean {
 	}
 
 	/**
-	 * Description : generate Mbean for Bulk api
+	 * Description : generate MBean for Bulk api
 	 *
 	 * @param mbean
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public String generateMetaDataMbean(String mbean) throws JsonProcessingException {
+	public String generateMetaDataMbean(EventType eventType) throws JsonProcessingException {
 		Configuration conf = new Configuration();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
@@ -117,7 +114,7 @@ public class Mbean {
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
-		elasticMetaData.getIndexElement().setType("mbean");
+		elasticMetaData.getIndexElement().setType(eventType.toString());
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
 
@@ -152,7 +149,7 @@ public class Mbean {
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;
 		LOG.info(" Flush " + jsonEvents2.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
-		LOG.debug(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		LOG.debug(" Sending MBean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 
 }

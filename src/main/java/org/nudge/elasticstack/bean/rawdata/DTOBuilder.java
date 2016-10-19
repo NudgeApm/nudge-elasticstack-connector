@@ -51,9 +51,9 @@ public class DTOBuilder {
 		return transactions;
 	}
 
-	public static List<MBeanDTO> buildMBeans(List<RawDataProtocol.MBean> rawdataMbeans) {
-		List<MBeanDTO> mbeanList = new ArrayList<>(rawdataMbeans.size());
-		for (RawDataProtocol.MBean rawdataMbean : rawdataMbeans) {
+	public static List<MBeanDTO> buildMBeans(List<RawDataProtocol.MBean> rawdataMBeans) {
+		List<MBeanDTO> mbeanList = new ArrayList<>(rawdataMBeans.size());
+		for (RawDataProtocol.MBean rawdataMbean : rawdataMBeans) {
 			MBeanDTO mbean = new MBeanDTO();
 			mbean.setAttributeInfoCount(rawdataMbean.getAttributeInfoCount());
 			mbean.setCollectingTime(rawdataMbean.getCollectingTime());

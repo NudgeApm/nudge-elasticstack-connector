@@ -8,7 +8,6 @@ package org.nudge.elasticstack;
  */
 
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import mapping.Mapping;
@@ -27,8 +26,8 @@ import org.nudge.elasticstack.json.bean.GeoLocationWriter;
 import org.nudge.elasticstack.service.GeoLocationService;
 import org.nudge.elasticstack.service.impl.GeoFreeGeoIpImpl;
 import org.nudge.elasticstack.type.GeoLocationElasticPusher;
-import org.nudge.elasticstack.type.Mbean;
-import org.nudge.elasticstack.type.Sql;
+import org.nudge.elasticstack.type.MBean;
+import org.nudge.elasticstack.type.SQLLayer;
 import org.nudge.elasticstack.type.TransactionLayer;
 
 import java.util.ArrayList;
@@ -95,18 +94,16 @@ public class Daemon {
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
-						
 
-							
 							// ==============================
 							// Type : Transaction and Layer
 							// ==============================
 							TransactionLayer tl = new TransactionLayer();
 							List<Transaction> transactions = rawdata.getTransactionsList();
-							// TODO FMA builder
-							List<TransactionDTO> transactionsFred = DTOBuilder.buildTransactions(transactions);
 
-							List<EventTransaction> events = tl.buildTransactionEvents(transactionsFred);
+							List<TransactionDTO> transactionDTOs = DTOBuilder.buildTransactions(transactions);
+
+							List<EventTransaction> events = tl.buildTransactionEvents(transactionDTOs);
 							for (EventTransaction eventTrans : events) {
 								tl.nullLayer(eventTrans);
 							}
@@ -116,22 +113,21 @@ public class Daemon {
 							// ===========================
 							// Type : MBean
 							// ===========================
-							Mbean mb = new Mbean();
-							List<MBean> mbean = rawdata.getMBeanList();
+							MBean mb = new MBean();
+							List<com.nudge.apm.buffer.probe.RawDataProtocol.MBean> mbean = rawdata.getMBeanList();
 
-
-							List<MBeanDTO> mBeansFred = DTOBuilder.buildMBeans(mbean);
+							List<MBeanDTO> mBeans = DTOBuilder.buildMBeans(mbean);
 
 							Dictionary dictionary = rawdata.getMbeanDictionary();
-							List<EventMBean> eventsMBeans = mb.buildMbeanEvents(mBeansFred, dictionary);
+							List<EventMBean> eventsMBeans = mb.buildMbeanEvents(mBeans, dictionary);
 							List<String> jsonEvents2 = mb.parseJsonMBean(eventsMBeans);
 							mb.sendElk(jsonEvents2);
 
 							// ===========================
 							// Type : SQL
 							// ===========================
-							Sql s = new Sql();
-							List<EventSQL> sql = s.buildSqlEvents(transactionsFred);
+							SQLLayer s = new SQLLayer();
+							List<EventSQL> sql = s.buildSQLEvents(transactionDTOs);
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
 							
@@ -143,7 +139,7 @@ public class Daemon {
 							mapping.pushMapping(config, MappingType.Transaction);
 							// Sql update mapping
 							mapping.pushMapping(config, MappingType.Sql);
-							// Mbean update mapping
+							// MBean update mapping
 							mapping.pushMapping(config, MappingType.Mbean);
 							// GeoLocation mapping
 							mapping.pushGeolocationMapping(config);
@@ -153,12 +149,12 @@ public class Daemon {
 							// ===========================
 							List<GeoLocation> geoLocations = new ArrayList<>();
 							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
-							for (TransactionDTO transaction : transactionsFred) {
+							for (TransactionDTO transaction : transactionDTOs) {
 								GeoLocation geoLocation = geoLocationService
 										.requestGeoLocationFromIp(transaction.getUserIp());
 								geoLocations.add(geoLocation);
 							}
-							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactionsFred);
+							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactionDTOs);
 							List<String> json = gep.parseJsonLocation(location);
 							gep.sendElk(json);
 
