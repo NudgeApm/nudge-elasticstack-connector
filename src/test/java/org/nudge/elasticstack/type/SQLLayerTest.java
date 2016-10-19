@@ -2,8 +2,8 @@ package org.nudge.elasticstack.type;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.nudge.elasticstack.context.elasticsearch.builder.SQLLayer;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.EventSQL;
+import org.nudge.elasticstack.context.elasticsearch.json.builder.SQLLayer;
 import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;

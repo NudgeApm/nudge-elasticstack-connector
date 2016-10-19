@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.context.elasticsearch.builder;
+package org.nudge.elasticstack.context.elasticsearch.json.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
