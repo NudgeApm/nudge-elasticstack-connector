@@ -1,6 +1,7 @@
 package org.nudge.elasticstack.json.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.nudge.elasticstack.type.EventType;
 
 /**
  * @author : Sarah Bourgeois
@@ -11,47 +12,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EventMBean {
 
-	// MBean attribute info
 	private String nameMbean;
 	private double valueMbean;
-	private String type;
+	private EventType type;
 	private String objectName;
 	private int countAttribute;
 	private String collectingTime;
-	private static String transactionId;
 
-	public EventMBean(String nameMbean, String objectName, String type, double valueMbean, String collectingTime,
-			int countAttribute, String transactionId) {
+	public EventMBean(String nameMbean, String objectName, EventType type, double valueMbean, String collectingTime,
+					  int countAttribute) {
 		this.setNameMbean(nameMbean);
 		this.setValueMbean(valueMbean);
 		this.setCollectingTime(collectingTime);
 		this.setCountAttribute(countAttribute);
 		this.setObjectName(objectName);
 		this.setType(type);
-		EventMBean.getTransactionId();
 	}
 	
-public	String toString() {
-	return "transactionId" + transactionId;
-}
-
 	// ===========================
 	// Getters and Setters
 	// ===========================
 
-	public String getType() {
+	public EventType getType() {
 		return type;
 	}
 
-	public static String getTransactionId() {
-		return transactionId;
-	}
-
-	public static void setTransactionId(String transactionId) {
-		EventMBean.transactionId = transactionId;
-	}
-
-	public String setType(String type) {
+	public EventType setType(EventType type) {
 		return this.type = type;
 	}
 
