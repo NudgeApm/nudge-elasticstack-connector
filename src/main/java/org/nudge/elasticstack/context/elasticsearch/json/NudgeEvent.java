@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.json.bean;
+package org.nudge.elasticstack.context.elasticsearch.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

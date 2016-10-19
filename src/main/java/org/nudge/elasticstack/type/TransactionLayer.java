@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.bean.rawdata.LayerDTO;
-import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
 import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventTransaction;
-import org.nudge.elasticstack.json.bean.NudgeEvent;
+import org.nudge.elasticstack.context.elasticsearch.json.EventTransaction;
+import org.nudge.elasticstack.context.elasticsearch.json.NudgeEvent;
+import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
+import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;

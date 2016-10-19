@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.bean.rawdata;
+package org.nudge.elasticstack.context.nudge.dto;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;

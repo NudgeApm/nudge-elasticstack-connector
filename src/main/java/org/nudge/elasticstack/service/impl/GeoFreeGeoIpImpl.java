@@ -3,16 +3,13 @@ package org.nudge.elasticstack.service.impl;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.json.bean.GeoLocation;
-import org.nudge.elasticstack.json.bean.GeoLocationWriter;
+import org.nudge.elasticstack.context.elasticsearch.json.GeoLocation;
 import org.nudge.elasticstack.service.GeoLocationService;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Sarah Bourgeois

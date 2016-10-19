@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.bean.rawdata;
+package org.nudge.elasticstack.context.nudge.dto;
 
 /**
  * Created by Fred on 19/10/2016.

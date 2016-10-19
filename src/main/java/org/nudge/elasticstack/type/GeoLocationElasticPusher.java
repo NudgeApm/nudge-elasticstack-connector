@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
 import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.GeoLocation;
-import org.nudge.elasticstack.json.bean.GeoLocationWriter;
+import org.nudge.elasticstack.context.elasticsearch.json.GeoLocation;
+import org.nudge.elasticstack.context.elasticsearch.json.GeoLocationWriter;
+import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

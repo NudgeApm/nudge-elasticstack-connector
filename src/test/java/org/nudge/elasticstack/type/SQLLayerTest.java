@@ -2,10 +2,10 @@ package org.nudge.elasticstack.type;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.nudge.elasticstack.bean.rawdata.LayerCallDTO;
-import org.nudge.elasticstack.bean.rawdata.LayerDTO;
-import org.nudge.elasticstack.bean.rawdata.TransactionDTO;
-import org.nudge.elasticstack.json.bean.EventSQL;
+import org.nudge.elasticstack.context.elasticsearch.json.EventSQL;
+import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
+import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
+import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;

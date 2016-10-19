@@ -1,9 +1,14 @@
-package org.nudge.elasticstack.bean.rawdata;
+package org.nudge.elasticstack.context.nudge.rawdata.rawdata;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.nudge.elasticstack.context.nudge.dto.DTOBuilder;
+import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
+import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
+import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
+import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 
 import java.io.IOException;
 import java.util.List;
