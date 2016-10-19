@@ -1,5 +1,6 @@
 package org.nudge.elasticstack;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
@@ -8,9 +9,6 @@ package org.nudge.elasticstack;
  * 
  * Description : Convert data for the Bulk API 
  */
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class BulkFormat {
 
 	@JsonProperty("index")
