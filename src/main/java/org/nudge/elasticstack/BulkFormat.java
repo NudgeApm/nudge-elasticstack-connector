@@ -3,11 +3,10 @@ package org.nudge.elasticstack;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * 
+ * Bulk JSON structure for ES bulk pushes.
+ *
  * @author Sarah Bourgeois
  * @author Frederic Massart
- * 
- * Description : Convert data for the Bulk API 
  */
 public class BulkFormat {
 
