@@ -7,7 +7,7 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.Configuration;
 import org.nudge.elasticstack.context.elasticsearch.json.EventType;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;

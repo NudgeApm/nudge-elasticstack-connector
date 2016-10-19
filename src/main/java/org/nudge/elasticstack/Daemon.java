@@ -13,7 +13,6 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import mapping.Mapping;
 import mapping.Mapping.MappingType;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.config.Configuration;
 import org.nudge.elasticstack.connection.Connection;
 import org.nudge.elasticstack.context.elasticsearch.builder.GeoLocationElasticPusher;
 import org.nudge.elasticstack.context.elasticsearch.builder.MBean;

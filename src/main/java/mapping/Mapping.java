@@ -8,7 +8,7 @@ package mapping;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.Configuration;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

@@ -8,7 +8,7 @@
 
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.config.Configuration;
+import org.nudge.elasticstack.Configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
