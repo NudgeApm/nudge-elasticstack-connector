@@ -3,7 +3,7 @@ package org.nudge.elasticstack.service.impl;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.context.elasticsearch.json.GeoLocation;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocation;
 import org.nudge.elasticstack.service.GeoLocationService;
 
 import java.io.IOException;

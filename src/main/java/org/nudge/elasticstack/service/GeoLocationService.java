@@ -1,6 +1,6 @@
 package org.nudge.elasticstack.service;
 
-import org.nudge.elasticstack.context.elasticsearch.json.GeoLocation;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocation;
 
 import java.io.IOException;
 

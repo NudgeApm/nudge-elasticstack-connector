@@ -1,7 +1,7 @@
-package org.nudge.elasticstack.context.elasticsearch.json;
+package org.nudge.elasticstack.context.elasticsearch.json.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.nudge.elasticstack.type.EventType;
+import org.nudge.elasticstack.context.elasticsearch.json.EventType;
 
 /**
  * @author : Sarah Bourgeois

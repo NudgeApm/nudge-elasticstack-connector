@@ -4,7 +4,8 @@ import com.nudge.apm.buffer.probe.RawDataProtocol;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nudge.elasticstack.Utils;
-import org.nudge.elasticstack.context.elasticsearch.json.EventMBean;
+import org.nudge.elasticstack.context.elasticsearch.builder.MBean;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 import org.nudge.elasticstack.context.nudge.rawdata.rawdata.DTOBuilderTest;
 

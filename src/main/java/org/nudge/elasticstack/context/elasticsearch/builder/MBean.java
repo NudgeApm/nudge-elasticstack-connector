@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.type;
+package org.nudge.elasticstack.context.elasticsearch.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +8,8 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
 import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.context.elasticsearch.json.EventMBean;
+import org.nudge.elasticstack.context.elasticsearch.json.EventType;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 
 import java.io.IOException;
