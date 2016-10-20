@@ -1,8 +1,7 @@
-package org.nudge.elasticstack.config;
+package org.nudge.elasticstack;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.nudge.elasticstack.Configuration;
 
 import java.util.Properties;
 
