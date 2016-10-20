@@ -1,17 +1,17 @@
-package org.nudge.elasticstack.json.bean;
+package org.nudge.elasticstack.context.elasticsearch.json.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ *
  * @author Sarah Bourgeois
- * 		   Frederic Massart
- * 
- *         Description : Build SQL insert
+ * @author Frederic Massart
  */
 public class EventSQL extends NudgeEvent {
 
-	public EventSQL(String timestamp, String name, long count, long responseTime) {
-		super(name, responseTime, timestamp, count, "sql");
+	public EventSQL(String timestamp, String name, long count, long responseTime, String transactionId) {
+		super(name, responseTime, timestamp, count, "sql", transactionId);
+		this.setTransactionId(transactionId);
 	}
 
 	// ===========================
@@ -24,6 +24,10 @@ public class EventSQL extends NudgeEvent {
 		return super.getName();
 	}
 
+	public String getTransactionId() {
+		return super.getTransactionId();
+	}
+
 	@JsonProperty("sql_count")
 	public long getCount() {
 		return super.getCount();
@@ -33,7 +37,11 @@ public class EventSQL extends NudgeEvent {
 	@JsonProperty("sql_responseTime")
 	public long getResponseTime() {
 		return super.getResponseTime();
-
 	}
+
+
+
+
+
 
 }

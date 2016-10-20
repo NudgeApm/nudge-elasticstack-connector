@@ -5,6 +5,6 @@
     "description": "",
     "version": 1,
     "kibanaSavedObjectMeta": {
-      "searchSourceJSON": "{\"index\":\"nudge\",\"query\":{\"query_string\":{\"query\":\"mbean_name:\\\"java.lang:type=Threading\\\" AND mbean_attributename:\\\"ThreadCount\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      "searchSourceJSON": "{\"index\":\"nudge-*\",\"query\":{\"query_string\":{\"query\":\"mbean_name:\\\"java.lang:type=Threading\\\" AND mbean_attributename:\\\"ThreadCount\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
     }
   }

@@ -1,15 +1,15 @@
-package org.nudge.elasticstack.type;
+package org.nudge.elasticstack.context.elasticsearch.json.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventTransaction;
-import org.nudge.elasticstack.json.bean.NudgeEvent;
+import org.nudge.elasticstack.Configuration;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.EventTransaction;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.NudgeEvent;
+import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
+import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -18,44 +18,55 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-
+import java.util.UUID;
 
 public class TransactionLayer {
-	
-	private static final Logger LOG = Logger.getLogger("Transaction org.nudge.elasticstack.type : ");
+
+	private static final Logger LOG = Logger.getLogger(TransactionLayer.class.getName());
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
 	/**
-	 * Description : retrieve Transaction data from rawdata and add it to
-	 * parse.
+	 * Retrieve transaction data from rawdata and add it to parse.
 	 *
 	 * @param transactionList
 	 * @return
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<EventTransaction> buildTransactionEvents(List<Transaction> transactionList)
+	public List<EventTransaction> buildTransactionEvents(List<TransactionDTO> transactionList)
 			throws ParseException, JsonProcessingException {
 		List<EventTransaction> events = new ArrayList<EventTransaction>();
-		for (Transaction trans : transactionList) {
+		for (TransactionDTO trans : transactionList) {
 			String name = trans.getCode();
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdfr.format(trans.getStartTime());
 			long response_time = trans.getEndTime() - trans.getStartTime();
-			EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L);
+			EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L, trans.getId());
 			events.add(transactionEvent);
 			// handle layers
-			buildLayerEvents(trans.getLayersList(), transactionEvent);
+			buildLayerEvents(trans.getLayers(), transactionEvent);
 			events.add(transactionEvent);
 		}
 		return events;
 	}
 
 	/**
-	 * Description : retrieve layer from transaction
-	 * 
+	 * Temporary method, only used while we use our generation of the transaction id to ES.
+	 */
+	// WTF ??!
+	private void diffusionTransactionId(TransactionDTO transactionDTO) {
+//		UUID id = transactionDTO.getId();
+		if (transactionDTO.getLayers() != null) {
+			for (LayerDTO layerDTO : transactionDTO.getLayers()) {
+			//	layerDTO.
+			}
+		}
+	}
+
+	/**
+	 * Retrieve layer from transaction
+	 *
 	 * @param eventTrans
 	 * @return
 	 */
@@ -86,9 +97,9 @@ public class TransactionLayer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public void buildLayerEvents(List<Layer> rawdataLayers, EventTransaction eventTrans)
+	public void buildLayerEvents(List<LayerDTO> rawdataLayers, EventTransaction eventTrans)
 			throws ParseException, JsonProcessingException {
-		for (Layer layer : rawdataLayers) {
+		for (LayerDTO layer : rawdataLayers) {
 			if (layer.getLayerName().equals("SQL")) {
 				eventTrans.setResponseTimeLayerSql(layer.getTime());
 				eventTrans.setLayerCountSql(layer.getCount());
@@ -153,8 +164,8 @@ public class TransactionLayer {
 	}
 
 	/**
-	 * Description : Use bulk API to send huge rawdatas in ElasticSearch To
-	 * use this API it must be to format Json in the Bulk Format.
+	 * Description : Use bulk API to send huge rawdatas in ElasticSearch To use
+	 * this API it must be to format Json in the Bulk Format.
 	 *
 	 * @param type
 	 * @return
@@ -167,15 +178,15 @@ public class TransactionLayer {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
+		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
 		elasticMetaData.getIndexElement().setType(type);
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
 
 	/**
-	 * Description : It permits to index huge rawdata in elasticSearch with
-	 * HTTP request
-	 *
+	 * Description : It permits to index huge rawdata in elasticSearch with HTTP
+	 * request
 	 * @param jsonEvents
 	 * @throws Exception
 	 */
@@ -209,6 +220,5 @@ public class TransactionLayer {
 		httpCon.getResponseCode();
 		httpCon.getResponseMessage();
 	}
-	
-	  
+
 }

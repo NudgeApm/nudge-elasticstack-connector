@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.config;
+package org.nudge.elasticstack;
 
 import org.junit.Assert;
 import org.junit.Test;

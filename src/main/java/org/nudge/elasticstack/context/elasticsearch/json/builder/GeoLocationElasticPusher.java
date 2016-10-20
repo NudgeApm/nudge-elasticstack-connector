@@ -1,14 +1,15 @@
-package org.nudge.elasticstack.type;
+package org.nudge.elasticstack.context.elasticsearch.json.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.GeoLocation;
-import org.nudge.elasticstack.json.bean.GeoLocationWriter;
+import org.nudge.elasticstack.Configuration;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocation;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocationWriter;
+import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -25,7 +26,7 @@ import java.util.List;
 
 public class GeoLocationElasticPusher {
 
-	private static final Logger LOG = Logger.getLogger("Geolocation" + GeoLocationElasticPusher.class);
+	private static final Logger LOG = Logger.getLogger(GeoLocationElasticPusher.class.getName());
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
@@ -37,17 +38,17 @@ public class GeoLocationElasticPusher {
 	 * @param transaction
 	 * @return
 	 */
-	public List<GeoLocationWriter> buildLocationEvents(List<GeoLocation> geolocation, List<Transaction> transaction) {
+	public List<GeoLocationWriter> buildLocationEvents(List<GeoLocation> geolocation, List<TransactionDTO> transaction) {
 		List<GeoLocationWriter> geowriter = new ArrayList<>();
 		for (GeoLocation geo : geolocation) {
 			String timestamp = null;
 			double latitude = geo.getLatitude();
 			double longitude = geo.getLongitude();
 			String Location = geo.getClientlocation();
+			String id = "";
 			GeoLocationWriter geolocationwriter = new GeoLocationWriter(latitude, longitude, Location, "location",
-					timestamp);
-			for (Transaction trans : transaction) {
-			
+					timestamp, id);
+			for (TransactionDTO trans : transaction) {
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				String date = sdfr.format(trans.getStartTime());
 				timestamp = geolocationwriter.setResponseTime(date);
@@ -130,9 +131,9 @@ public class GeoLocationElasticPusher {
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;
 		LOG.info(" Flush " + jsonEvents2.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
-		LOG.debug(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		LOG.debug(" Sending MBean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 	
 
 
-} // End of class
+}

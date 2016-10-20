@@ -6,9 +6,7 @@ import mapping.MappingPropertiesGeoLocation.Properties.Name;
  * 
  * @author Sarah Bourgeois
  * @author Frederic Massart
- *
  */
-
 public class MappingPropertiesGeolocationBuilder {
 
 	public static MappingPropertiesGeoLocation createMappingGeolocationProperties() {

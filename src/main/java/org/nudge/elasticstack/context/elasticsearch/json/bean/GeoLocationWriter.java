@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.json.bean;
+package org.nudge.elasticstack.context.elasticsearch.json.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,13 +14,23 @@ public class GeoLocationWriter {
 	private double longitude;
 	private String responseTime;
 	private String type;
+	protected static String transactionId;
 
-	public GeoLocationWriter(double latitude, double longitude, String location, String type, String responseTime)
+	public String getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(String transactionId) {
+		GeoLocationWriter.transactionId = transactionId;
+	}
+
+	public GeoLocationWriter(double latitude, double longitude, String location, String type, String responseTime, String transactionId)
 	{
 		this.setLatitude(latitude);
 		this.setLongitude(longitude);
 		this.setResponseTime(responseTime);
 		this.setType(type);
+		this.setTransactionId(transactionId);
 	}
 
 	// ==================
@@ -68,4 +78,4 @@ public class GeoLocationWriter {
 	}
 
 
-} // End of class
+}

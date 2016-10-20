@@ -4,7 +4,7 @@ package mapping;
  * @author : Sarah Bourgeois 
  * @author : Frederic Massart
  * 
- * Description : properties of the update mapping for type : sql, transaction and Mbean
+ * Description : properties of the update mapping for type : sql, transaction and MBean
  */
 
 import com.fasterxml.jackson.annotation.JsonProperty;

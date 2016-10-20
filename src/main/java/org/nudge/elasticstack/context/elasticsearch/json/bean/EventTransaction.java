@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.json.bean;
+package org.nudge.elasticstack.context.elasticsearch.json.bean;
 
 /**
  * 
@@ -32,8 +32,8 @@ public class EventTransaction extends NudgeEvent {
 	private Long layerCountJava;
 
 
-	public EventTransaction(String name, Long responseTime, String date, Long count) {
-		super(name, responseTime, date, count, "transaction");
+	public EventTransaction(String name, Long responseTime, String date, Long count, String transactionId) {
+		super(name, responseTime, date, count, "transaction", transactionId);
 	}
 
 	// ========================

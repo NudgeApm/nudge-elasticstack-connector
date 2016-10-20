@@ -1,15 +1,16 @@
-package org.nudge.elasticstack.type;
+package org.nudge.elasticstack.context.elasticsearch.json.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import com.nudge.apm.buffer.probe.RawDataProtocol.LayerDetail;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventSQL;
+import org.nudge.elasticstack.Configuration;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.EventSQL;
+import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
+import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
+import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -19,45 +20,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Sql {
+public class SQLLayer {
 
-	private static final Logger LOG = Logger.getLogger("Sql org.nudge.elasticstack.type :");
+	private static final Logger LOG = Logger.getLogger(SQLLayer.class.getName());
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
 	/**
-	 * Description : retrieve SQL request
+	 * Extract SQL events from transactions.
 	 */
-	public List<EventSQL> buildSqlEvents(List<Transaction> transaction) {
-		List<EventSQL> eventSqls = new ArrayList<>();
-		List<Layer> layer = new ArrayList<>();
-		List<LayerDetail> layerDetail = new ArrayList<>();
-		for (Transaction trans : transaction) {
-			trans.getLayersList();
-			layer.addAll(trans.getLayersList());
+	public List<EventSQL> buildSQLEvents(List<TransactionDTO> transactions) {
+		List<EventSQL> sqlEvents = new ArrayList<>();
+
+		for (TransactionDTO transaction : transactions) {
+			for (LayerDTO layer : transaction.getLayers()) {
+				for (LayerCallDTO layerCall : layer.getCalls()) {
+					String sqlCode = layerCall.getCode();
+					long sqlCount = layerCall.getCount();
+					long sqlTime = layerCall.getResponseTime();
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+					String sqlTimestamp = sdfr.format(layerCall.getTimestamp());
+					sqlEvents.add(new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime, transaction.getId()));
+				}
+			}
 		}
-		for (Layer lay : layer) {
-			lay.getCallsList();
-			layerDetail.addAll(lay.getCallsList());
-		}
-		for (LayerDetail layd : layerDetail) {
-			String sqlCode = null, sqlTimestamp;
-			long sqlCount = 0, sqlTime = 0;
-			sqlCode = layd.getCode();
-			sqlCount = layd.getCount();
-			sqlTime = layd.getTime();
-			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			sqlTimestamp = sdfr.format(layd.getTimestamp());
-			EventSQL sqlevent = new EventSQL(sqlTimestamp, sqlCode, sqlCount, sqlTime);
-			eventSqls.add(sqlevent);
-		}
-		return eventSqls;
+		return sqlEvents;
 	}
 
 	/**
 	 * Description : Parse SQL to send to Elastic
 	 *
-	 * @param eventList
+	 * @param eventSqls
 	 * @return
 	 * @throws Exception
 	 */
@@ -82,7 +75,7 @@ public class Sql {
 	/**
 	 * Description : generate SQL for Bulk api
 	 *
-	 * @param mbean
+	 * @param sql
 	 * @return
 	 * @throws JsonProcessingException
 	 */
@@ -101,7 +94,7 @@ public class Sql {
 	/**
 	 * Description : Send MBean into elasticSearch
 	 *
-	 * @param jsonEvents2
+	 * @param jsonEventsSql
 	 * @throws IOException
 	 */
 	public void sendSqltoElk(List<String> jsonEventsSql) throws IOException {
@@ -131,4 +124,4 @@ public class Sql {
 		LOG.debug(" Sending Sql : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 
-} // End of class
+}

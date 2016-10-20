@@ -1,57 +1,56 @@
-package org.nudge.elasticstack.type;
+package org.nudge.elasticstack.context.elasticsearch.json.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBean;
-import com.nudge.apm.buffer.probe.RawDataProtocol.MBeanAttributeInfo;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
-import org.nudge.elasticstack.config.Configuration;
-import org.nudge.elasticstack.json.bean.EventMBean;
+import org.nudge.elasticstack.Configuration;
+import org.nudge.elasticstack.context.elasticsearch.json.EventType;
+import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
+import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.nudge.elasticstack.Utils.ES_DATE_FORMAT;
 
-public class Mbean {
 
-	private static final Logger LOG = Logger.getLogger("Mbean org.nudge.elasticstack.type : ");
+public class MBean {
+
+	private static final Logger LOG = Logger.getLogger(MBean.class.getName());
 	private static final String lineBreak = "\n";
 	Configuration config = new Configuration();
 
 	/**
-	 * Description : retrieve Mbean from rawdata
+	 * Description : retrieve MBean from rawdata
 	 *
 	 * @param mbean
 	 * @param dictionary
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public List<EventMBean> buildMbeanEvents(List<MBean> mbean, Dictionary dictionary) throws JsonProcessingException {
+	public List<EventMBean> buildMbeanEvents(List<MBeanDTO> mbean, Dictionary dictionary) throws JsonProcessingException {
 		List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
 		List<DictionaryEntry> dico = dictionary.getDictionaryList();
 
 		// retrieve MBean
-		for (MBean mb : mbean) {
-			for (MBeanAttributeInfo mBeanAttributeInfo : mb.getAttributeInfoList()) {
-				String nameMbean = null, objectName = null, type = null;
-				int countAttribute = 0, nameId = 0;
+		for (MBeanDTO mb : mbean) {
+
+			String collectingTime = ES_DATE_FORMAT.format(mb.getCollectingTime());
+			String objectName = mb.getObjectName();
+			int countAttribute = mb.getAttributeInfoCount();
+
+			for (MBeanDTO.AttributeInfo mBeanAttributeInfo : mb.getAttributeInfos()) {
+				String nameMbean = null;
 				double valueMbean = 0;
-				String collectingTime;
-				
-				SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-				collectingTime = sdfr.format(mb.getCollectingTime());
-				objectName = mb.getObjectName();
-				countAttribute = mb.getAttributeInfoCount();
-				nameId = mBeanAttributeInfo.getNameId();
-				type = "Mbean";
+			int	nameId = mBeanAttributeInfo.getNameId();
 				try {
 					valueMbean = Double.parseDouble(mBeanAttributeInfo.getValue());
 				} catch (NumberFormatException nfe) { 
@@ -59,14 +58,13 @@ public class Mbean {
 						LOG.debug("Impossible to get the value of a mbean, it will not be inserted to ELK. MBean from rawdata : " + mBeanAttributeInfo);
 					}
 				}
-				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, type, valueMbean,
-						collectingTime, countAttribute);
+				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, EventType.MBEAN, valueMbean, collectingTime, countAttribute);
+				// TODO FMA export the dicotionary stuff at the place that mbean dto are created
 				// retrieve nameMbean with Dictionary
 				for (DictionaryEntry dictionaryEntry : dico) {
-					String name = dictionaryEntry.getName();
 					int id = dictionaryEntry.getId();
 					if (nameId == id) {
-						nameMbean = mbeanEvent.setNameMbean(name);
+						mbeanEvent.setNameMbean(dictionaryEntry.getName());
 					}
 				}
 				// add events
@@ -77,7 +75,7 @@ public class Mbean {
 	}
 
 	/**
-	 * Description : Parse Mbean to send to Elastic
+	 * Description : Parse MBean to send to Elastic
 	 *
 	 * @param eventList
 	 * @return
@@ -103,13 +101,13 @@ public class Mbean {
 	}
 
 	/**
-	 * Description : generate Mbean for Bulk api
+	 * Description : generate MBean for Bulk api
 	 *
 	 * @param mbean
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public String generateMetaDataMbean(String mbean) throws JsonProcessingException {
+	public String generateMetaDataMbean(EventType eventType) throws JsonProcessingException {
 		Configuration conf = new Configuration();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
@@ -117,7 +115,7 @@ public class Mbean {
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
-		elasticMetaData.getIndexElement().setType("mbean");
+		elasticMetaData.getIndexElement().setType(eventType.toString());
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
 
@@ -152,7 +150,7 @@ public class Mbean {
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;
 		LOG.info(" Flush " + jsonEvents2.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
-		LOG.debug(" Sending Mbean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		LOG.debug(" Sending MBean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 
-} // End of class
+}

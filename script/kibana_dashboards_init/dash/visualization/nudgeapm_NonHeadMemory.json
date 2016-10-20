@@ -5,6 +5,6 @@
     "description": "",
     "version": 1,
     "kibanaSavedObjectMeta": {
-      "searchSourceJSON": "{\"index\":\"nudge\",\"query\":{\"query_string\":{\"query\":\"mbean_name:\\\"java.lang:type=Memory\\\" AND mbean_attributename:\\\"NonHeapMemoryUsage.used\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      "searchSourceJSON": "{\"index\":\"nudge-*\",\"query\":{\"query_string\":{\"query\":\"mbean_name:\\\"java.lang:type=Memory\\\" AND mbean_attributename:\\\"NonHeapMemoryUsage.used\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
     }
   }

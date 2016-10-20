@@ -3,13 +3,11 @@ package mapping;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * 
+ * Properties of the update mapping for Geolocation.
+ *
  * @author Sarah Bourgeois
  * @author Frederic Massart
- *
- *         Description : Propertiees of the update mapping for Geolocation
  */
-
 public class MappingPropertiesGeoLocation {
 
 	@JsonProperty("properties")
@@ -82,8 +80,6 @@ public class MappingPropertiesGeoLocation {
 			public void setGeohash_precision(int geohash_precision) {
 				this.geohash_precision = geohash_precision;
 			}
-
 		}
 	}
-
-} // End of class
+}

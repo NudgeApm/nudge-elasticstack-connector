@@ -1,35 +1,32 @@
-package org.nudge.elasticstack.json.bean;
+package org.nudge.elasticstack.context.elasticsearch.json.bean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
- * 
  */
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public abstract class NudgeEvent {
-	//Attributs
+
 	private String date;
 	private String name;
 	private long responseTime;
 	private long count;
 	private String type;
+	private String transactionId;
 	
-	//Constructors
-	public NudgeEvent(String name, long responseTime, String date, long count, String type) {
+	public NudgeEvent(String name, long responseTime, String date, long count, String type, String transactionId) {
 		setName(name);
 		this.date = date;
 		this.responseTime = responseTime;
 		this.count = count;
 		this.type = type;
+		this.transactionId=transactionId;
 	}
 
-	// Method
 	public String toString() {
-		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count;
+		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count + "transactionId =" + transactionId;
 	}
 
 	// =========================
@@ -81,6 +78,12 @@ public abstract class NudgeEvent {
 		this.count = count;
 	}
 	
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
 
+	public String getTransactionId() {
+		return transactionId;
+	}
 
-} // end of class
+}

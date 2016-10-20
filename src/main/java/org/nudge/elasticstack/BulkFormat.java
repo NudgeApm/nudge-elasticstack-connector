@@ -1,16 +1,13 @@
 package org.nudge.elasticstack;
 
-
-/**
- * 
- * @author Sarah Bourgeois
- * @author Frederic Massart
- * 
- * Description : Convert data for the Bulk API 
- */
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Bulk JSON structure for ES bulk pushes.
+ *
+ * @author Sarah Bourgeois
+ * @author Frederic Massart
+ */
 public class BulkFormat {
 
 	@JsonProperty("index")
@@ -32,6 +29,7 @@ public class BulkFormat {
 	public class Index {
 		private String index;
 		private String type;
+		private String id;
 
 		@JsonProperty("_index")
 		public String getIndex() {
@@ -54,6 +52,15 @@ public class BulkFormat {
 
 		public void setType(String type) {
 			this.type = type;
+		}
+
+		@JsonProperty("_id")
+		public String getId() {
+			return id;
+		}
+
+		public void setId(String id) {
+			this.id = id;
 		}
 	}
 }
