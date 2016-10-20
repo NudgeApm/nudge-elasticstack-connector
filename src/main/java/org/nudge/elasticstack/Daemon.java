@@ -135,11 +135,11 @@ public class Daemon {
 							// ===========================
 							Mapping mapping = new Mapping();
 							// Transaction update mapping
-							mapping.pushMapping(config, MappingType.Transaction);
+							mapping.pushMapping(config, MappingType.TRANSACTION);
 							// Sql update mapping
-							mapping.pushMapping(config, MappingType.Sql);
+							mapping.pushMapping(config, MappingType.SQL);
 							// MBean update mapping
-							mapping.pushMapping(config, MappingType.Mbean);
+							mapping.pushMapping(config, MappingType.MBEAN);
 							// GeoLocation mapping
 							mapping.pushGeolocationMapping(config);
 							
