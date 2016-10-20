@@ -16,20 +16,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Mapping {
-	private static final Logger LOG = Logger.getLogger("Update mapping : ");
-	Configuration config = new Configuration();
-	String elasticURL = config.getOutputElasticHosts();
+
+	private static final Logger LOG = Logger.getLogger(Mapping.class.getName());
 
 	public enum MappingType {
 		Transaction, Sql, Mbean
 	}
 
 	public void pushMapping(Configuration config, Object mod) throws IOException {
-		pushMapping(elasticURL, config.getElasticIndex(), mod);
+		pushMapping(config.getOutputElasticHosts(), config.getElasticIndex(), mod);
 	}
 
 	public void pushGeolocationMapping(Configuration config) throws IOException {
-		pushGeolocationMapping(elasticURL, config.getElasticIndex());
+		pushGeolocationMapping(config.getOutputElasticHosts(), config.getElasticIndex());
 	}
 
 	/**
@@ -39,10 +38,10 @@ public class Mapping {
 	 */
 	public void pushMapping(String elasticURL, String index, Object mod) throws IOException {
 		ObjectMapper jsonSerializer = new ObjectMapper();
-		MappingProperties mappingProperies = MappingPropertiesBuilder.buildMappingProperties("multi_field", "string",
+		MappingProperties mappingProperties = MappingPropertiesBuilder.buildMappingProperties("multi_field", "string",
 				"analyzed", "string", "not_analyzed");
 		jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
-		String jsonEvent = jsonSerializer.writeValueAsString(mappingProperies);
+		String jsonEvent = jsonSerializer.writeValueAsString(mappingProperties);
 
 		// ***** Case transaction update mapping ******
 		if (MappingType.Transaction == mod) {
