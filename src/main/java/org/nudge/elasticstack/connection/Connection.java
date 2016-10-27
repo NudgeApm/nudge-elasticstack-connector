@@ -6,9 +6,13 @@
  * Description : Connection to the Nudge API. 
  */
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.Configuration;
+import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Connection {
-	Configuration config = new Configuration();
 	private static final Logger LOG = Logger.getLogger(Connection.class);
-	public static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm";
 	private final String url;
+	private Configuration config = Configuration.getInstance();
 	private String sessionCookie;
 
 	public Connection(String url) {
@@ -67,7 +70,7 @@ public class Connection {
 		// TODO parametriser le from
 		String finalUrl = url + "api/apps/" + appId + "/rawdata?from=" + config.getRawdataHistory();
 		HttpURLConnection connection = prepareRequest(finalUrl);
-		LOG.debug(connection.getResponseCode());
+		LOG.debug("Request URL " + finalUrl + " = " + connection.getResponseCode());
 		List<String> contentRawdata = parseRawdataListResponse(connection.getInputStream());
 		connection.disconnect();
 		return contentRawdata;
@@ -121,5 +124,16 @@ public class Connection {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public List<Filter> requestFilters(String appId) throws IOException {
+		String finalUrl = url + "api/apps/" + appId + "/filters";
+		HttpURLConnection connection = prepareRequest(finalUrl);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+		mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+
+		return mapper.readValue(connection.getInputStream(), new TypeReference<List<Filter>>(){});
 	}
 }

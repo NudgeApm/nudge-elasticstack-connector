@@ -9,8 +9,10 @@ import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
+import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,7 +42,8 @@ public class DTOBuilderTest {
 
 	@Test
 	public void buildTransactions() throws Exception {
-		List<TransactionDTO> transactionDTOList = DTOBuilder.buildTransactions(rawData.getTransactionsList());
+		List<Filter> filters = new ArrayList<>();
+		List<TransactionDTO> transactionDTOList = DTOBuilder.buildTransactions(rawData.getTransactionsList(), filters);
 
 		// First test : transaction stuff
 		RawDataProtocol.Transaction expectedTrans = rawData.getTransactionsList().get(0);

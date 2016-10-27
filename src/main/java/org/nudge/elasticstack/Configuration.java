@@ -46,7 +46,7 @@ public class Configuration {
 	private boolean dryRun;
 	private String rawdataHistory;
 
-	public Configuration() {
+	private Configuration() {
 		searchPropertiesFile();
 	}
 
@@ -66,6 +66,13 @@ public class Configuration {
 	}
 
 
+	private static class ConfigurationHolder {
+		private static final Configuration instance = new Configuration();
+	}
+
+	public static Configuration getInstance() {
+		return ConfigurationHolder.instance;
+	}
 
 	/**
 	 * Load properties with the default conf file, must be placed next to the

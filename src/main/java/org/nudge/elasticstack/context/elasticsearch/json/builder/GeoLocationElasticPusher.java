@@ -28,7 +28,7 @@ public class GeoLocationElasticPusher {
 
 	private static final Logger LOG = Logger.getLogger(GeoLocationElasticPusher.class.getName());
 	private static final String lineBreak = "\n";
-	Configuration config = new Configuration();
+	private Configuration config = Configuration.getInstance();
 
 	/**
 	 * Description : Retrieve data from List Geolocalisation and write it in a
@@ -89,13 +89,12 @@ public class GeoLocationElasticPusher {
 	 * @throws JsonProcessingException
 	 */
 	public String generateMetaDataGeoLocation(String mbean) throws JsonProcessingException {
-		Configuration conf = new Configuration();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
-		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
+		elasticMetaData.getIndexElement().setIndex(config.getElasticIndex());
 		elasticMetaData.getIndexElement().setType("location");
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
@@ -107,7 +106,6 @@ public class GeoLocationElasticPusher {
 	 * @throws IOException
 	 */
 	public void sendElk(List<String> jsonEvents2) throws IOException {
-		Configuration conf = new Configuration();
 		StringBuilder sb = new StringBuilder();
 
 		for (String json : jsonEvents2) {
@@ -118,7 +116,7 @@ public class GeoLocationElasticPusher {
 			return;
 		}
 		long start = System.currentTimeMillis();
-		URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
+		URL URL = new URL(config.getOutputElasticHosts() + "_bulk");
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
 		}

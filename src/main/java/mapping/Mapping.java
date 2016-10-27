@@ -48,20 +48,20 @@ public class Mapping {
 		URL url;
 		switch (mappingType) {
 			case TRANSACTION:
-				url = new URL(elasticURL + index + "/transaction/_mapping");
+				url = new URL(elasticURL + dailyIndex(index) + "/transaction/_mapping");
 				HttpURLConnection httpConTrans = (HttpURLConnection) url.openConnection();
 				httpConTrans.setDoOutput(true);
 				httpConTrans.setRequestMethod("PUT");
 				OutputStreamWriter outTrans = new OutputStreamWriter(httpConTrans.getOutputStream());
 				outTrans.write(jsonEvent);
 				outTrans.close();
-				LOG.debug(" Transaction Mapping Flushed : " + httpConTrans.getResponseCode() + " - "
-						+ httpConTrans.getResponseMessage());
+				LOG.debug("Transaction Mapping Flushed : " + httpConTrans.getResponseCode() + " - "
+						+ httpConTrans.getResponseMessage() + " - " + url.toString());
 				break;
 			case SQL:
 				// change mapping value
 				jsonEvent = jsonEvent.replaceAll("transaction_name", "sql_code");
-				url = new URL(elasticURL + index + "/sql/_mapping");
+				url = new URL(elasticURL + dailyIndex(index) + "/sql/_mapping");
 				HttpURLConnection httpConSql = (HttpURLConnection) url.openConnection();
 				httpConSql.setDoOutput(true);
 				httpConSql.setRequestMethod("PUT");
@@ -74,7 +74,7 @@ public class Mapping {
 			case MBEAN:
 				// change mapping value : for attributeName
 				jsonEvent = jsonEvent.replaceAll("transaction_name", "mbean_attributename");
-				url = new URL(elasticURL + index + "/mbean/_mapping");
+				url = new URL(elasticURL + dailyIndex(index) + "/mbean/_mapping");
 				HttpURLConnection httpConMbean1 = (HttpURLConnection) url.openConnection();
 				httpConMbean1.setDoOutput(true);
 				httpConMbean1.setRequestMethod("PUT");
@@ -85,7 +85,7 @@ public class Mapping {
 						+ httpConMbean1.getResponseMessage());
 				// change mapping value : for name
 				jsonEvent = jsonEvent.replaceAll("mbean_attributename", "mbean_name");
-				url = new URL(elasticURL + index + "/mbean/_mapping");
+				url = new URL(elasticURL + dailyIndex(index) + "/mbean/_mapping");
 				HttpURLConnection httpConMbean2 = (HttpURLConnection) url.openConnection();
 				httpConMbean2.setDoOutput(true);
 				httpConMbean2.setRequestMethod("PUT");
@@ -104,7 +104,7 @@ public class Mapping {
 				.buildGeolocationMappingProperties("geo_point", true, true, 7);
 		jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		String jsonEvent = jsonSerializer.writeValueAsString(mpgl);
-		URL URL = new URL(elasticURL + index + "/location/_mapping");
+		URL URL = new URL(elasticURL + dailyIndex(index) + "/location/_mapping");
 		HttpURLConnection httpConTrans = (HttpURLConnection) URL.openConnection();
 		httpConTrans.setDoOutput(true);
 		httpConTrans.setRequestMethod("PUT");
@@ -113,6 +113,15 @@ public class Mapping {
 		outTrans.close();
 		LOG.debug(" GeoLocation Mapping Flushed : " + httpConTrans.getResponseCode() + " - "
 				+ httpConTrans.getResponseMessage());
+	}
+
+	// TODO review this with getIndex from BulkFormat
+	public static String dailyIndex(String index) {
+		String format = "yyyy-MM-dd";
+		java.text.SimpleDateFormat formater = new java.text.SimpleDateFormat(format);
+		java.util.Date date = new java.util.Date();
+		String dateFormater = formater.format(date);
+		return index  + "-" + dateFormater;
 	}
 
 }

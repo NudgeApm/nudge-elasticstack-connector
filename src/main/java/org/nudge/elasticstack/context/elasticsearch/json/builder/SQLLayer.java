@@ -24,7 +24,7 @@ public class SQLLayer {
 
 	private static final Logger LOG = Logger.getLogger(SQLLayer.class.getName());
 	private static final String lineBreak = "\n";
-	Configuration config = new Configuration();
+	private Configuration config = Configuration.getInstance();
 
 	/**
 	 * Extract SQL events from transactions.
@@ -80,13 +80,12 @@ public class SQLLayer {
 	 * @throws JsonProcessingException
 	 */
 	public String generateMetaDataSQL(String sql) throws JsonProcessingException {
-		Configuration conf = new Configuration();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
-		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
+		elasticMetaData.getIndexElement().setIndex(config.getElasticIndex());
 		elasticMetaData.getIndexElement().setType("sql");
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
@@ -98,7 +97,6 @@ public class SQLLayer {
 	 * @throws IOException
 	 */
 	public void sendSqltoElk(List<String> jsonEventsSql) throws IOException {
-		Configuration conf = new Configuration();
 		StringBuilder sb = new StringBuilder();
 		for (String json : jsonEventsSql) {
 			sb.append(json);
@@ -108,7 +106,7 @@ public class SQLLayer {
 			return;
 		}
 		long start = System.currentTimeMillis();
-		URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
+		URL URL = new URL(config.getOutputElasticHosts() + "_bulk");
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
 		}

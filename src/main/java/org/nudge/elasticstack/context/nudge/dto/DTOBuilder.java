@@ -2,6 +2,8 @@ package org.nudge.elasticstack.context.nudge.dto;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
+import org.nudge.elasticstack.context.nudge.filter.FilterManager;
+import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +16,24 @@ import java.util.List;
  */
 public class DTOBuilder {
 
-	public static List<TransactionDTO> buildTransactions(List<RawDataProtocol.Transaction> rawdataTransactions) {
+
+	public static List<TransactionDTO> buildTransactions(List<RawDataProtocol.Transaction> rawdataTransactions, List<Filter> filters) {
 		List<TransactionDTO> transactions = new ArrayList<>(rawdataTransactions.size());
 
 		for (RawDataProtocol.Transaction rawdataTransaction : rawdataTransactions) {
+
+			String code = rawdataTransaction.getCode();
+			Filter filter = FilterManager.findFilter(filters, rawdataTransaction, code);
+
+			if (filter != null) {
+				if (filter.isExclusion()) {
+					continue;
+				}
+ 				code = FilterManager.constructTargetUrl(rawdataTransaction, rawdataTransaction.getCode(), filter);
+			}
+
 			TransactionDTO transaction = new TransactionDTO();
-			transaction.setCode(rawdataTransaction.getCode());
+			transaction.setCode(code);
 			transaction.setStartTime(rawdataTransaction.getStartTime());
 			transaction.setEndTime(rawdataTransaction.getEndTime());
 			transaction.setUserIp(rawdataTransaction.getUserIp());

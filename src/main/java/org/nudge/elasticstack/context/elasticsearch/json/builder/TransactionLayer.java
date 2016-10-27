@@ -24,7 +24,7 @@ public class TransactionLayer {
 
 	private static final Logger LOG = Logger.getLogger(TransactionLayer.class.getName());
 	private static final String lineBreak = "\n";
-	Configuration config = new Configuration();
+	private Configuration config = Configuration.getInstance();
 
 	/**
 	 * Retrieve transaction data from rawdata and add it to parse.
@@ -159,7 +159,7 @@ public class TransactionLayer {
 			String jsonEvent = jsonSerializer.writeValueAsString(event);
 			jsonEvents.add(jsonEvent + lineBreak);
 		}
-		LOG.debug(jsonEvents);
+//		LOG.debug(jsonEvents);
 		return jsonEvents;
 	}
 
@@ -172,14 +172,13 @@ public class TransactionLayer {
 	 * @throws JsonProcessingException
 	 */
 	public String generateMetaData(String type) throws JsonProcessingException {
-		Configuration conf = new Configuration();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
-		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
+		elasticMetaData.getIndexElement().setIndex(config.getElasticIndex());
 		elasticMetaData.getIndexElement().setType(type);
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
@@ -194,7 +193,6 @@ public class TransactionLayer {
 		if (jsonEvents == null || jsonEvents.isEmpty()) {
 			return;
 		}
-		Configuration conf = new Configuration();
 		StringBuilder sb = new StringBuilder();
 		for (String json : jsonEvents) {
 			sb.append(json);
@@ -204,7 +202,7 @@ public class TransactionLayer {
 			return;
 		}
 		long start = System.currentTimeMillis();
-		URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
+		URL URL = new URL(config.getOutputElasticHosts() + "_bulk");
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
 		}

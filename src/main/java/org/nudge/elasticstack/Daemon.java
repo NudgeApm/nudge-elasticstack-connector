@@ -26,6 +26,7 @@ import org.nudge.elasticstack.context.elasticsearch.json.builder.TransactionLaye
 import org.nudge.elasticstack.context.nudge.dto.DTOBuilder;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
+import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
 import org.nudge.elasticstack.service.GeoLocationService;
 import org.nudge.elasticstack.service.impl.GeoFreeGeoIpImpl;
 
@@ -94,20 +95,22 @@ public class Daemon {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
 
+							// Request Filters
+							List<Filter> filters = c.requestFilters(appId);
+
 							// ==============================
 							// Type : Transaction and Layer
 							// ==============================
-							TransactionLayer tl = new TransactionLayer();
 							List<Transaction> transactions = rawdata.getTransactionsList();
+							List<TransactionDTO> transactionDTOs = DTOBuilder.buildTransactions(transactions, filters);
 
-							List<TransactionDTO> transactionDTOs = DTOBuilder.buildTransactions(transactions);
-
-							List<EventTransaction> events = tl.buildTransactionEvents(transactionDTOs);
+							TransactionLayer transactionLayer = new TransactionLayer();
+							List<EventTransaction> events = transactionLayer.buildTransactionEvents(transactionDTOs);
 							for (EventTransaction eventTrans : events) {
-								tl.nullLayer(eventTrans);
+								transactionLayer.nullLayer(eventTrans);
 							}
-							List<String> jsonEvents = tl.parseJson(events);
-							tl.sendToElastic(jsonEvents);
+							List<String> jsonEvents = transactionLayer.parseJson(events);
+							transactionLayer.sendToElastic(jsonEvents);
 
 							// ===========================
 							// Type : MBean

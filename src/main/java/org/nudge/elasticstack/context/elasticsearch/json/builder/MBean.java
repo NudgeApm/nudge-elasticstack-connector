@@ -26,7 +26,7 @@ public class MBean {
 
 	private static final Logger LOG = Logger.getLogger(MBean.class.getName());
 	private static final String lineBreak = "\n";
-	Configuration config = new Configuration();
+	private Configuration config = Configuration.getInstance();
 
 	/**
 	 * Description : retrieve MBean from rawdata
@@ -108,13 +108,12 @@ public class MBean {
 	 * @throws JsonProcessingException
 	 */
 	public String generateMetaDataMbean(EventType eventType) throws JsonProcessingException {
-		Configuration conf = new Configuration();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
-		elasticMetaData.getIndexElement().setIndex(conf.getElasticIndex());
+		elasticMetaData.getIndexElement().setIndex(config.getElasticIndex());
 		elasticMetaData.getIndexElement().setType(eventType.toString());
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
@@ -126,7 +125,6 @@ public class MBean {
 	 * @throws IOException
 	 */
 	public void sendElk(List<String> jsonEvents2) throws IOException {
-		Configuration conf = new Configuration();
 		StringBuilder sb = new StringBuilder();
 
 		for (String json : jsonEvents2) {
@@ -137,7 +135,7 @@ public class MBean {
 			return;
 		}
 		long start = System.currentTimeMillis();
-		URL URL = new URL(conf.getOutputElasticHosts() + "_bulk");
+		URL URL = new URL(config.getOutputElasticHosts() + "_bulk");
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
 		}
