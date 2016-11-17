@@ -11,7 +11,7 @@ Before anything else, you have to execute the Nudge plugin, in order to import N
 
 | Tables                  | Value                                                               |
 | ----------------------- | ------------------------------------------------------------------- |
-| ELASTICSEARCH_HOST      | URL of your elasticsearchLogin (by default _http://localhost:9200_) |
+| ELASTICSEARCH_HOST      | URL of your elasticsearch host (by default _http://localhost:9200_) |
 
 
 The only configuration which you can modify in the script without impacting its using is the hosts of elasticSearch.
