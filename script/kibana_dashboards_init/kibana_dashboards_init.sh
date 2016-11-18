@@ -74,7 +74,7 @@ delete_all () {
   do
     name=`basename $file .json`
     echo "Supressing dashboards called $name: "
-    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
+    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$name -d @$file ||exit 1
     printf "\n"
   done
 
@@ -108,7 +108,7 @@ delete_dash() {
   for file in $DIR/dashboards/*.json
   do
     read -p 'Which dashboard do you want to delete ? (example : nudgeapm_petclinicDashboards)  ' name
-    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboards/$name -d @$file ||exit 1
+    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$name -d @$file ||exit 1
     printf "\n"
   done
 }
