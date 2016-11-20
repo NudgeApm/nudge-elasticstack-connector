@@ -1,0 +1,10 @@
+{
+  "title": "Global Count",
+  "visState": "{\"title\":\"Global count\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=nudge*, metric=count).label('now').color(pink), .es(index=nudge*, metric=count, offset=-1w).label('1 week ago').color(black)\",\"interval\":\"1h\"},\"aggs\":[],\"listeners\":{}}",
+  "uiStateJSON": "{}",
+  "description": "",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

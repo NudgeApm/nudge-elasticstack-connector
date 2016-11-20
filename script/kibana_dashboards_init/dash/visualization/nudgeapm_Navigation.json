@@ -1,10 +1,10 @@
 {
-      "title": "Dashboard",
-      "visState": "{\"title\":\"Dashboard\",\"type\":\"markdown\",\"params\":{\"markdown\":\"![Nudge apm : Code Centric App Perf](http://2.bp.blogspot.com/-l61Mjmik0js/VmmifI2mISI/AAAAAAAAAI8/aROP5ocr004/s1600-r/NudgeSL_320T_cut.png)\\n\\n# Navigation #\\n---------------------------\\n\\n[Transaction Dashboard](/#/dashboard/nudgeapm_TransactionDashboard)\\n\\n--------------------------\\n\\n[JVM Dashboard](/#/dashboard/nudgeapm_JVMDashboard)\\n\\n--------------------------\"},\"aggs\":[],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      }
-    }
+  "title": "Dashboard",
+  "visState": "{\"title\":\"Dashboard\",\"type\":\"markdown\",\"params\":{\"markdown\":\"# Navigation #\\n---------------------------\\n\\n[Transaction Dashboard](http://bit.ly/2bucr4f)\\n\\n--------------------------\\n\\n[JVM Dashboard](http://bit.ly/2fDdr5U)\\n\\n--------------------------\\n\\n[Week by week comparison](http://bit.ly/2fDdGhu)\"},\"aggs\":[],\"listeners\":{}}",
+  "uiStateJSON": "{}",
+  "description": "",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

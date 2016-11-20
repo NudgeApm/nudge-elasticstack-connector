@@ -1,14 +1,15 @@
 #!/bin/bash
 # Author : Sarah Bourgeois
-# Description : import visualizations and dashboards directly on your Kibana thanks to the Nudge connector.
+# Description : import Nudge Dashboards and Visualizations in your Kibana.
 
 #Elastic Stack parameters
 ELASTICSEARCH_HOST="http://localhost:9200"
 
 #Internal script command
 NAME_ELASTIC_INDEX=".kibana"
-CURL=curl
 DIR=dash
+NUDGE_INDEX_PATTERN="nudge-*"
+NUDGE_INDEX_PATTERN_FILE="$DIR/index-pattern/nudgeapm_indexPattern.json"
 
 printf "\n"
 echo "-------------------------------------------------"
@@ -19,97 +20,117 @@ printf "\n"
 # Help to use correctly arguments
 help_command () {
   echo  "help :
-  import       ==> to import vizualisation and dashboards from Nudge data
-  delete_all   ==> to delete Nudge vizualisations and dashboards which are in your .kibana:
-  delete_visu  ==> to delete vizualisations one per one
-  delete_dash  ==> to delete dashboards one per one"
+  import                ==> import visualizations and dashboards in your Kibana
+  import_index_pattern  ==> import on Nudge index pattern in your Kibana
+  delete_all            ==> delete Nudge APM visualizations and dashboards from your \".kibana\" index
+  delete_visu           ==> delete visualization one by one
+  delete_dash           ==> delete dashboard one by one"
   printf "\n"
 }
 
-# Import Nudge vizualisations, Nudge index-pattern and Nudge dasboards
+curl_delete() {
+  echo "Delete $1 with id \"$2\": "
+  echo "curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/$1/$2\?pretty"
+  curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/$1/$2\?pretty
+  echo
+}
+
+list_object() {
+echo "List of Nudge $1s : "
+  for file in $DIR/$1/*.json
+  do
+    echo $file
+  done
+}
+
+import_index_pattern() {
+  echo "****************************"
+  echo "*** Index-pattern import ***"
+  echo "****************************"
+    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$NUDGE_INDEX_PATTERN?pretty -d @$NUDGE_INDEX_PATTERN_FILE
+}
+
+# Import Nudge visualizations, Nudge index-pattern and Nudge dasboards
 import () {
   echo "Processing... "
   echo "Loading to $ELASTICSEARCH_HOST in $NAME_ELASTIC_INDEX ... "
   printf "\n"
 
+  import_index_pattern
+
+  echo "*****************************"
+  echo "*** Visualizations import ***"
+  echo "*****************************"
   for file in $DIR/visualization/*.json
   do
-    name=`basename $file .json`
-    echo "Loading visualization called $name: "
-    curl -XPUT $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name -d @$file ||exit 1
+    id=`basename $file .json`
+    echo "\"$id\" import response:"
+    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$id?pretty -d @$file
     printf "\n"
   done
 
-  for file in $DIR/index-pattern/*.json
+  echo "*************************"
+  echo "*** Dashboards import ***"
+  echo "*************************"
+  for file in $DIR/dashboard/*.json
   do
-    name=`awk '$1 == "\"title\":" {gsub(/"/, "", $2); print $2}' $file`
-    echo "Loading index pattern $name:"
-    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name  \
-    -d @$file
-    printf "\n"
-  done
-
-  for file in $DIR/dashboards/*.json
-  do
-    name=`basename $file .json`
-    echo "Loading dashboard $name:"
-    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$name \
-    -d @$file
+    id=`basename $file .json`
+    echo "\"$id\" import response:"
+    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$id?pretty -d @$file
     echo
   done
   printf "\n"
 }
 
-# Delete all : vizualisations, index-pattern and dasboards
+# Delete all : visualizations, dashboards and index-pattern
 delete_all () {
   for file in $DIR/visualization/*.json
   do
-    name=`basename $file .json`
-    echo "Supressing visualization called $name: "
-    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name -d @$file ||exit 1
-    printf "\n"
+    id=`basename $file .json`
+    curl_delete 'visualization' $id
   done
 
-  for file in $DIR/dashboards/*.json
+  for file in $DIR/dashboard/*.json
   do
-    name=`basename $file .json`
-    echo "Supressing dashboards called $name: "
-    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$name -d @$file ||exit 1
-    printf "\n"
+    id=`basename $file .json`
+    curl_delete 'dashboard' $id
   done
 
-  for file in $DIR/index-pattern/*.json
-  do
-    name=`basename $file .json`
-    echo "Supressing index-pattern called $name: "
-    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$name -d @$file ||exit 1
-    printf "\n"
+  id="nudge-*"
+  curl_delete 'index-pattern' $id
+}
+
+# Delete visualization one by one
+delete_visu() {
+  list_object visualization
+  read -p "Type the name of the dashboard to delete (example : nudgeapm_CpuLoad) : " visuId
+  echo
+  until [[ -z $visuId ]] ;do
+    curl_delete 'visualization' $visuId
+    read -p "Delete another visualization ? [y/n] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        read -p "Type the name of the visualization to delete (example : nudgeapm_CpuLoad) : " visualization
+    else
+        break
+    fi
   done
 }
 
-# Delete vizualisation one per one
-delete_visu () {
-  echo "List of Nudge vizualisations : "
-  echo $DIR/visualization/*.json "\n"
-  for file in $DIR/visualization/*
-  do
-    read -p 'Which vizualisation do you want to delete ? (example : nudgeapm_ResponsetimeLayers)  ' name
-    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/visualization/$name \
-    -d @$file
-    printf "\n"
-  done
-}
-
-
-# Delete dashboards one per one
+# Delete dashboards one by one
 delete_dash() {
-  echo "List of Nudge dashboards : "
-  echo $DIR/dashboards/*.json "\n"
-  for file in $DIR/dashboards/*.json
-  do
-    read -p 'Which dashboard do you want to delete ? (example : nudgeapm_petclinicDashboards)  ' name
-    curl -XDELETE $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/dashboard/$name -d @$file ||exit 1
-    printf "\n"
+  list_object dashboard
+  read -p "Type the name of the dashboard to delete (example : nudgeapm_TransactionDashboard) : " dashId
+  echo
+  until [[ -z $dashId ]] ;do
+    curl_delete 'dashboard' $dashId
+    read -p "Delete another dashboard ? [y/n] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        read -p "Type the name of the dashboard to delete (example : nudgeapm_TransactionDashboard) : " dashId
+    else
+        break
+    fi
   done
 }
 
@@ -122,6 +143,11 @@ fi
 if [[ $1 = 'import' ]];
 then
   import
+fi
+
+if [[ $1 = 'import_index_pattern' ]];
+then
+  import_index_pattern
 fi
 
 if [[ $1 = 'delete_all' ]];
