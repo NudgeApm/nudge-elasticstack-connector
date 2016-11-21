@@ -21,7 +21,7 @@ printf "\n"
 help_command () {
   echo  "help :
   import                ==> import visualizations and dashboards in your Kibana
-  import_index_pattern  ==> import on Nudge index pattern in your Kibana
+  import_index_pattern  ==> import Nudge index pattern in your Kibana
   delete_all            ==> delete Nudge APM visualizations and dashboards from your \".kibana\" index
   delete_visu           ==> delete visualization one by one
   delete_dash           ==> delete dashboard one by one"
