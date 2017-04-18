@@ -14,6 +14,7 @@ import mapping.Mapping;
 import mapping.Mapping.MappingType;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.connection.Connection;
+import org.nudge.elasticstack.connection.ElasticConnection;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.EventSQL;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.EventTransaction;
@@ -88,6 +89,7 @@ public class Daemon {
 				// Connection and load configuration
 				Connection c = new Connection(config.getNudgeUrl());
 				c.login(config.getNudgeLogin(), config.getNudgePwd());
+				ElasticConnection esCon = new ElasticConnection(config.getOutputElasticHosts());
 				for (String appId : config.getAppIds()) {
 					List<String> rawdataList = c.requestRawdataList(appId, "-10m");
 					// analyse files, comparaison and push
@@ -132,11 +134,11 @@ public class Daemon {
 							List<EventSQL> sql = s.buildSQLEvents(transactionDTOs);
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
-							
+
 							// ===========================
 							// Mapping
 							// ===========================
-							Mapping mapping = new Mapping();
+							Mapping mapping = new Mapping(esCon);
 							// Transaction update mapping
 							mapping.pushMapping(config, MappingType.TRANSACTION);
 							// Sql update mapping
@@ -145,15 +147,14 @@ public class Daemon {
 							mapping.pushMapping(config, MappingType.MBEAN);
 							// GeoLocation mapping
 							mapping.pushGeolocationMapping(config);
-							
+
 							// ===========================
 							// GeoLocalation
 							// ===========================
 							List<GeoLocation> geoLocations = new ArrayList<>();
 							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
 							for (TransactionDTO transaction : transactionDTOs) {
-								GeoLocation geoLocation = geoLocationService
-										.requestGeoLocationFromIp(transaction.getUserIp());
+								GeoLocation geoLocation = geoLocationService.requestGeoLocationFromIp(transaction.getUserIp());
 								geoLocations.add(geoLocation);
 							}
 							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactionDTOs);

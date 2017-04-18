@@ -1,22 +1,22 @@
 
-#**Nudge Elastic Stack connector**
+# Nudge Elastic Stack connector
 
-##Overview
+## Overview
 
 The Nudge ElasticStack Plugin is a very simple daemon connector that let you integrate your applications performance measures analyzed by [Nudge APM](https://www.nudge-apm.com/) into your Elastic stack.
 
-##Live demo
+## Live demo
 To view a live demo follow this link :
 [bit.ly/nudge-demo-elastic](http://bit.ly/2f1NbUz)</a>
 
 
-##Requirements
+## Requirements
 1. A [Nudge APM](https://www.nudge-apm.com/) account (login, password) and the token of the app (allowed for this account) you want to view in Kibana. You can find this token in the application settings screen.
-2. Elastic >= 2.3.
-3. Kibana >= 4.5.0.
-4. Java >= 1.7 (Open JDK and Oracle JVM have been tested).
+2. Elastic 2.3
+3. Kibana 4.5.0
+4. Java >= 1.7 (Open JDK and Oracle JVM have been tested)
 
-##Getting started
+## Getting started
 First download and unpack our archive.
 
 ```
@@ -52,7 +52,6 @@ $ ./script/kibana_dashboard_init.sh import
 For more information about this script, read the [related documentation page](https://github.com/NudgeApm/nudge-elasticstack-connector/blob/master/script/kibana_dashboards_init/README.md).
 
 
-##Documentation
+## Documentation
 
 Visit [nudge-apm.com](https://www.nudge-apm.com/integration) for the full documentation.
-

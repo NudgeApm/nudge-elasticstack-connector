@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.nudge.elasticstack.connection.ElasticConnection;
 
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
@@ -32,12 +33,13 @@ public class DaemonTest {
 
     @Test
     // TODO migrate this test in MappingTest
-    public void pushMapping_test() throws IOException, URISyntaxException {
+    public void pushMapping_test() throws Exception {
         // given
         initTransactionBean();
+        ElasticConnection esCon = new ElasticConnection(URL_ELASTIC_TEST);
 
         // when
-        Mapping mapping = new Mapping();
+        Mapping mapping = new Mapping(esCon);
 
         mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, Mapping.MappingType.TRANSACTION);
 
