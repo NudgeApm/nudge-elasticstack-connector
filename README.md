@@ -1,57 +1,56 @@
 
-#**Nudge Elastic Stack connector**
+# Nudge Elastic Stack connector
 
-##Overview
+## Overview
 
 The Nudge ElasticStack Plugin is a very simple daemon connector that let you integrate your applications performance measures analyzed by [Nudge APM](https://www.nudge-apm.com/) into your Elastic stack.
 
-##Live demo
+## Live demo
 To view a live demo follow this link :
 [http://kibana.nudgeapm.io](http://bit.ly/nudge-kibana)</a>
 
-##Requirements
+## Requirements
 1. A [Nudge APM](https://www.nudge-apm.com/) account (login, password) and the token of the app (allowed for this account) you want to view in Kibana. You can find this token in the application settings screen.
 2. Elastic >= 2.3.
 3. Kibana >= 4.5.0.
 4. Java >= 1.7 (Open JDK and Oracle JVM have been tested).
 
-##Getting started
+## Getting started
 First download and unpack our archive.
 
 ```
-$ wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.1.0/nudge-elasticstack-connector-1.1.0.zip
-$ unzip nudge-elasticstack-connector-1.1.0.zip
+$ wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.3.1/nudge-elasticstack-connector-1.3.1.zip
+$ unzip nudge-elasticstack-connector-1.3.1.zip
 ```
 
 Then edit the properties file and set your own properties.
 These are the mandatory properties you have to specify :
 
 
-| Property       | Value                                                       |
-|----------------|-------------------------------------------------------------|
-|nudge.login   |Login to [Nudge APM](https://www.nudge-apm.com/) platform                                  |
-|nudge.password|Password to [Nudge APM](https://www.nudge-apm.com/) platform                               |
-|nudge.apps.ids|Your application token in [Nudge API](https://monitor.nudge-apm.com/api-doc/)                                      |
-|elastic.index |The name of the Elastic index you want the plugin to write to|
-|output.elastic.hosts|Elastic hosts (default http://localhost:9200)                |
+|Property|Value|
+|-|-|
+|nudge.api.token|[Nudge APM](https://www.nudge-apm.com/) API authentication token platform|
+|nudge.apps.ids|Your application token in [Nudge API](https://monitor.nudge-apm.com/api-doc/)|
+|elastic.index|The name of the Elastic index you want the plugin to write to|
+|output.elastic.hosts|Elastic hosts (default http://localhost:9200)|
 
-Finally start the service.
+Finally start the service :
 
 ```
-$ java -jar nudge-elasticstack-connector-1.1.0.jar -startDaemon
+$ java -jar nudge-elasticstack-connector-1.3.1.jar -startDaemon
 ```
 
 The plugin is now fetching live data from [nudge-apm.com](https://www.nudge-apm.com/) and writing them to your Elastic.
 After running the connector, you can easily set up an initial Kibana dashboard using the shell script provided in the archive : `kibana_dashboard_init.sh`.
 
 ```
-$ ./script/kibana_dashboard_init.sh import
+$ ce script
+$ ./kibana_dashboard_init.sh import
 ```
 
 For more information about this script, read the [related documentation page](https://github.com/NudgeApm/nudge-elasticstack-connector/blob/master/script/kibana_dashboards_init/README.md).
 
 
-##Documentation
+## Documentation
 
-Visit [nudge-apm.com](https://www.nudge-apm.com/integration) for the full documentation.
-
+Visit [www.nudge-apm.com](https://www.nudge-apm.com/integration) for the full documentation.
