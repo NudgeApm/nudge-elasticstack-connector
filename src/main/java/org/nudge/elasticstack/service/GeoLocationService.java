@@ -1,8 +1,7 @@
 package org.nudge.elasticstack.service;
 
+import org.nudge.elasticstack.NudgeESConnectorException;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocation;
-
-import java.io.IOException;
 
 
 /**
@@ -12,6 +11,5 @@ import java.io.IOException;
  *
  */
 public interface GeoLocationService {
-
-    public GeoLocation requestGeoLocationFromIp(String ip) throws IOException;
+    public GeoLocation requestGeoLocationFromIp(String ip) throws NudgeESConnectorException;
 }

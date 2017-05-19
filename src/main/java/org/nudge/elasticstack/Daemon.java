@@ -30,8 +30,11 @@ import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
 import org.nudge.elasticstack.service.GeoLocationService;
 import org.nudge.elasticstack.service.impl.GeoFreeGeoIpImpl;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -41,12 +44,12 @@ public class Daemon {
 	private static final Logger LOG = Logger.getLogger("Connector : ");
 	private static ScheduledExecutorService scheduler;
 	private static List<String> analyzedFilenames = new ArrayList<>();
-	private static final long ONE_MIN = 60000;
 
 	/**
 	 * Description : Launcher Deamon.
 	 * 
 	 * @param config
+	 * @throws NudgeESConnectorException
 	 *
 	 */
 	public static void start(Configuration config) {
@@ -70,13 +73,30 @@ public class Daemon {
 	}
 
 	protected static class DaemonTask implements Runnable {
-		private Configuration config;
-
-		GeoLocationService geoLocationService;
+		private final Configuration config;
+		private final GeoLocationService geoLocationService;
+		// TODO Should be size limited => replace with a cache
+		private final Map<String, GeoLocation> geoLocationsMap;
 
 		DaemonTask(Configuration config) {
 			this.config = config;
 			geoLocationService = new GeoFreeGeoIpImpl();
+			geoLocationsMap = new HashMap<>();
+
+			// Mapping
+			Mapping mapping = new Mapping();
+			try {
+				// Transaction update mapping
+				mapping.pushMapping(config, MappingType.TRANSACTION);
+				// Sql update mapping
+				mapping.pushMapping(config, MappingType.SQL);
+				// MBean update mapping
+				mapping.pushMapping(config, MappingType.MBEAN);
+				// GeoLocation mapping
+				mapping.pushGeolocationMapping(config);
+			} catch (IOException e) {
+				throw new IllegalStateException("Failed to init mapping", e);
+			}
 		}
 
 		/**
@@ -86,14 +106,13 @@ public class Daemon {
 		public void run() {
 			try {
 				// Connection and load configuration
-				Connection c = new Connection(config.getNudgeUrl());
-				c.login(config.getNudgeLogin(), config.getNudgePwd());
+				Connection c = new Connection(config.getNudgeUrl(), config.getNudgeApiToken());
 				for (String appId : config.getAppIds()) {
-					List<String> rawdataList = c.requestRawdataList(appId, "-10m");
+					List<String> rawdataList = c.getRawdataList(appId, "-10m");
 					// analyse files, comparaison and push
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
-							RawData rawdata = c.requestRawdata(appId, rawdataFilename);
+							RawData rawdata = c.getRawdata(appId, rawdataFilename);
 
 							// Request Filters
 							List<Filter> filters = c.requestFilters(appId);
@@ -134,49 +153,35 @@ public class Daemon {
 							s.sendSqltoElk(jsonEventsSql);
 							
 							// ===========================
-							// Mapping
-							// ===========================
-							Mapping mapping = new Mapping();
-							// Transaction update mapping
-							mapping.pushMapping(config, MappingType.TRANSACTION);
-							// Sql update mapping
-							mapping.pushMapping(config, MappingType.SQL);
-							// MBean update mapping
-							mapping.pushMapping(config, MappingType.MBEAN);
-							// GeoLocation mapping
-							mapping.pushGeolocationMapping(config);
-							
-							// ===========================
 							// GeoLocalation
 							// ===========================
 							List<GeoLocation> geoLocations = new ArrayList<>();
 							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
-							for (TransactionDTO transaction : transactionDTOs) {
-								GeoLocation geoLocation = geoLocationService
-										.requestGeoLocationFromIp(transaction.getUserIp());
-								geoLocations.add(geoLocation);
+							try {
+								for (TransactionDTO transaction : transactionDTOs) {
+									String userIp = transaction.getUserIp();
+									if (userIp != null && !"".equals(userIp)) {
+										GeoLocation geoLocation = geoLocationsMap.get(userIp);
+										if(geoLocation == null) {
+											LOG.debug("looking for "+userIp);
+											geoLocation = geoLocationService.requestGeoLocationFromIp(userIp);
+											geoLocationsMap.put(userIp, geoLocation);
+										}
+										geoLocations.add(geoLocation);
+									}
+								}
+							} catch (NudgeESConnectorException e) {
+								LOG.error("Failed to consider geolocation", e);
 							}
 							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactionDTOs);
 							List<String> json = gep.parseJsonLocation(location);
 							gep.sendElk(json);
-
 						}
 					}
 					analyzedFilenames = rawdataList;
 				}
 			} catch (Throwable t) {
-				LOG.fatal("The daemon has encountered a crash error", t);
-				if (null != scheduler) {
-					// Reschedule the daemonTask
-					LOG.info("Restart the daemon in " + ONE_MIN + "ms");
-					try {
-						Thread.sleep(ONE_MIN);
-					} catch (InterruptedException e) {
-						LOG.warn("Interrupted before a daemon restart", e);
-					}
-					LOG.info("Restarting daemon ...");
-					scheduleDaemon(scheduler, config);
-				}
+				LOG.error("Uncaptured error", t);
 			}
 		}
 	}

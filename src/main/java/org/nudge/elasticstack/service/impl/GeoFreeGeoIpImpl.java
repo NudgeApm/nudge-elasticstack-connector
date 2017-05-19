@@ -3,6 +3,7 @@ package org.nudge.elasticstack.service.impl;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
+import org.nudge.elasticstack.NudgeESConnectorException;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocation;
 import org.nudge.elasticstack.service.GeoLocationService;
 
@@ -19,9 +20,10 @@ public class GeoFreeGeoIpImpl implements GeoLocationService {
 
 	private static final Logger LOG = Logger.getLogger(GeoFreeGeoIpImpl.class);
 	private static final String FINAL_URL = "http://freegeoip.net/json/";
+	private long failureEpoch = 0;
 
 	@Override
-	public GeoLocation requestGeoLocationFromIp(String ip) throws IOException {
+	public GeoLocation requestGeoLocationFromIp(String ip) throws NudgeESConnectorException {
 		String geoLocString = getGeoFromIP(ip);
 		return parseGeoLocation(geoLocString);
 	}
@@ -30,8 +32,9 @@ public class GeoFreeGeoIpImpl implements GeoLocationService {
 	 *
 	 * @param completeUrl
 	 * @return
+	 * @throws IOException
 	 */
-	private HttpURLConnection prepareGeoDataRequest(String completeUrl) {
+	private HttpURLConnection prepareGeoDataRequest(String completeUrl) throws NudgeESConnectorException {
 		try {
 			URL url = new URL(completeUrl);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -41,20 +44,19 @@ public class GeoFreeGeoIpImpl implements GeoLocationService {
 			con.setInstanceFollowRedirects(false);
 			return con;
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new NudgeESConnectorException("Failed to request geo data service", e);
 		}
 	}
 
-	private GeoLocation parseGeoLocation(String geoLocationString) {
+	private GeoLocation parseGeoLocation(String geoLocationString) throws NudgeESConnectorException {
 		GeoLocation geoLocation = new GeoLocation();
 		if (geoLocationString != null && !geoLocationString.equals("")) {
 			ObjectMapper mapper = new ObjectMapper();
-			try {
-				MappingIterator<GeoLocation> objectMappingIterator = mapper.reader().forType(GeoLocation.class)
-						.readValues(geoLocationString);
+			try (MappingIterator<GeoLocation> objectMappingIterator = mapper.reader().forType(GeoLocation.class).readValues(
+					geoLocationString)) {
 				geoLocation = objectMappingIterator.next();
 			} catch (IOException e) {
-				LOG.error("Can't parse the geo json object from api", e);
+				throw new NudgeESConnectorException("Failed to parse geo data service response", e);
 			}
 		}
 		return geoLocation;
@@ -66,14 +68,20 @@ public class GeoFreeGeoIpImpl implements GeoLocationService {
 	 * @param userIp
 	 * @return
 	 * @throws IOException
+	 * @throws NudgeESConnectorException
 	 */
-	private String getGeoFromIP(String userIp) throws IOException {
+	private String getGeoFromIP(String userIp) throws NudgeESConnectorException {
 		HttpURLConnection connection = prepareGeoDataRequest(FINAL_URL + userIp);
-		LOG.debug(connection.getResponseCode());
-		InputStream is = connection.getInputStream();
-		String geoString = convertStreamToString(is);
-		connection.disconnect();
-		return geoString;
+		try {
+			LOG.debug(connection.getResponseCode());
+			try (InputStream is = connection.getInputStream()) {
+				String geoString = convertStreamToString(is);
+				connection.disconnect();
+				return geoString;
+			}
+		} catch (IOException e) {
+			throw new NudgeESConnectorException("Failed to read geo data service response", e);
+		}
 	}
 
 	/**
