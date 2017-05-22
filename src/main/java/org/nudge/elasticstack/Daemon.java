@@ -3,15 +3,15 @@ package org.nudge.elasticstack;
 /**
  * @author Sarah Bourgeois
  * @author Frederic Massart
+ * @author Thomas Arnaud
  *
- * Description : Class which permits to send rawdatas to elasticSearch with -startDeamon
+ * Description : Daemon task  that grab data from Nudge APM API and sends it to ES
  */
 
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import mapping.Mapping;
-import mapping.Mapping.MappingType;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.connection.Connection;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
@@ -78,25 +78,12 @@ public class Daemon {
 		// TODO Should be size limited => replace with a cache
 		private final Map<String, GeoLocation> geoLocationsMap;
 
+		private String currentIndex = null;
+
 		DaemonTask(Configuration config) {
 			this.config = config;
 			geoLocationService = new GeoFreeGeoIpImpl();
 			geoLocationsMap = new HashMap<>();
-
-			// Mapping
-			Mapping mapping = new Mapping();
-			try {
-				// Transaction update mapping
-				mapping.pushMapping(config, MappingType.TRANSACTION);
-				// Sql update mapping
-				mapping.pushMapping(config, MappingType.SQL);
-				// MBean update mapping
-				mapping.pushMapping(config, MappingType.MBEAN);
-				// GeoLocation mapping
-				mapping.pushGeolocationMapping(config);
-			} catch (IOException e) {
-				throw new IllegalStateException("Failed to init mapping", e);
-			}
 		}
 
 		/**
@@ -105,6 +92,19 @@ public class Daemon {
 		@Override
 		public void run() {
 			try {
+				String esIndex = config.getElasticIndex() + "-" + Utils.getIndexSuffix();
+				if(!esIndex.equals(currentIndex)) {
+					// Mapping
+					Mapping mapping = new Mapping(config.getOutputElasticHosts(), esIndex);
+					try {
+						mapping.initIndex();
+						mapping.pushMappings();
+					} catch (IOException e) {
+						throw new IllegalStateException("Failed to init mapping", e);
+					}
+					currentIndex = esIndex;
+				}
+
 				// Connection and load configuration
 				Connection c = new Connection(config.getNudgeUrl(), config.getNudgeApiToken());
 				for (String appId : config.getAppIds()) {
