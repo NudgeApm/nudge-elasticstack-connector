@@ -38,12 +38,12 @@ public class DaemonTest {
 		ElasticConnection esCon = new ElasticConnection(URL_ELASTIC_TEST);
 
 		// when
-		Mapping mapping = new Mapping(esCon);
+		Mapping mapping = new Mapping(esCon, URL_ELASTIC_TEST, INDEX_TEST);
 
-		mapping.pushMapping(URL_ELASTIC_TEST, INDEX_TEST, Mapping.MappingType.TRANSACTION);
+		mapping.pushMapping(Mapping.MappingType.TRANSACTION);
 
 		// then
-		URL elasticTest = new URL(URL_ELASTIC_TEST + Mapping.dailyIndex(INDEX_TEST) + "/transaction/_mapping");
+		URL elasticTest = new URL(URL_ELASTIC_TEST + INDEX_TEST + "/transaction/_mapping");
 		HttpURLConnection connection = (HttpURLConnection) elasticTest.openConnection();
 		connection.setDoOutput(true);
 		connection.setRequestMethod("GET");
@@ -119,7 +119,7 @@ public class DaemonTest {
 	}
 
 	private void createIndex() throws IOException, URISyntaxException {
-		URL elasticTest = new URL(URL_ELASTIC_TEST + Mapping.dailyIndex(INDEX_TEST));
+		URL elasticTest = new URL(URL_ELASTIC_TEST + INDEX_TEST);
 		HttpURLConnection connection = (HttpURLConnection) elasticTest.openConnection();
 		connection.setRequestMethod("PUT");
 		connection.setDoOutput(true);
@@ -133,7 +133,7 @@ public class DaemonTest {
 	}
 
 	private void dropIndex() throws IOException {
-		URL elasticTest = new URL(URL_ELASTIC_TEST + Mapping.dailyIndex(INDEX_TEST));
+		URL elasticTest = new URL(URL_ELASTIC_TEST + INDEX_TEST);
 		HttpURLConnection connection = (HttpURLConnection) elasticTest.openConnection();
 		connection.setRequestMethod("DELETE");
 		LOG.info("Drop index " + connection.getResponseCode() + " - " + connection.getResponseMessage());
