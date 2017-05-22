@@ -22,7 +22,7 @@ public class ConnectionTest {
 	@Test
 	public void parseRawdataListResponseTest() {
 		// ***** given *****
-		Connection connection = new Connection("mockApiUrl");
+		Connection connection = new Connection("mockApiUrl", "any-token");
 		// Simulation of API answer
 		InputStream mockResponseStream = new ByteArrayInputStream(
 				"[\"collecte_2016-07-28_18-45-02-146_94.dat\",\"collecte_2016-07-28_18-45-02-206_86.dat\"]".getBytes());
@@ -45,7 +45,7 @@ public class ConnectionTest {
 	@Test
 	public void parseRawdataListResponseTest2() {
 		// ***** given *****
-		Connection connection = new Connection("mockApiUrl2");
+		Connection connection = new Connection("mockApiUrl2", "any-token");
 		InputStream mockResponseStream = new ByteArrayInputStream(
 				"[\"collecte_2016-06-08_00-53-01-676_1311.dat\"]".getBytes());
 		
@@ -65,7 +65,7 @@ public class ConnectionTest {
 	@Test
 	public void parseRawdataListResponseTest3() {
 		// ***** given *****
-		Connection connection = new Connection("mockApiUrl2");
+		Connection connection = new Connection("mockApiUrl2", "any-token");
 		InputStream mockResponseStream = new ByteArrayInputStream(
 				"[]".getBytes());
 		

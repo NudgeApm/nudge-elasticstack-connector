@@ -24,50 +24,15 @@ import java.util.List;
 public class Connection {
 	private static final Logger LOG = Logger.getLogger(Connection.class);
 	private final String url;
+	private final String apiKeyParam;
 	private Configuration config = Configuration.getInstance();
-	private String sessionCookie;
 
-	public Connection(String url) {
+	public Connection(String url, String apiKey) {
 		this.url = url;
-		sessionCookie = null;
+		this.apiKeyParam = "Bearer " + apiKey;
 	}
 
-	public void login(String login, String pwd) {
-		try {
-			HttpURLConnection con;
-			URL loginUrl = new URL(url + "login/usrpwd");
-			con = (HttpURLConnection) loginUrl.openConnection();
-			con.setRequestMethod("POST");
-			con.setDoOutput(true);
-			con.setConnectTimeout(1000);
-			con.setReadTimeout(5000);
-			con.setInstanceFollowRedirects(false);
-			String params = "id=" + login + "&pwd=" + pwd;
-			con.getOutputStream().write(params.getBytes());
-			getSessionFromCookies(con.getHeaderFields().get("Set-Cookie"));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void getSessionFromCookies(List<String> cookies) {
-		if (cookies == null || cookies.size() < 1) {
-			throw new IllegalStateException("Login answer does not contains session cookie.");
-		}
-		for (String cookie : cookies) {
-			for (String param : cookie.split(";")) {
-				if (param.contains("JSESSIONID=")) {
-					sessionCookie = sessionCookie == null ? param : sessionCookie + ";" + param;
-				}
-				if (param.contains("-cookie=")) {
-					sessionCookie = sessionCookie == null ? param : sessionCookie + ";" + param;
-				}
-			}
-		}
-	}
-
-	public List<String> requestRawdataList(String appId, String from) throws IOException {
-		// TODO parametriser le from
+	public List<String> getRawdataList(String appId, String from) throws IOException {
 		String finalUrl = url + "api/apps/" + appId + "/rawdata?from=" + config.getRawdataHistory();
 		HttpURLConnection connection = prepareRequest(finalUrl);
 		LOG.debug("Request URL " + finalUrl + " = " + connection.getResponseCode());
@@ -105,7 +70,7 @@ public class Connection {
 		}
 	}
 
-	public RawData requestRawdata(String appId, String rawdataFilename) throws IOException {
+	public RawData getRawdata(String appId, String rawdataFilename) throws IOException {
 		String finalUrl = url + "api/apps/" + appId + "/rawdata/" + rawdataFilename;
 		HttpURLConnection connection = prepareRequest(finalUrl);
 		return RawData.parseFrom(connection.getInputStream());
@@ -119,7 +84,7 @@ public class Connection {
 			con.setConnectTimeout(1000);
 			con.setReadTimeout(5000);
 			con.setInstanceFollowRedirects(false);
-			con.setRequestProperty("Cookie", sessionCookie);
+			con.setRequestProperty("Authorization", apiKeyParam);
 			return con;
 		} catch (IOException e) {
 			throw new RuntimeException(e);

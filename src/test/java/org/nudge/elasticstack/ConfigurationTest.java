@@ -35,8 +35,7 @@ public class ConfigurationTest {
 
     private Properties defineDefaultProperties() {
         Properties properties = new Properties();
-        properties.setProperty("nudge.login", "mail");
-        properties.setProperty("nudge.password", "password");
+        properties.setProperty("nudge.api.token", "key");
         properties.setProperty("nudge.app.ids", "605050b8-6d88-49e5-bdea-165499ee2c4f");
         properties.setProperty("elastic.index", "nudge");
         properties.setProperty("output.elastic.hosts", "http://localhost:9200/");

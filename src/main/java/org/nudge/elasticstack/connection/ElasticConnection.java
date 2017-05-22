@@ -8,6 +8,7 @@ import java.net.URL;
 
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -91,6 +92,8 @@ public class ElasticConnection {
 			private String number;
 			@JsonProperty("build_hash")
 			private String buildHash;
+			@JsonProperty("build_timestamp")
+			private String buildTimestamp;
 			@JsonProperty("build_date")
 			private String buildDate;
 			@JsonProperty("build_snapshot")
@@ -103,6 +106,9 @@ public class ElasticConnection {
 			}
 			public String getBuildHash() {
 				return buildHash;
+			}
+			public String getBuildTimestamp() {
+				return buildTimestamp;
 			}
 			public String getBuildDate() {
 				return buildDate;
