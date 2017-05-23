@@ -184,7 +184,7 @@ public class Daemon {
 					analyzedFilenames = rawdataList;
 				}
 			} catch (Throwable t) {
-				LOG.error("Uncaptured error", t);
+				LOG.error("Uncaught error", t);
 			}
 		}
 	}
