@@ -126,6 +126,6 @@ public class Mapping {
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setDoOutput(true);
 		con.setRequestMethod("PUT");
-		con.connect();
+		con.getResponseCode();
 	}
 }
