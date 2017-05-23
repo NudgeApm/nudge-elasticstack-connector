@@ -31,7 +31,6 @@ import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
 import org.nudge.elasticstack.service.GeoLocationService;
 import org.nudge.elasticstack.service.impl.GeoFreeGeoIpImpl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,9 +76,9 @@ public class Daemon {
 		private final Configuration config;
 		private final GeoLocationService geoLocationService;
 		private final ElasticConnection esCon;
+		private final Connection nudgeCon;
 		// TODO Should be size limited => replace with a cache
 		private final Map<String, GeoLocation> geoLocationsMap;
-		
 
 		private String currentIndex = null;
 
@@ -87,6 +86,8 @@ public class Daemon {
 			this.config = config;
 			geoLocationService = new GeoFreeGeoIpImpl();
 			geoLocationsMap = new HashMap<>();
+			// Connection and load configuration
+			nudgeCon = new Connection(config.getNudgeUrl(), config.getNudgeApiToken());
 			try {
 				this.esCon = new ElasticConnection(config.getOutputElasticHosts());
 			} catch (Exception e) {
@@ -102,28 +103,22 @@ public class Daemon {
 			try {
 				String esIndex = config.getElasticIndex() + "-" + Utils.getIndexSuffix();
 				if(!esIndex.equals(currentIndex)) {
+					esCon.createAndUseIndex(esIndex);
 					// Mapping
 					Mapping mapping = new Mapping(esCon, config.getOutputElasticHosts(), esIndex);
-					try {
-						mapping.initIndex();
-						mapping.pushMappings();
-					} catch (IOException e) {
-						throw new IllegalStateException("Failed to init mapping", e);
-					}
+					mapping.pushMappings();
 					currentIndex = esIndex;
 				}
 
-				// Connection and load configuration
-				Connection c = new Connection(config.getNudgeUrl(), config.getNudgeApiToken());
 				for (String appId : config.getAppIds()) {
-					List<String> rawdataList = c.getRawdataList(appId, "-10m");
+					List<String> rawdataList = nudgeCon.getRawdataList(appId, "-10m");
 					// analyse files, comparaison and push
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
-							RawData rawdata = c.getRawdata(appId, rawdataFilename);
+							RawData rawdata = nudgeCon.getRawdata(appId, rawdataFilename);
 
 							// Request Filters
-							List<Filter> filters = c.requestFilters(appId);
+							List<Filter> filters = nudgeCon.requestFilters(appId);
 
 							// ==============================
 							// Type : Transaction and Layer

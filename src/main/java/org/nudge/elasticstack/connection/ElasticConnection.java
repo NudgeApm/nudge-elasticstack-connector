@@ -1,14 +1,16 @@
 package org.nudge.elasticstack.connection;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
+import org.nudge.elasticstack.NudgeESConnectorException;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,23 +21,78 @@ public class ElasticConnection {
 	private final String elasticHost;
 	private final Metadata metadata;
 	private final int esVersion;
+	private String esCommandPrefix;
 
 	public ElasticConnection(String host) throws Exception {
 		this.elasticHost = host;
-		String jsonMetadata = get("");
+		String jsonMetadata = get();
 		ObjectMapper mapper = new ObjectMapper();
 		this.metadata = mapper.readValue(jsonMetadata, Metadata.class);
 		this.esVersion = Integer.parseInt(this.metadata.version.number.split("\\.")[0]);
 	}
 
-	public String get(String resource) throws Exception {
-		URL url = new URL(elasticHost + resource);
+	public String get(String resource) throws NudgeESConnectorException {
+		try {
+			URL url = new URL(esCommandPrefix + resource);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("GET " + url);
+			}
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.connect();
+			String message = readHttpResponse(connection);
+			if (connection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+				return message;
+			} else {
+				throw new NudgeESConnectorException("Failed ES command with message: " + message);
+			}
+		} catch (IOException e) {
+			throw new NudgeESConnectorException("Failed ES command", e);
+		}
+	}
+
+	public void put(String resource, String body) throws NudgeESConnectorException {
+		try {
+			URL url = new URL(esCommandPrefix + resource);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("PUT " + url);
+			}
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setDoOutput(true);
+			connection.setRequestMethod("PUT");
+			if (body != null) {
+				try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream())) {
+					out.write(body);
+					out.close();
+				}
+			}
+			String message = readHttpResponse(connection);
+			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
+				throw new NudgeESConnectorException("Failed ES command with message: " + message);
+			}
+		} catch (IOException e) {
+			throw new NudgeESConnectorException("Failed ES command", e);
+		}
+	}
+
+	private String get() throws Exception {
+		URL url = new URL(elasticHost);
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Bulk request to : " + url);
+			LOG.debug("Request to : " + url);
 		}
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.connect();
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+		String message = readHttpResponse(connection);
+		if (connection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+			return message;
+		} else {
+			throw new NudgeESConnectorException("Failed ES command with message: " + message);
+		}
+	}
+
+	private String readHttpResponse(HttpURLConnection connection) throws IOException {
+		InputStream respStream = connection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST ? connection
+				.getInputStream() : connection.getErrorStream();
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(respStream))) {
 			StringBuilder result = new StringBuilder();
 			String line = null;
 			while ((line = reader.readLine()) != null) {
@@ -45,20 +102,15 @@ public class ElasticConnection {
 		}
 	}
 
-	public void put(String resource, String body) throws Exception {
-		URL url = new URL(elasticHost + resource);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Bulk request to : " + url);
-		}
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setDoOutput(true);
-		connection.setRequestMethod("PUT");
-		try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream())) {
-			out.write(body);
-			out.close();
+	public void createAndUseIndex(String esIndex) {
+		esCommandPrefix = elasticHost + esIndex + "/";
+		try {
+			put("", null);
+		} catch (NudgeESConnectorException e) {
+			LOG.warn("Failed to create index (this error will be ignored, the index could already exists)", e);
 		}
 	}
-	
+
 	public int getESVersion() {
 		return esVersion;
 	}
