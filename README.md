@@ -41,11 +41,11 @@ java -jar nudge-elasticstack-connector.jar -startDaemon
 ```
 
 The plugin is now fetching live data from [nudge-apm.com](https://www.nudge-apm.com/) and writing them to your Elastic.
-After running the connector, you can easily set up an initial Kibana dashboard using the shell script provided in the archive : `kibana_dashboard_init.sh`.
+After running the connector, you can easily set up an initial Kibana dashboard using the shell script provided in the archive : `kibana_dashboards_init.sh`.
 
 ```
-cd script
-./kibana_dashboard_init.sh import
+cd kibana_dashboards_init
+./kibana_dashboards_init.sh import
 ```
 
 For more information about this script, read the [related documentation page](https://github.com/NudgeApm/nudge-elasticstack-connector/blob/master/script/kibana_dashboards_init/README.md).
