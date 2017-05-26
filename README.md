@@ -19,8 +19,8 @@ To view a live demo follow this link :
 First download and unpack our archive.
 
 ```
-$ wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.3.1/nudge-elasticstack-connector-1.3.1.zip
-$ unzip nudge-elasticstack-connector-1.3.1.zip
+wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.3.1/nudge-elasticstack-connector-1.3.1.zip
+unzip nudge-elasticstack-connector-1.3.1.zip
 ```
 
 Then edit the properties file and set your own properties.
@@ -37,15 +37,15 @@ These are the mandatory properties you have to specify :
 Finally start the service :
 
 ```
-$ java -jar nudge-elasticstack-connector-1.3.1.jar -startDaemon
+java -jar nudge-elasticstack-connector-1.3.1.jar -startDaemon
 ```
 
 The plugin is now fetching live data from [nudge-apm.com](https://www.nudge-apm.com/) and writing them to your Elastic.
 After running the connector, you can easily set up an initial Kibana dashboard using the shell script provided in the archive : `kibana_dashboard_init.sh`.
 
 ```
-$ cd script
-$ ./kibana_dashboard_init.sh import
+cd script
+./kibana_dashboard_init.sh import
 ```
 
 For more information about this script, read the [related documentation page](https://github.com/NudgeApm/nudge-elasticstack-connector/blob/master/script/kibana_dashboards_init/README.md).
