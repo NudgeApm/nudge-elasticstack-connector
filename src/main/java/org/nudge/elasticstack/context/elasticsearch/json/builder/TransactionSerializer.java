@@ -20,21 +20,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TransactionLayer {
+public class TransactionSerializer {
 
-	private static final Logger LOG = Logger.getLogger(TransactionLayer.class.getName());
+	private static final Logger LOG = Logger.getLogger(TransactionSerializer.class.getName());
 	private static final String lineBreak = "\n";
 	private Configuration config = Configuration.getInstance();
 
 	/**
 	 * Retrieve transaction data from rawdata and add it to parse.
+	 * @param appId 
 	 *
 	 * @param transactionList
 	 * @return
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<EventTransaction> buildTransactionEvents(List<TransactionDTO> transactionList)
+	public List<EventTransaction> serialize(String appId, List<TransactionDTO> transactionList)
 			throws ParseException, JsonProcessingException {
 		List<EventTransaction> events = new ArrayList<EventTransaction>();
 		for (TransactionDTO trans : transactionList) {
@@ -42,26 +43,13 @@ public class TransactionLayer {
 			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdfr.format(trans.getStartTime());
 			long response_time = trans.getEndTime() - trans.getStartTime();
-			EventTransaction transactionEvent = new EventTransaction(name, response_time, date, 1L, trans.getId());
+			EventTransaction transactionEvent = new EventTransaction(appId, name, response_time, date, 1L, trans.getId());
 			events.add(transactionEvent);
 			// handle layers
 			buildLayerEvents(trans.getLayers(), transactionEvent);
 			events.add(transactionEvent);
 		}
 		return events;
-	}
-
-	/**
-	 * Temporary method, only used while we use our generation of the transaction id to ES.
-	 */
-	// WTF ??!
-	private void diffusionTransactionId(TransactionDTO transactionDTO) {
-//		UUID id = transactionDTO.getId();
-		if (transactionDTO.getLayers() != null) {
-			for (LayerDTO layerDTO : transactionDTO.getLayers()) {
-			//	layerDTO.
-			}
-		}
 	}
 
 	/**
@@ -145,7 +133,7 @@ public class TransactionLayer {
 	 * @throws Exception
 	 * @Description :
 	 */
-	public List<String> parseJson(List<EventTransaction> eventList) throws Exception {
+	public List<String> serialize(List<EventTransaction> eventList) throws Exception {
 		List<String> jsonEvents = new ArrayList<String>();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {

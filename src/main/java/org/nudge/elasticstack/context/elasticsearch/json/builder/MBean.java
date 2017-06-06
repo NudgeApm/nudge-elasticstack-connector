@@ -21,7 +21,6 @@ import java.util.List;
 
 import static org.nudge.elasticstack.Utils.ES_DATE_FORMAT;
 
-
 public class MBean {
 
 	private static final Logger LOG = Logger.getLogger(MBean.class.getName());
@@ -36,7 +35,8 @@ public class MBean {
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public List<EventMBean> buildMbeanEvents(List<MBeanDTO> mbean, Dictionary dictionary) throws JsonProcessingException {
+	public List<EventMBean> buildMbeanEvents(String appId, List<MBeanDTO> mbean, Dictionary dictionary)
+			throws JsonProcessingException {
 		List<EventMBean> eventsMbean = new ArrayList<EventMBean>();
 		List<DictionaryEntry> dico = dictionary.getDictionaryList();
 
@@ -50,15 +50,18 @@ public class MBean {
 			for (MBeanDTO.AttributeInfo mBeanAttributeInfo : mb.getAttributeInfos()) {
 				String nameMbean = null;
 				double valueMbean = 0;
-			int	nameId = mBeanAttributeInfo.getNameId();
+				int nameId = mBeanAttributeInfo.getNameId();
 				try {
 					valueMbean = Double.parseDouble(mBeanAttributeInfo.getValue());
-				} catch (NumberFormatException nfe) { 
+				} catch (NumberFormatException nfe) {
 					if (LOG.isDebugEnabled()) {
-						LOG.debug("Impossible to get the value of a mbean, it will not be inserted to ELK. MBean from rawdata : " + mBeanAttributeInfo);
+						LOG.debug(
+								"Impossible to get the value of a mbean, it will not be inserted to ELK. MBean from rawdata : "
+										+ mBeanAttributeInfo);
 					}
 				}
-				EventMBean mbeanEvent = new EventMBean(nameMbean, objectName, EventType.MBEAN, valueMbean, collectingTime, countAttribute);
+				EventMBean mbeanEvent = new EventMBean(
+						appId, nameMbean, objectName, EventType.MBEAN, valueMbean, collectingTime, countAttribute);
 				// TODO FMA export the dicotionary stuff at the place that mbean dto are created
 				// retrieve nameMbean with Dictionary
 				for (DictionaryEntry dictionaryEntry : dico) {
@@ -95,8 +98,7 @@ public class MBean {
 			// Handle data event
 			String jsonEvent = jsonSerializer.writeValueAsString(event);
 			jsonEvents2.add(jsonEvent + lineBreak);
-        }
-		LOG.debug(jsonEvents2);
+		}
 		return jsonEvents2;
 	}
 

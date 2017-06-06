@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class EventSQL extends NudgeEvent {
 
-	public EventSQL(String timestamp, String name, long count, long responseTime, String transactionId) {
-		super(name, responseTime, timestamp, count, "sql", transactionId);
+	public EventSQL(String appId, String timestamp, String name, long count, long responseTime, String transactionId) {
+		super(appId, name, responseTime, timestamp, count, "sql", transactionId);
 		this.setTransactionId(transactionId);
 	}
 
@@ -33,15 +33,9 @@ public class EventSQL extends NudgeEvent {
 		return super.getCount();
 	}
 
-
 	@JsonProperty("sql_responseTime")
 	public long getResponseTime() {
 		return super.getResponseTime();
 	}
-
-
-
-
-
 
 }

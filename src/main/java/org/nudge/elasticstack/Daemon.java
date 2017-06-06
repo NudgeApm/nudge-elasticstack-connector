@@ -23,7 +23,7 @@ import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocationWriter;
 import org.nudge.elasticstack.context.elasticsearch.json.builder.GeoLocationElasticPusher;
 import org.nudge.elasticstack.context.elasticsearch.json.builder.MBean;
 import org.nudge.elasticstack.context.elasticsearch.json.builder.SQLLayer;
-import org.nudge.elasticstack.context.elasticsearch.json.builder.TransactionLayer;
+import org.nudge.elasticstack.context.elasticsearch.json.builder.TransactionSerializer;
 import org.nudge.elasticstack.context.nudge.dto.DTOBuilder;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
@@ -80,6 +80,7 @@ public class Daemon {
 		// TODO Should be size limited => replace with a cache
 		private final Map<String, GeoLocation> geoLocationsMap;
 
+		private final TransactionSerializer transactionLayer;
 		private String currentIndex = null;
 
 		DaemonTask(Configuration config) {
@@ -93,6 +94,7 @@ public class Daemon {
 			} catch (Exception e) {
 				throw new IllegalStateException("Failed to init mapping", e);
 			}
+			transactionLayer = new TransactionSerializer();
 		}
 
 		/**
@@ -102,7 +104,7 @@ public class Daemon {
 		public void run() {
 			try {
 				String esIndex = config.getElasticIndex() + "-" + Utils.getIndexSuffix();
-				if(!esIndex.equals(currentIndex)) {
+				if (!esIndex.equals(currentIndex)) {
 					esCon.createAndUseIndex(esIndex);
 					// Mapping
 					Mapping mapping = new Mapping(esCon, config.getOutputElasticHosts(), esIndex);
@@ -126,12 +128,11 @@ public class Daemon {
 							List<Transaction> transactions = rawdata.getTransactionsList();
 							List<TransactionDTO> transactionDTOs = DTOBuilder.buildTransactions(transactions, filters);
 
-							TransactionLayer transactionLayer = new TransactionLayer();
-							List<EventTransaction> events = transactionLayer.buildTransactionEvents(transactionDTOs);
+							List<EventTransaction> events = transactionLayer.serialize(appId, transactionDTOs);
 							for (EventTransaction eventTrans : events) {
 								transactionLayer.nullLayer(eventTrans);
 							}
-							List<String> jsonEvents = transactionLayer.parseJson(events);
+							List<String> jsonEvents = transactionLayer.serialize(events);
 							transactionLayer.sendToElastic(jsonEvents);
 
 							// ===========================
@@ -143,7 +144,7 @@ public class Daemon {
 							List<MBeanDTO> mBeans = DTOBuilder.buildMBeans(mbean);
 
 							Dictionary dictionary = rawdata.getMbeanDictionary();
-							List<EventMBean> eventsMBeans = mb.buildMbeanEvents(mBeans, dictionary);
+							List<EventMBean> eventsMBeans = mb.buildMbeanEvents(appId, mBeans, dictionary);
 							List<String> jsonEvents2 = mb.parseJsonMBean(eventsMBeans);
 							mb.sendElk(jsonEvents2);
 
@@ -151,7 +152,7 @@ public class Daemon {
 							// Type : SQL
 							// ===========================
 							SQLLayer s = new SQLLayer();
-							List<EventSQL> sql = s.buildSQLEvents(transactionDTOs);
+							List<EventSQL> sql = s.buildSQLEvents(appId, transactionDTOs);
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
 
@@ -165,8 +166,8 @@ public class Daemon {
 									String userIp = transaction.getUserIp();
 									if (userIp != null && !"".equals(userIp)) {
 										GeoLocation geoLocation = geoLocationsMap.get(userIp);
-										if(geoLocation == null) {
-											LOG.debug("looking for "+userIp);
+										if (geoLocation == null) {
+											LOG.debug("looking for " + userIp);
 											geoLocation = geoLocationService.requestGeoLocationFromIp(userIp);
 											geoLocationsMap.put(userIp, geoLocation);
 										}

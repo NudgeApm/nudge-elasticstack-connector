@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public abstract class NudgeEvent {
 
+	private String appId;
 	private String date;
 	private String name;
 	private long responseTime;
@@ -16,8 +17,9 @@ public abstract class NudgeEvent {
 	private String type;
 	private String transactionId;
 	
-	public NudgeEvent(String name, long responseTime, String date, long count, String type, String transactionId) {
-		setName(name);
+	public NudgeEvent(String appId, String name, long responseTime, String date, long count, String type, String transactionId) {
+		this.name = name;
+		this.appId = appId;
 		this.date = date;
 		this.responseTime = responseTime;
 		this.count = count;
@@ -47,6 +49,9 @@ public abstract class NudgeEvent {
 		return name;
 	}
 
+	public String getAppId() {
+		return appId;
+	}
 
 	public void setName(String name) {
 		this.name = name;

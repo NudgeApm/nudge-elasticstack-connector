@@ -77,7 +77,6 @@ public class GeoLocationElasticPusher {
 			String jsonEvent = jsonSerializer.writeValueAsString(event);
 			jsonEvent2.add(jsonEvent + lineBreak);
 		}
-		LOG.debug(jsonEvent2);
 		return jsonEvent2;
 	}
 

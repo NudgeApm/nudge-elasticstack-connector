@@ -12,6 +12,7 @@ import org.nudge.elasticstack.context.elasticsearch.json.EventType;
 
 public class EventMBean {
 
+	private String appId;
 	private String nameMbean;
 	private double valueMbean;
 	private EventType type;
@@ -19,26 +20,27 @@ public class EventMBean {
 	private int countAttribute;
 	private String collectingTime;
 
-	public EventMBean(String nameMbean, String objectName, EventType type, double valueMbean, String collectingTime,
+	public EventMBean(String appId, String nameMbean, String objectName, EventType type, double valueMbean, String collectingTime,
 					  int countAttribute) {
-		this.setNameMbean(nameMbean);
-		this.setValueMbean(valueMbean);
-		this.setCollectingTime(collectingTime);
-		this.setCountAttribute(countAttribute);
-		this.setObjectName(objectName);
-		this.setType(type);
+		this.appId = appId;
+		this.nameMbean = nameMbean;
+		this.valueMbean = valueMbean;
+		this.collectingTime = collectingTime;
+		this.countAttribute = countAttribute;
+		this.objectName = objectName;
+		this.type = type;
 	}
 	
 	// ===========================
 	// Getters and Setters
 	// ===========================
 
-	public EventType getType() {
-		return type;
+	public String getAppId() {
+		return appId;
 	}
 
-	public EventType setType(EventType type) {
-		return this.type = type;
+	public EventType getType() {
+		return type;
 	}
 
 	@JsonProperty("mbean_name")
@@ -46,17 +48,9 @@ public class EventMBean {
 		return objectName;
 	}
 
-	public String setObjectName(String objectName) {
-		return this.objectName = objectName;
-	}
-
 	@JsonProperty("@timestamp")
 	public String getCollectingTime() {
 		return collectingTime;
-	}
-
-	public String setCollectingTime(String collectingTime) {
-		return this.collectingTime = collectingTime;
 	}
 
 	@JsonProperty("mbean_value")
@@ -64,17 +58,9 @@ public class EventMBean {
 		return valueMbean;
 	}
 
-	public double setValueMbean(double valueMbean) {
-		return this.valueMbean = valueMbean;
-	}
-
 	@JsonProperty("mbean_count")
 	public int getCountAttribute() {
 		return countAttribute;
-	}
-
-	public int setCountAttribute(int countAttribute) {
-		return this.countAttribute = countAttribute;
 	}
 
 	@JsonProperty("mbean_attributename")
@@ -82,8 +68,7 @@ public class EventMBean {
 		return nameMbean;
 	}
 
-	public String setNameMbean(String nameMbean) {
-		return this.nameMbean = nameMbean;
+	public void setNameMbean(String name) {
+		this.nameMbean = name;
 	}
-
 }
