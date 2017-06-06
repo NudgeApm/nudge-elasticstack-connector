@@ -24,7 +24,7 @@ public class MBeanTest {
 	public void buildMbeanEvents() throws Exception {
 		DTOBuilderTest dto = new DTOBuilderTest();
 		RawDataProtocol.RawData rawData = dto.readRawdata();
-		List<EventMBean> eventMBean = mBean.buildMbeanEvents(Collections.singletonList(buildSampleMBeanDTO()), rawData.getMbeanDictionary());
+		List<EventMBean> eventMBean = mBean.buildMbeanEvents("", Collections.singletonList(buildSampleMBeanDTO()), rawData.getMbeanDictionary());
 
 		Assert.assertEquals(2, eventMBean.size());
 		Assert.assertEquals("TransactionsQueueSize", eventMBean.get(0).getNameMbean());
