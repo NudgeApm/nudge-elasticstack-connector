@@ -10,7 +10,6 @@ import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 import org.nudge.elasticstack.context.nudge.rawdata.rawdata.DTOBuilderTest;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,7 +29,7 @@ public class MBeanTest {
 		Assert.assertEquals("TransactionsQueueSize", eventMBean.get(0).getNameMbean());
 		Assert.assertEquals(2D, eventMBean.get(0).getValueMbean(), 0);
 		Assert.assertEquals(0D, eventMBean.get(1).getValueMbean(), 0);
-		Assert.assertEquals(Utils.ES_DATE_FORMAT.format(new Date(1475139154420L)), eventMBean.get(0).getCollectingTime());
+		Assert.assertEquals(Utils.formatTimeToString(1475139154420L), eventMBean.get(0).getCollectingTime());
 	}
 
 //	*** Utility methods ***

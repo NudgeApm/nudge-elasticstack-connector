@@ -8,6 +8,7 @@ import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.BulkFormat;
 import org.nudge.elasticstack.Configuration;
+import org.nudge.elasticstack.Utils;
 import org.nudge.elasticstack.context.elasticsearch.json.EventType;
 import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
@@ -18,8 +19,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.nudge.elasticstack.Utils.ES_DATE_FORMAT;
 
 public class MBean {
 
@@ -43,7 +42,7 @@ public class MBean {
 		// retrieve MBean
 		for (MBeanDTO mb : mbean) {
 
-			String collectingTime = ES_DATE_FORMAT.format(mb.getCollectingTime());
+			String collectingTime = Utils.formatTimeToString(mb.getCollectingTime());
 			String objectName = mb.getObjectName();
 			int countAttribute = mb.getAttributeInfoCount();
 

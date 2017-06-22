@@ -90,7 +90,7 @@ public class Configuration {
 				LOG.warn(CONF_FILE + " doesn't found at the classloader root path");
 			}
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			LOG.error("Incorrect path for configuration file", e);
 		}
 	}
 
