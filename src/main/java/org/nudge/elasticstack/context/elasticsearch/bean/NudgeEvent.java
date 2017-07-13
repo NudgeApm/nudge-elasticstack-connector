@@ -10,33 +10,49 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public abstract class NudgeEvent {
 
 	private String appId;
+	private String host;
 	private String hostname;
 	private String date;
 	private String name;
 	private long responseTime;
 	private long count;
-	private String type;
+	private EventType type;
 	private String transactionId;
-	
-	public NudgeEvent(String appId, String hostname, String name, long responseTime, String date, long count, String type, String transactionId) {
-		this.name = name;
-		this.hostname = hostname;
-		this.appId = appId;
-		this.date = date;
-		this.responseTime = responseTime;
-		this.count = count;
-		this.type = type;
-		this.transactionId = transactionId;
+
+	NudgeEvent() {
 	}
 
+	@Override
 	public String toString() {
-		return " response-time :" + responseTime + "name = :" + name + "date = :" + date + "count :" + count + "transactionId =" + transactionId;
+		return "NudgeEvent{" +
+				"appId='" + appId + '\'' +
+				", host='" + host + '\'' +
+				", hostname='" + hostname + '\'' +
+				", date='" + date + '\'' +
+				", name='" + name + '\'' +
+				", responseTime=" + responseTime +
+				", count=" + count +
+				", type='" + type + '\'' +
+				", transactionId='" + transactionId + '\'' +
+				'}';
 	}
 
 	// =========================
 	//  Getters and Setters
 	// =========================
 
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
 
 	public String getHostname() {
 		return hostname;
@@ -68,11 +84,11 @@ public abstract class NudgeEvent {
 		this.name = name;
 	}
 
-	public String getType() {
+	public EventType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(EventType type) {
 		this.type = type;
 	}
 

@@ -1,19 +1,20 @@
   package org.nudge.elasticstack.connection;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
-import org.apache.log4j.Logger;
-import org.nudge.elasticstack.Configuration;
-import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
+  import com.fasterxml.jackson.core.type.TypeReference;
+  import com.fasterxml.jackson.databind.DeserializationFeature;
+  import com.fasterxml.jackson.databind.ObjectMapper;
+  import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
+  import org.apache.log4j.Logger;
+  import org.nudge.elasticstack.Configuration;
+  import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
+  import org.nudge.elasticstack.context.nudge.filter.bean.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+  import java.io.IOException;
+  import java.io.InputStream;
+  import java.net.HttpURLConnection;
+  import java.net.URL;
+  import java.util.ArrayList;
+  import java.util.List;
 
 /**
  * Connection to the Nudge API.
@@ -101,4 +102,17 @@ public class NudgeApiConnection {
 
 		return mapper.readValue(connection.getInputStream(), new TypeReference<List<Filter>>(){});
 	}
+
+	public List<Service> requestServices(String appId) throws IOException {
+		String finalUrl = url + "api/apps/" + appId + "/services?from=-10h";
+		HttpURLConnection connection = prepareRequest(finalUrl);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+		mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+
+		return mapper.readValue(connection.getInputStream(), new TypeReference<List<Service>>() {
+		});
+	}
+
 }

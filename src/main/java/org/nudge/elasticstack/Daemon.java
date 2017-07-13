@@ -3,26 +3,24 @@ package org.nudge.elasticstack;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
-import org.nudge.elasticstack.context.elasticsearch.mapping.Mapping;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.connection.NudgeApiConnection;
 import org.nudge.elasticstack.connection.ElasticConnection;
-import org.nudge.elasticstack.context.elasticsearch.bean.EventMBean;
-import org.nudge.elasticstack.context.elasticsearch.bean.EventSQL;
-import org.nudge.elasticstack.context.elasticsearch.bean.EventTransaction;
-import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocation;
-import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocationWriter;
+import org.nudge.elasticstack.connection.NudgeApiConnection;
+import org.nudge.elasticstack.context.elasticsearch.bean.*;
 import org.nudge.elasticstack.context.elasticsearch.builder.GeoLocationElasticPusher;
 import org.nudge.elasticstack.context.elasticsearch.builder.MBean;
 import org.nudge.elasticstack.context.elasticsearch.builder.SQLLayer;
 import org.nudge.elasticstack.context.elasticsearch.builder.TransactionSerializer;
+import org.nudge.elasticstack.context.elasticsearch.mapping.Mapping;
 import org.nudge.elasticstack.context.nudge.dto.DTOBuilder;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
 import org.nudge.elasticstack.exception.NudgeESConnectorException;
 import org.nudge.elasticstack.service.GeoLocationService;
+import org.nudge.elasticstack.service.NudgeAPIService;
 import org.nudge.elasticstack.service.impl.GeoFreeGeoIpImpl;
+import org.nudge.elasticstack.service.impl.NudgeAPIServiceImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,6 +73,7 @@ public class Daemon {
 		private final GeoLocationService geoLocationService;
 		private final ElasticConnection esCon;
 		private final NudgeApiConnection nudgeCon;
+		private final NudgeAPIService nudgeAPIService;
 		// TODO Should be size limited => replace with a cache
 		private final Map<String, GeoLocation> geoLocationsMap;
 
@@ -87,6 +86,7 @@ public class Daemon {
 			geoLocationsMap = new HashMap<>();
 			// NudgeApiConnection and load configuration
 			nudgeCon = new NudgeApiConnection(config.getNudgeUrl(), config.getNudgeApiToken());
+			nudgeAPIService = new NudgeAPIServiceImpl(nudgeCon);
 			try {
 				this.esCon = new ElasticConnection(config.getOutputElasticHosts());
 			} catch (Exception e) {
@@ -117,9 +117,11 @@ public class Daemon {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = nudgeCon.getRawdata(appId, rawdataFilename);
 							String hostname = rawdata.getHostname();
+							String nudgeConfigHostname = nudgeAPIService.retrieveConfiguredHostName(appId, hostname);
 
 							// Request Filters
 							List<Filter> filters = nudgeCon.requestFilters(appId);
+
 
 							// ==============================
 							// Type : Transaction and Layer
@@ -127,8 +129,8 @@ public class Daemon {
 							List<Transaction> transactions = rawdata.getTransactionsList();
 							List<TransactionDTO> transactionDTOs = DTOBuilder.buildTransactions(transactions, filters);
 
-							List<EventTransaction> events = transactionLayer.serialize(appId, hostname, transactionDTOs);
-							for (EventTransaction eventTrans : events) {
+							List<TransactionEvent> events = transactionLayer.serialize(appId, hostname, nudgeConfigHostname, transactionDTOs);
+							for (TransactionEvent eventTrans : events) {
 								transactionLayer.nullLayer(eventTrans);
 							}
 							List<String> jsonEvents = transactionLayer.serialize(events);
@@ -151,7 +153,7 @@ public class Daemon {
 							// Type : SQL
 							// ===========================
 							SQLLayer s = new SQLLayer();
-							List<EventSQL> sql = s.buildSQLEvents(appId, hostname, transactionDTOs);
+							List<SQLEvent> sql = s.buildSQLEvents(appId, hostname, nudgeConfigHostname, transactionDTOs);
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
 

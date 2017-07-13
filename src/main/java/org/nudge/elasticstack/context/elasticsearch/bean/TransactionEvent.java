@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author : Frederic Massart
  */
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
-public class EventTransaction extends NudgeEvent {
+public class TransactionEvent extends NudgeEvent {
 
 	// WS attributs
 	private Long responseTimeLayerJaxws;
@@ -28,8 +28,8 @@ public class EventTransaction extends NudgeEvent {
 	private String layerNameJava;
 	private Long layerCountJava;
 
-	public EventTransaction(String appId, String hostname, String name, Long responseTime, String date, Long count, String transactionId) {
-		super(appId, hostname, name, responseTime, date, count, "transaction", transactionId);
+	public TransactionEvent() {
+		super.setType(EventType.TRANSACTION);
 	}
 
 	// ========================

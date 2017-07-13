@@ -2,7 +2,7 @@ package org.nudge.elasticstack.type;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.nudge.elasticstack.context.elasticsearch.bean.EventSQL;
+import org.nudge.elasticstack.context.elasticsearch.bean.SQLEvent;
 import org.nudge.elasticstack.context.elasticsearch.builder.SQLLayer;
 import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
@@ -29,14 +29,14 @@ public class SQLLayerTest {
 		int count = 1;
 		Date date = new Date();
 
-		List<EventSQL> eventSQLs = sqlLayer.buildSQLEvents("", "", Collections.singletonList(
+		List<SQLEvent> sqlEvents = sqlLayer.buildSQLEvents("", "", "", Collections.singletonList(
 				buildTransactionDTO(sqlReq, responseTime, 1, date.getTime())));
 
-		for (EventSQL eventSQL : eventSQLs) {
-			Assert.assertEquals(sqlReq, eventSQL.getName());
-			Assert.assertEquals(responseTime, eventSQL.getResponseTime());
-			Assert.assertEquals(count, eventSQL.getCount());
-			Assert.assertEquals(SDF.format(date), eventSQL.getDate());
+		for (SQLEvent sqlEvent : sqlEvents) {
+			Assert.assertEquals(sqlReq, sqlEvent.getName());
+			Assert.assertEquals(responseTime, sqlEvent.getResponseTime());
+			Assert.assertEquals(count, sqlEvent.getCount());
+			Assert.assertEquals(SDF.format(date), sqlEvent.getDate());
 		}
 	}
 

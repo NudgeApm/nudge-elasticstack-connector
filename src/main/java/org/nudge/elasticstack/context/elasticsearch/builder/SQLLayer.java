@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.Configuration;
-import org.nudge.elasticstack.context.elasticsearch.bean.EventSQL;
+import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
+import org.nudge.elasticstack.context.elasticsearch.bean.SQLEvent;
 import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
@@ -30,18 +30,25 @@ public class SQLLayer {
 	 * Extract SQL events from transactions.
 	 * @param appId 
 	 */
-	public List<EventSQL> buildSQLEvents(String appId, String hostname, List<TransactionDTO> transactions) {
-		List<EventSQL> sqlEvents = new ArrayList<>();
+	public List<SQLEvent> buildSQLEvents(String appId, String host, String hostname, List<TransactionDTO> transactions) {
+		List<SQLEvent> sqlEvents = new ArrayList<>();
 
 		for (TransactionDTO transaction : transactions) {
 			for (LayerDTO layer : transaction.getLayers()) {
 				for (LayerCallDTO layerCall : layer.getCalls()) {
-					String sqlCode = layerCall.getCode();
-					long sqlCount = layerCall.getCount();
-					long sqlTime = layerCall.getResponseTime();
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 					String sqlTimestamp = sdfr.format(layerCall.getTimestamp());
-					sqlEvents.add(new EventSQL(appId, hostname, sqlTimestamp, sqlCode, sqlCount, sqlTime, transaction.getId()));
+
+					SQLEvent sqlEvent = new SQLEvent();
+					sqlEvent.setAppId(appId);
+					sqlEvent.setHost(host);
+					sqlEvent.setHostname(hostname);
+					sqlEvent.setDate(sqlTimestamp);
+					sqlEvent.setName(layerCall.getCode());
+					sqlEvent.setCount(layerCall.getCount());
+					sqlEvent.setResponseTime(layerCall.getResponseTime());
+					sqlEvent.setTransactionId(transaction.getId());
+					sqlEvents.add(sqlEvent);
 				}
 			}
 		}
@@ -51,22 +58,22 @@ public class SQLLayer {
 	/**
 	 * Parse SQL to send to Elastic
 	 *
-	 * @param eventSqls
+	 * @param sqlEvents
 	 * @return
 	 * @throws Exception
 	 */
-	public List<String> parseJsonSQL(List<EventSQL> eventSqls) throws Exception {
+	public List<String> parseJsonSQL(List<SQLEvent> sqlEvents) throws Exception {
 		List<String> jsonEventsSql = new ArrayList<String>();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
-		for (EventSQL eventSql : eventSqls) {
-			String jsonMetadata = generateMetaDataSQL(eventSql.getName());
+		for (SQLEvent sqlEvent : sqlEvents) {
+			String jsonMetadata = generateMetaDataSQL(sqlEvent.getName());
 			jsonEventsSql.add(jsonMetadata + lineBreak);
-			// Handle data eventSql
-			String jsonEvent = jsonSerializer.writeValueAsString(eventSql);
+			// Handle data sqlEvent
+			String jsonEvent = jsonSerializer.writeValueAsString(sqlEvent);
 			jsonEventsSql.add(jsonEvent + lineBreak);
 		}
 		return jsonEventsSql;

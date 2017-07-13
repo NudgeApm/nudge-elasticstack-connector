@@ -7,11 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Sarah Bourgeois
  * @author Frederic Massart
  */
-public class EventSQL extends NudgeEvent {
+public class SQLEvent extends NudgeEvent {
 
-	public EventSQL(String appId, String hostname, String timestamp, String name, long count, long responseTime, String transactionId) {
-		super(appId, hostname, name, responseTime, timestamp, count, "sql", transactionId);
-		this.setTransactionId(transactionId);
+	public SQLEvent() {
+		super.setType(EventType.SQL);
 	}
 
 	// ===========================

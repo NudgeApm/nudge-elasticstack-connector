@@ -4,10 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.Configuration;
-import org.nudge.elasticstack.context.elasticsearch.bean.EventTransaction;
+import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventType;
 import org.nudge.elasticstack.context.elasticsearch.bean.NudgeEvent;
+import org.nudge.elasticstack.context.elasticsearch.bean.TransactionEvent;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 
@@ -37,15 +38,23 @@ public class TransactionSerializer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<EventTransaction> serialize(String appId, String hostname, List<TransactionDTO> transactionList)
+	public List<TransactionEvent> serialize(String appId, String host, String hostname, List<TransactionDTO> transactionList)
 			throws ParseException, JsonProcessingException {
-		List<EventTransaction> events = new ArrayList<EventTransaction>();
+		List<TransactionEvent> events = new ArrayList<TransactionEvent>();
 		for (TransactionDTO trans : transactionList) {
-			String name = trans.getCode();
+			TransactionEvent transactionEvent = new TransactionEvent();
+
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdf.format(trans.getStartTime());
-			long responseTime = trans.getEndTime() - trans.getStartTime();
-			EventTransaction transactionEvent = new EventTransaction(appId, hostname, name, responseTime, date, 1L, trans.getId());
+			transactionEvent.setAppId(appId);
+			transactionEvent.setHost(host);
+			transactionEvent.setHostname(hostname);
+			transactionEvent.setName(trans.getCode());
+			transactionEvent.setResponseTime(trans.getEndTime() - trans.getStartTime());
+			transactionEvent.setDate(date);
+			transactionEvent.setCount(1L);
+			transactionEvent.setTransactionId(trans.getId());
+
 			events.add(transactionEvent);
 			// handle layers
 			buildLayerEvents(trans.getLayers(), transactionEvent);
@@ -60,7 +69,7 @@ public class TransactionSerializer {
 	 * @param eventTrans
 	 * @return
 	 */
-	public EventTransaction nullLayer(EventTransaction eventTrans) {
+	public TransactionEvent nullLayer(TransactionEvent eventTrans) {
 		if (eventTrans.getLayerNameSql() == null) {
 			eventTrans.setResponseTimeLayerSql(0L);
 			eventTrans.setLayerCountSql(0L);
@@ -87,7 +96,7 @@ public class TransactionSerializer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public void buildLayerEvents(List<LayerDTO> rawdataLayers, EventTransaction eventTrans)
+	public void buildLayerEvents(List<LayerDTO> rawdataLayers, TransactionEvent eventTrans)
 			throws ParseException, JsonProcessingException {
 		for (LayerDTO layer : rawdataLayers) {
 			if (layer.getLayerName().equals("SQL")) {
@@ -134,7 +143,7 @@ public class TransactionSerializer {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<String> serialize(List<EventTransaction> eventList) throws Exception {
+	public List<String> serialize(List<TransactionEvent> eventList) throws Exception {
 		List<String> jsonEvents = new ArrayList<String>();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
@@ -160,7 +169,7 @@ public class TransactionSerializer {
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public String generateMetaData(String type) throws JsonProcessingException {
+	public String generateMetaData(EventType type) throws JsonProcessingException {
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
@@ -168,7 +177,7 @@ public class TransactionSerializer {
 		BulkFormat elasticMetaData = new BulkFormat();
 		elasticMetaData.getIndexElement().setId(UUID.randomUUID().toString());
 		elasticMetaData.getIndexElement().setIndex(config.getElasticIndex());
-		elasticMetaData.getIndexElement().setType(type);
+		elasticMetaData.getIndexElement().setType(type.toString());
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
 

@@ -1,7 +1,6 @@
 package org.nudge.elasticstack.context.elasticsearch.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.nudge.elasticstack.context.elasticsearch.EventType;
 
 /**
  * Build Manage-Bean insertion

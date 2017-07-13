@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.Configuration;
 import org.nudge.elasticstack.Utils;
-import org.nudge.elasticstack.context.elasticsearch.EventType;
+import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.context.elasticsearch.bean.EventMBean;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventType;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 
 import java.io.IOException;
