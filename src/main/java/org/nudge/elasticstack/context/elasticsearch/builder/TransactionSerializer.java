@@ -37,7 +37,7 @@ public class TransactionSerializer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<EventTransaction> serialize(String appId, List<TransactionDTO> transactionList)
+	public List<EventTransaction> serialize(String appId, String hostname, List<TransactionDTO> transactionList)
 			throws ParseException, JsonProcessingException {
 		List<EventTransaction> events = new ArrayList<EventTransaction>();
 		for (TransactionDTO trans : transactionList) {
@@ -45,7 +45,7 @@ public class TransactionSerializer {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdf.format(trans.getStartTime());
 			long responseTime = trans.getEndTime() - trans.getStartTime();
-			EventTransaction transactionEvent = new EventTransaction(appId, name, responseTime, date, 1L, trans.getId());
+			EventTransaction transactionEvent = new EventTransaction(appId, hostname, name, responseTime, date, 1L, trans.getId());
 			events.add(transactionEvent);
 			// handle layers
 			buildLayerEvents(trans.getLayers(), transactionEvent);

@@ -116,6 +116,7 @@ public class Daemon {
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
 							RawData rawdata = nudgeCon.getRawdata(appId, rawdataFilename);
+							String hostname = rawdata.getHostname();
 
 							// Request Filters
 							List<Filter> filters = nudgeCon.requestFilters(appId);
@@ -126,7 +127,7 @@ public class Daemon {
 							List<Transaction> transactions = rawdata.getTransactionsList();
 							List<TransactionDTO> transactionDTOs = DTOBuilder.buildTransactions(transactions, filters);
 
-							List<EventTransaction> events = transactionLayer.serialize(appId, transactionDTOs);
+							List<EventTransaction> events = transactionLayer.serialize(appId, hostname, transactionDTOs);
 							for (EventTransaction eventTrans : events) {
 								transactionLayer.nullLayer(eventTrans);
 							}
@@ -150,7 +151,7 @@ public class Daemon {
 							// Type : SQL
 							// ===========================
 							SQLLayer s = new SQLLayer();
-							List<EventSQL> sql = s.buildSQLEvents(appId, transactionDTOs);
+							List<EventSQL> sql = s.buildSQLEvents(appId, hostname, transactionDTOs);
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
 

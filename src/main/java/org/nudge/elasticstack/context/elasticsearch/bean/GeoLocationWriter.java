@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Sarah Bourgeois
  * @author Frederic Massart
  */
-
 public class GeoLocationWriter {
+
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	private double latitude;
 	private double longitude;

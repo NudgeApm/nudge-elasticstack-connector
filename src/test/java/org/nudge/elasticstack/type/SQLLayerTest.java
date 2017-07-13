@@ -29,7 +29,7 @@ public class SQLLayerTest {
 		int count = 1;
 		Date date = new Date();
 
-		List<EventSQL> eventSQLs = sqlLayer.buildSQLEvents("", Collections.singletonList(
+		List<EventSQL> eventSQLs = sqlLayer.buildSQLEvents("", "", Collections.singletonList(
 				buildTransactionDTO(sqlReq, responseTime, 1, date.getTime())));
 
 		for (EventSQL eventSQL : eventSQLs) {

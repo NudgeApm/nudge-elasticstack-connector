@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public abstract class NudgeEvent {
 
 	private String appId;
+	private String hostname;
 	private String date;
 	private String name;
 	private long responseTime;
@@ -17,14 +18,15 @@ public abstract class NudgeEvent {
 	private String type;
 	private String transactionId;
 	
-	public NudgeEvent(String appId, String name, long responseTime, String date, long count, String type, String transactionId) {
+	public NudgeEvent(String appId, String hostname, String name, long responseTime, String date, long count, String type, String transactionId) {
 		this.name = name;
+		this.hostname = hostname;
 		this.appId = appId;
 		this.date = date;
 		this.responseTime = responseTime;
 		this.count = count;
 		this.type = type;
-		this.transactionId=transactionId;
+		this.transactionId = transactionId;
 	}
 
 	public String toString() {
@@ -34,7 +36,16 @@ public abstract class NudgeEvent {
 	// =========================
 	//  Getters and Setters
 	// =========================
-	
+
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
+	}
+
 	@JsonProperty("@timestamp")
 	public String getDate() {
 		return date;

@@ -30,7 +30,7 @@ public class SQLLayer {
 	 * Extract SQL events from transactions.
 	 * @param appId 
 	 */
-	public List<EventSQL> buildSQLEvents(String appId, List<TransactionDTO> transactions) {
+	public List<EventSQL> buildSQLEvents(String appId, String hostname, List<TransactionDTO> transactions) {
 		List<EventSQL> sqlEvents = new ArrayList<>();
 
 		for (TransactionDTO transaction : transactions) {
@@ -41,7 +41,7 @@ public class SQLLayer {
 					long sqlTime = layerCall.getResponseTime();
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 					String sqlTimestamp = sdfr.format(layerCall.getTimestamp());
-					sqlEvents.add(new EventSQL(appId, sqlTimestamp, sqlCode, sqlCount, sqlTime, transaction.getId()));
+					sqlEvents.add(new EventSQL(appId, hostname, sqlTimestamp, sqlCode, sqlCount, sqlTime, transaction.getId()));
 				}
 			}
 		}
