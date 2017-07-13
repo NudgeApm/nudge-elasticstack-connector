@@ -27,7 +27,7 @@ public class MBean {
 	private Configuration config = Configuration.getInstance();
 
 	/**
-	 * Description : retrieve MBean from rawdata
+	 * Retrieve MBean from rawdata
 	 *
 	 * @param mbean
 	 * @param dictionary
@@ -102,7 +102,7 @@ public class MBean {
 	}
 
 	/**
-	 * Description : generate MBean for Bulk api
+	 * Generate MBean for Bulk api
 	 *
 	 * @param eventType
 	 * @return
@@ -120,7 +120,7 @@ public class MBean {
 	}
 
 	/**
-	 * Description : Send MBean into elasticSearch
+	 * Send MBean into elasticSearch
 	 *
 	 * @param jsonEvents2
 	 * @throws IOException

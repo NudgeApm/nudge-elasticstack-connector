@@ -80,7 +80,7 @@ public class TransactionSerializer {
 	}
 
 	/**
-	 * Description : build layer events
+	 * Build layer events
 	 *
 	 * @param rawdataLayers
 	 * @param eventTrans
@@ -128,12 +128,11 @@ public class TransactionSerializer {
 	}
 
 	/**
-	 * Desription : parse datas in Json
+	 * Parse datas in Json
 	 *
 	 * @param eventList
 	 * @return
 	 * @throws Exception
-	 * @Description :
 	 */
 	public List<String> serialize(List<EventTransaction> eventList) throws Exception {
 		List<String> jsonEvents = new ArrayList<String>();
@@ -154,7 +153,7 @@ public class TransactionSerializer {
 	}
 
 	/**
-	 * Description : Use bulk API to send huge rawdatas in ElasticSearch To use
+	 * Use bulk API to send huge rawdatas in ElasticSearch To use
 	 * this API it must be to format Json in the Bulk Format.
 	 *
 	 * @param type
@@ -174,7 +173,7 @@ public class TransactionSerializer {
 	}
 
 	/**
-	 * Description : It permits to index huge rawdata in elasticSearch with HTTP
+	 * It permits to index huge rawdata in elasticSearch with HTTP
 	 * request
 	 * @param jsonEvents
 	 * @throws Exception

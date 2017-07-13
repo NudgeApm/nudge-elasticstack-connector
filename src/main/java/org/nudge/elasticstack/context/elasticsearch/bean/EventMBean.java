@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.nudge.elasticstack.context.elasticsearch.EventType;
 
 /**
+ * Build Manage-Bean insertion
+ *
  * @author : Sarah Bourgeois
  * @author : Frederic Massart
- * 
- *         Description : Build Manage-Bean insertion
  */
-
 public class EventMBean {
 
 	private String appId;

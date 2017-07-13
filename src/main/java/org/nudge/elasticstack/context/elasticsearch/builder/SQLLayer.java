@@ -49,7 +49,7 @@ public class SQLLayer {
 	}
 
 	/**
-	 * Description : Parse SQL to send to Elastic
+	 * Parse SQL to send to Elastic
 	 *
 	 * @param eventSqls
 	 * @return
@@ -73,7 +73,7 @@ public class SQLLayer {
 	}
 
 	/**
-	 * Description : generate SQL for Bulk api
+	 * Generate SQL for Bulk api
 	 *
 	 * @param sql
 	 * @return
@@ -91,7 +91,7 @@ public class SQLLayer {
 	}
 
 	/**
-	 * Description : Send MBean into elasticSearch
+	 * Send MBean into elasticSearch
 	 *
 	 * @param jsonEventsSql
 	 * @throws IOException

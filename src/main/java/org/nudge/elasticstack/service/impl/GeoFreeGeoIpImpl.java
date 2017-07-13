@@ -20,7 +20,6 @@ public class GeoFreeGeoIpImpl implements GeoLocationService {
 
 	private static final Logger LOG = Logger.getLogger(GeoFreeGeoIpImpl.class);
 	private static final String FINAL_URL = "http://freegeoip.net/json/";
-	private long failureEpoch = 0;
 
 	@Override
 	public GeoLocation requestGeoLocationFromIp(String ip) throws NudgeESConnectorException {
@@ -63,7 +62,7 @@ public class GeoFreeGeoIpImpl implements GeoLocationService {
 	}
 
 	/**
-	 * Description : Retrieve api data
+	 * Retrieve api data
 	 * 
 	 * @param userIp
 	 * @return
@@ -85,7 +84,7 @@ public class GeoFreeGeoIpImpl implements GeoLocationService {
 	}
 
 	/**
-	 * Description : convert inputStream in String
+	 * Convert inputStream in String
 	 * 
 	 * @param is
 	 * @return

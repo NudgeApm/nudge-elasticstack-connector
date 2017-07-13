@@ -31,8 +31,7 @@ public class GeoLocationElasticPusher {
 	private Configuration config = Configuration.getInstance();
 
 	/**
-	 * Description : Retrieve data from List Geolocalisation and write it in a
-	 * new bean
+	 * Retrieve data from List Geolocalisation and write it in a new bean
 	 * 
 	 * @param geolocation
 	 * @param transaction
@@ -81,7 +80,7 @@ public class GeoLocationElasticPusher {
 	}
 
 	/**
-	 * Description : generate Geolocation data for Bulk api
+	 * Generate Geolocation data for Bulk api
 	 * 
 	 * @param mbean
 	 * @return
@@ -99,15 +98,15 @@ public class GeoLocationElasticPusher {
 	}
 
 	/**
-	 * Description : Send Geolocation data into elasticSearch
+	 * Send Geolocation data into elasticSearch
 	 *
-	 * @param jsonEvents2
+	 * @param jsonEvents
 	 * @throws IOException
 	 */
-	public void sendElk(List<String> jsonEvents2) throws IOException {
+	public void sendElk(List<String> jsonEvents) throws IOException {
 		StringBuilder sb = new StringBuilder();
 
-		for (String json : jsonEvents2) {
+		for (String json : jsonEvents) {
 			sb.append(json);
 		}
 		if (config.getDryRun()) {
@@ -127,7 +126,7 @@ public class GeoLocationElasticPusher {
 		out.close();
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;
-		LOG.info(" Flush " + jsonEvents2.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
+		LOG.info(" Flush " + jsonEvents.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
 		LOG.debug(" Sending MBean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 	
