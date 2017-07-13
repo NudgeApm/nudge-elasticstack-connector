@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.context.elasticsearch.json;
+package org.nudge.elasticstack.context.elasticsearch;
 
 /**
  * List of all type of event that the connector pushes to ES.

@@ -14,6 +14,7 @@ public class TransactionDTO {
 
     private String id;
     private String code;
+    private String hostname;
     private long startTime;
     private long endTime;
     private String userIp;
@@ -48,6 +49,14 @@ public class TransactionDTO {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
     }
 
     public long getStartTime() {

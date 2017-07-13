@@ -1,7 +1,7 @@
 package org.nudge.elasticstack.service;
 
-import org.nudge.elasticstack.NudgeESConnectorException;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocation;
+import org.nudge.elasticstack.exception.NudgeESConnectorException;
+import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocation;
 
 
 /**

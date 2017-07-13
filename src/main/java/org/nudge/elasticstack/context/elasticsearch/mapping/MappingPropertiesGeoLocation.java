@@ -1,9 +1,9 @@
-package mapping;
+package org.nudge.elasticstack.context.elasticsearch.mapping;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Properties of the update mapping for Geolocation.
+ * Properties of the update org.nudge.elasticstack.context.elasticsearch.mapping for Geolocation.
  *
  * @author Sarah Bourgeois
  * @author Frederic Massart
@@ -26,7 +26,7 @@ public class MappingPropertiesGeoLocation {
 	}
 
 	// =====================================
-	// Inner class Geolocation mapping
+	// Inner class Geolocation org.nudge.elasticstack.context.elasticsearch.mapping
 	// =====================================
 
 	// *****Properties ************

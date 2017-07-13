@@ -1,13 +1,10 @@
 
 package org.nudge.elasticstack;
 
-import mapping.Mapping;
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.nudge.elasticstack.connection.ElasticConnection;
 
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;

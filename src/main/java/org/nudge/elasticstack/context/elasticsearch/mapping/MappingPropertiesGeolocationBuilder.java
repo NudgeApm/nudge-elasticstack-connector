@@ -1,6 +1,6 @@
-package mapping;
+package org.nudge.elasticstack.context.elasticsearch.mapping;
 
-import mapping.MappingPropertiesGeoLocation.Properties.Name;
+import org.nudge.elasticstack.context.elasticsearch.mapping.MappingPropertiesGeoLocation.Properties.Name;
 
 /**
  * 

@@ -4,6 +4,7 @@ import com.nudge.apm.buffer.probe.RawDataProtocol;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
 import org.nudge.elasticstack.context.nudge.filter.FilterManager;
 import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
+import org.nudge.elasticstack.exception.ExcludedTransactionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,24 +17,20 @@ import java.util.List;
  */
 public class DTOBuilder {
 
-
 	public static List<TransactionDTO> buildTransactions(List<RawDataProtocol.Transaction> rawdataTransactions, List<Filter> filters) {
 		List<TransactionDTO> transactions = new ArrayList<>(rawdataTransactions.size());
 
 		for (RawDataProtocol.Transaction rawdataTransaction : rawdataTransactions) {
 
-			String code = rawdataTransaction.getCode();
-			Filter filter = FilterManager.findFilter(filters, rawdataTransaction, code);
-
-			if (filter != null) {
-				if (filter.isExclusion()) {
-					continue;
-				}
- 				code = FilterManager.constructTargetUrl(rawdataTransaction, rawdataTransaction.getCode(), filter);
+			String name;
+			try {
+				name = retrieveTransactionCodeName(rawdataTransaction, filters);
+			} catch (ExcludedTransactionException e) {
+				continue;
 			}
 
 			TransactionDTO transaction = new TransactionDTO();
-			transaction.setCode(code);
+			transaction.setCode(name);
 			transaction.setStartTime(rawdataTransaction.getStartTime());
 			transaction.setEndTime(rawdataTransaction.getEndTime());
 			transaction.setUserIp(rawdataTransaction.getUserIp());
@@ -84,6 +81,30 @@ public class DTOBuilder {
 			}
 		}
 		return mbeanList;
+	}
+
+	/**
+	 * Retrieve the transaction code name for a Nudge filter.
+	 *
+	 * @param transaction the rawdata transaction
+	 * @param filters retrieved from nudge api
+	 * @return
+	 *
+	 * @throws ExcludedTransactionException
+	 */
+	private static String retrieveTransactionCodeName(RawDataProtocol.Transaction transaction, List<Filter> filters)
+			throws ExcludedTransactionException {
+		String code = transaction.getCode();
+		Filter filter = FilterManager.findFilter(filters, transaction, code);
+
+		if (filter != null) {
+			if (filter.isExclusion()) {
+				throw new ExcludedTransactionException();
+			}
+			code = FilterManager.constructTargetUrl(transaction, transaction.getCode(), filter);
+		}
+		return code;
+
 	}
 
 }

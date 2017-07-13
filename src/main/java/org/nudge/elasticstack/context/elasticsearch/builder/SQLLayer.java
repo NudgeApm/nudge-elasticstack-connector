@@ -1,12 +1,12 @@
-package org.nudge.elasticstack.context.elasticsearch.json.builder;
+package org.nudge.elasticstack.context.elasticsearch.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.Configuration;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.EventSQL;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventSQL;
 import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;

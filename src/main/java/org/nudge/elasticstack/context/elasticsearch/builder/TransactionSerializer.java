@@ -1,13 +1,13 @@
-package org.nudge.elasticstack.context.elasticsearch.json.builder;
+package org.nudge.elasticstack.context.elasticsearch.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.Configuration;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.EventTransaction;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.NudgeEvent;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventTransaction;
+import org.nudge.elasticstack.context.elasticsearch.bean.NudgeEvent;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 
@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Serialize Nudge transaction into JSON object.
+ */
 public class TransactionSerializer {
 
 	private static final Logger LOG = Logger.getLogger(TransactionSerializer.class.getName());
@@ -29,7 +32,6 @@ public class TransactionSerializer {
 	/**
 	 * Retrieve transaction data from rawdata and add it to parse.
 	 * @param appId 
-	 *
 	 * @param transactionList
 	 * @return
 	 * @throws ParseException
@@ -40,10 +42,10 @@ public class TransactionSerializer {
 		List<EventTransaction> events = new ArrayList<EventTransaction>();
 		for (TransactionDTO trans : transactionList) {
 			String name = trans.getCode();
-			SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			String date = sdfr.format(trans.getStartTime());
-			long response_time = trans.getEndTime() - trans.getStartTime();
-			EventTransaction transactionEvent = new EventTransaction(appId, name, response_time, date, 1L, trans.getId());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			String date = sdf.format(trans.getStartTime());
+			long responseTime = trans.getEndTime() - trans.getStartTime();
+			EventTransaction transactionEvent = new EventTransaction(appId, name, responseTime, date, 1L, trans.getId());
 			events.add(transactionEvent);
 			// handle layers
 			buildLayerEvents(trans.getLayers(), transactionEvent);

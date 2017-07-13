@@ -1,4 +1,4 @@
-package org.nudge.elasticstack;
+package org.nudge.elasticstack.exception;
 
 @SuppressWarnings("serial")
 public class NudgeESConnectorException extends Exception {

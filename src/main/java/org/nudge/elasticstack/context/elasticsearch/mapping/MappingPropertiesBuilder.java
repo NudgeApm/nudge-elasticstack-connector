@@ -1,16 +1,15 @@
-package mapping;
+package org.nudge.elasticstack.context.elasticsearch.mapping;
+
+import org.nudge.elasticstack.context.elasticsearch.mapping.MappingProperties.Properties.Name;
+import org.nudge.elasticstack.context.elasticsearch.mapping.MappingProperties.Properties.Name.Fields;
+import org.nudge.elasticstack.context.elasticsearch.mapping.MappingProperties.Properties.Name.Fields.FieldAttribute;
 
 /**
+ * Build properties to update org.nudge.elasticstack.context.elasticsearch.mapping
+ *
  * @author : Sarah Bourgeois
- * 		   : Frederic Massart
- * 
- * Description : Build properties to update mapping
+ * @author : Frederic Massart
  */
-
-import mapping.MappingProperties.Properties.Name;
-import mapping.MappingProperties.Properties.Name.Fields;
-import mapping.MappingProperties.Properties.Name.Fields.FieldAttribute;
-
 public class MappingPropertiesBuilder {
 
 	public static MappingProperties createMappingProperties() {

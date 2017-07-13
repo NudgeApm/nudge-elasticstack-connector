@@ -1,11 +1,5 @@
   package org.nudge.elasticstack.connection;
 
-/**
- * @author : Sarah Bourgeois.
- * @author : Frederic Massart 
- * Description : Connection to the Nudge API. 
- */
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,13 +15,19 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Connection {
-	private static final Logger LOG = Logger.getLogger(Connection.class);
+/**
+ * Connection to the Nudge API.
+ *
+ * @author : Sarah Bourgeois.
+ * @author : Frederic Massart
+*/
+public class NudgeApiConnection {
+	private static final Logger LOG = Logger.getLogger(NudgeApiConnection.class);
 	private final String url;
 	private final String apiKeyParam;
 	private Configuration config = Configuration.getInstance();
 
-	public Connection(String url, String apiKey) {
+	public NudgeApiConnection(String url, String apiKey) {
 		this.url = url;
 		this.apiKeyParam = "Bearer " + apiKey;
 	}

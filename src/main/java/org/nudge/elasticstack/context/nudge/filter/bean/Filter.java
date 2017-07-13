@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * JSON filter object from Nudge API. <br/>
+ * A filter in Nudge permits in particular, to aggregate different transactions into the same or exclude them to the analysis.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Filter {
 

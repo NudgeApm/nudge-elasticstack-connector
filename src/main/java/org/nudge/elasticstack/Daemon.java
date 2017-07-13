@@ -1,33 +1,26 @@
 package org.nudge.elasticstack;
 
-/**
- * @author Sarah Bourgeois
- * @author Frederic Massart
- * @author Thomas Arnaud
- *
- * Description : Daemon task  that grab data from Nudge APM API and sends it to ES
- */
-
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
-import mapping.Mapping;
+import org.nudge.elasticstack.context.elasticsearch.mapping.Mapping;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.connection.Connection;
+import org.nudge.elasticstack.connection.NudgeApiConnection;
 import org.nudge.elasticstack.connection.ElasticConnection;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.EventSQL;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.EventTransaction;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocation;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.GeoLocationWriter;
-import org.nudge.elasticstack.context.elasticsearch.json.builder.GeoLocationElasticPusher;
-import org.nudge.elasticstack.context.elasticsearch.json.builder.MBean;
-import org.nudge.elasticstack.context.elasticsearch.json.builder.SQLLayer;
-import org.nudge.elasticstack.context.elasticsearch.json.builder.TransactionSerializer;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventMBean;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventSQL;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventTransaction;
+import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocation;
+import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocationWriter;
+import org.nudge.elasticstack.context.elasticsearch.builder.GeoLocationElasticPusher;
+import org.nudge.elasticstack.context.elasticsearch.builder.MBean;
+import org.nudge.elasticstack.context.elasticsearch.builder.SQLLayer;
+import org.nudge.elasticstack.context.elasticsearch.builder.TransactionSerializer;
 import org.nudge.elasticstack.context.nudge.dto.DTOBuilder;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
+import org.nudge.elasticstack.exception.NudgeESConnectorException;
 import org.nudge.elasticstack.service.GeoLocationService;
 import org.nudge.elasticstack.service.impl.GeoFreeGeoIpImpl;
 
@@ -40,17 +33,22 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Daemon task that grab data from Nudge APM API and sends it to ES.
+ *
+ * @author Sarah Bourgeois
+ * @author Frederic Massart
+ * @author Thomas Arnaud
+ */
 public class Daemon {
 	private static final Logger LOG = Logger.getLogger("Connector : ");
 	private static ScheduledExecutorService scheduler;
 	private static List<String> analyzedFilenames = new ArrayList<>();
 
 	/**
-	 * Description : Launcher Deamon.
+	 * Launcher Deamon.
 	 *
 	 * @param config
-	 * @throws NudgeESConnectorException
-	 *
 	 */
 	public static void start(Configuration config) {
 		scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -76,7 +74,7 @@ public class Daemon {
 		private final Configuration config;
 		private final GeoLocationService geoLocationService;
 		private final ElasticConnection esCon;
-		private final Connection nudgeCon;
+		private final NudgeApiConnection nudgeCon;
 		// TODO Should be size limited => replace with a cache
 		private final Map<String, GeoLocation> geoLocationsMap;
 
@@ -87,18 +85,18 @@ public class Daemon {
 			this.config = config;
 			geoLocationService = new GeoFreeGeoIpImpl();
 			geoLocationsMap = new HashMap<>();
-			// Connection and load configuration
-			nudgeCon = new Connection(config.getNudgeUrl(), config.getNudgeApiToken());
+			// NudgeApiConnection and load configuration
+			nudgeCon = new NudgeApiConnection(config.getNudgeUrl(), config.getNudgeApiToken());
 			try {
 				this.esCon = new ElasticConnection(config.getOutputElasticHosts());
 			} catch (Exception e) {
-				throw new IllegalStateException("Failed to init mapping", e);
+				throw new IllegalStateException("Failed to init org.nudge.elasticstack.context.elasticsearch.mapping", e);
 			}
 			transactionLayer = new TransactionSerializer();
 		}
 
 		/**
-		 * Description : Call connector methods and run it
+		 * Drives connections to Nudge API and ES and handle data manipulation
 		 */
 		@Override
 		public void run() {

@@ -1,16 +1,13 @@
-package org.nudge.elasticstack.context.elasticsearch.json.bean;
-
-/**
- * 
- * @author : Sarah Bourgeois
- *  * @author : Frederic Massart
- * 
- */
-
+package org.nudge.elasticstack.context.elasticsearch.bean;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ *
+ * @author : Sarah Bourgeois
+ * @author : Frederic Massart
+ */
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class EventTransaction extends NudgeEvent {
 
@@ -30,7 +27,6 @@ public class EventTransaction extends NudgeEvent {
 	private Long responseTimeLayerJava;
 	private String layerNameJava;
 	private Long layerCountJava;
-
 
 	public EventTransaction(String appId, String name, Long responseTime, String date, Long count, String transactionId) {
 		super(appId, name, responseTime, date, count, "transaction", transactionId);

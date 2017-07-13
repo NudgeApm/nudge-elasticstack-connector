@@ -1,14 +1,13 @@
-package mapping;
-
-/**
- * @author : Sarah Bourgeois 
- * @author : Frederic Massart
- * 
- * Description : properties of the update mapping for type : sql, transaction and MBean
- */
+package org.nudge.elasticstack.context.elasticsearch.mapping;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Properties of the update org.nudge.elasticstack.context.elasticsearch.mapping for type : sql, transaction and MBean
+ *
+ * @author : Sarah Bourgeois
+ * @author : Frederic Massart
+ */
 public class MappingProperties {
 
 	@JsonProperty("properties")

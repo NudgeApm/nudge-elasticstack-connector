@@ -1,4 +1,4 @@
-package org.nudge.elasticstack.context.elasticsearch.json.builder;
+package org.nudge.elasticstack.context.elasticsearch.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary.DictionaryEntry;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.BulkFormat;
+import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.Configuration;
 import org.nudge.elasticstack.Utils;
-import org.nudge.elasticstack.context.elasticsearch.json.EventType;
-import org.nudge.elasticstack.context.elasticsearch.json.bean.EventMBean;
+import org.nudge.elasticstack.context.elasticsearch.EventType;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventMBean;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class MBean {
 				}
 				EventMBean mbeanEvent = new EventMBean(
 						appId, nameMbean, objectName, EventType.MBEAN, valueMbean, collectingTime, countAttribute);
-				// TODO FMA export the dicotionary stuff at the place that mbean dto are created
+				// TODO FMA export the dictionary stuff at the place that mbean dto are created
 				// retrieve nameMbean with Dictionary
 				for (DictionaryEntry dictionaryEntry : dico) {
 					int id = dictionaryEntry.getId();
@@ -104,7 +104,7 @@ public class MBean {
 	/**
 	 * Description : generate MBean for Bulk api
 	 *
-	 * @param mbean
+	 * @param eventType
 	 * @return
 	 * @throws JsonProcessingException
 	 */
