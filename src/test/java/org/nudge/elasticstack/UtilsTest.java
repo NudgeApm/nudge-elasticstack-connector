@@ -4,8 +4,11 @@ import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,16 +40,24 @@ public class UtilsTest {
 	 */
 	@Test
 	public void formatTimeToString() throws Exception {
+		// given
 		final long ts = 1498147939000L;
+		String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+		Locale currentLocale = Locale.getDefault();
+		final Date dt = new Date(ts);
+
 		Callable<String> task = new Callable<String>(){
 			@Override
 			public String call() throws Exception {
+				// when
 				return Utils.formatTimeToString(ts);
 			}
 		};
 
 		for (Future<?> future : computeTask(task)) {
-			Assert.assertEquals("2017-06-22T18:12:19.000+0200", future.get());
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern, currentLocale);
+			// then
+			Assert.assertEquals(sdf.format(dt), future.get());
 		}
 	}
 
