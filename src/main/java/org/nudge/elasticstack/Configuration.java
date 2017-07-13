@@ -84,10 +84,11 @@ public class Configuration {
 			} else {
 				URL confURL = ClassLoader.getSystemResource(CONF_FILE);
 				if (confURL != null) {
-					LOG.warn(CONF_FILE + " found at the classloader root path");
+					LOG.info(CONF_FILE + " found at the classloader root path");
 					loadPropertiesFile(confURL.getPath());
+				} else {
+					LOG.warn(CONF_FILE + " doesn't found at the classloader root path");
 				}
-				LOG.warn(CONF_FILE + " doesn't found at the classloader root path");
 			}
 		} catch (URISyntaxException e) {
 			LOG.error("Incorrect path for configuration file", e);
