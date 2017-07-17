@@ -133,7 +133,5 @@ public class GeoLocationElasticPusher {
 		LOG.info(" Flush " + jsonEvents.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
 		LOG.debug(" Sending GeoLoc : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
-	
-
 
 }
