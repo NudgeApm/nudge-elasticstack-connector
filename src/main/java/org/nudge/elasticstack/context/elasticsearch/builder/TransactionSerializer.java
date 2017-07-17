@@ -38,7 +38,7 @@ public class TransactionSerializer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<TransactionEvent> serialize(String appId, String host, String hostname, List<TransactionDTO> transactionList)
+	public List<TransactionEvent> serialize(String appId, String appName, String host, String hostname, List<TransactionDTO> transactionList)
 			throws ParseException, JsonProcessingException {
 		List<TransactionEvent> events = new ArrayList<TransactionEvent>();
 		for (TransactionDTO trans : transactionList) {
@@ -47,6 +47,7 @@ public class TransactionSerializer {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdf.format(trans.getStartTime());
 			transactionEvent.setAppId(appId);
+			transactionEvent.setAppName(appName);
 			transactionEvent.setHost(host);
 			transactionEvent.setHostname(hostname);
 			transactionEvent.setName(trans.getCode());

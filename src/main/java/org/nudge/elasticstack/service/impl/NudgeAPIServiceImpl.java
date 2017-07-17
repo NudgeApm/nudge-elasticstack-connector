@@ -2,7 +2,8 @@ package org.nudge.elasticstack.service.impl;
 
 import org.apache.commons.lang.StringUtils;
 import org.nudge.elasticstack.connection.NudgeApiConnection;
-import org.nudge.elasticstack.context.nudge.filter.bean.Service;
+import org.nudge.elasticstack.context.nudge.api.bean.App;
+import org.nudge.elasticstack.context.nudge.api.bean.Service;
 import org.nudge.elasticstack.exception.NudgeApiException;
 import org.nudge.elasticstack.service.NudgeAPIService;
 
@@ -21,12 +22,23 @@ public class NudgeAPIServiceImpl implements NudgeAPIService {
     }
 
     @Override
+    public String retrieveAppName(String appId) throws NudgeApiException {
+        App app;
+        try {
+             app = apiConnection.requestApp(appId);
+        } catch (IOException ioe) {
+            throw new NudgeApiException("Error while querying the App resource from Nudge API", ioe);
+        }
+        return app.getName();
+    }
+
+    @Override
     public String retrieveConfiguredHostName(String appId, String host) throws NudgeApiException {
         List<Service> services;
         try {
             services = apiConnection.requestServices(appId);
         } catch (IOException ioe) {
-            throw new NudgeApiException("Error while querying the service resource from Nudge API", ioe);
+            throw new NudgeApiException("Error while querying the Service resource from Nudge API", ioe);
         }
 
         for (Service service : services) {
@@ -35,8 +47,6 @@ public class NudgeAPIServiceImpl implements NudgeAPIService {
                 return service.getName();
             }
         }
-
-        // default case
         return host;
     }
 }

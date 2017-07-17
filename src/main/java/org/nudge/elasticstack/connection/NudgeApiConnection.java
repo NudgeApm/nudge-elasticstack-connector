@@ -6,8 +6,9 @@
   import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
   import org.apache.log4j.Logger;
   import org.nudge.elasticstack.Configuration;
-  import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
-  import org.nudge.elasticstack.context.nudge.filter.bean.Service;
+  import org.nudge.elasticstack.context.nudge.api.bean.App;
+  import org.nudge.elasticstack.context.nudge.api.bean.Filter;
+  import org.nudge.elasticstack.context.nudge.api.bean.Service;
 
   import java.io.IOException;
   import java.io.InputStream;
@@ -23,6 +24,7 @@
  * @author : Frederic Massart
 */
 public class NudgeApiConnection {
+
 	private static final Logger LOG = Logger.getLogger(NudgeApiConnection.class);
 	private final String url;
 	private final String apiKeyParam;
@@ -115,4 +117,16 @@ public class NudgeApiConnection {
 		});
 	}
 
+	public App requestApp(String appId) throws IOException {
+
+		String finalUrl = url + "api/apps/" + appId;
+		HttpURLConnection connection = prepareRequest(finalUrl);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+		mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+
+		return mapper.readValue(connection.getInputStream(), new TypeReference<App>() {
+		});
+	}
 }

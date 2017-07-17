@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.Configuration;
+import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocation;
 import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocationWriter;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
@@ -104,6 +104,10 @@ public class GeoLocationElasticPusher {
 	 * @throws IOException
 	 */
 	public void sendElk(List<String> jsonEvents) throws IOException {
+		if (jsonEvents.isEmpty()) {
+			return;
+		}
+
 		StringBuilder sb = new StringBuilder();
 
 		for (String json : jsonEvents) {
@@ -127,7 +131,7 @@ public class GeoLocationElasticPusher {
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;
 		LOG.info(" Flush " + jsonEvents.size() + " documents insert in BULK in : " + (totalTime / 1000f) + "sec");
-		LOG.debug(" Sending MBean : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
+		LOG.debug(" Sending GeoLoc : " + httpCon2.getResponseCode() + " - " + httpCon2.getResponseMessage());
 	}
 	
 

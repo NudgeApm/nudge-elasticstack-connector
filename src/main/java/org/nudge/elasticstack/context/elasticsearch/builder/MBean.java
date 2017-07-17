@@ -126,6 +126,10 @@ public class MBean {
 	 * @throws IOException
 	 */
 	public void sendElk(List<String> jsonEvents2) throws IOException {
+		if (jsonEvents2.isEmpty()) {
+			return;
+		}
+
 		StringBuilder sb = new StringBuilder();
 
 		for (String json : jsonEvents2) {

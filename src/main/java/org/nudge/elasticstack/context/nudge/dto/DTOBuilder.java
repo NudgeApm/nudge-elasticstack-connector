@@ -2,8 +2,8 @@ package org.nudge.elasticstack.context.nudge.dto;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
 import com.nudge.apm.buffer.probe.RawDataProtocol.Layer;
-import org.nudge.elasticstack.context.nudge.filter.FilterManager;
-import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
+import org.nudge.elasticstack.context.nudge.api.FilterManager;
+import org.nudge.elasticstack.context.nudge.api.bean.Filter;
 import org.nudge.elasticstack.exception.ExcludedTransactionException;
 
 import java.util.ArrayList;

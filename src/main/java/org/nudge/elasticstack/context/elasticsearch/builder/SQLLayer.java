@@ -30,7 +30,7 @@ public class SQLLayer {
 	 * Extract SQL events from transactions.
 	 * @param appId 
 	 */
-	public List<SQLEvent> buildSQLEvents(String appId, String host, String hostname, List<TransactionDTO> transactions) {
+	public List<SQLEvent> buildSQLEvents(String appId, String appName, String host, String hostname, List<TransactionDTO> transactions) {
 		List<SQLEvent> sqlEvents = new ArrayList<>();
 
 		for (TransactionDTO transaction : transactions) {
@@ -41,6 +41,7 @@ public class SQLLayer {
 
 					SQLEvent sqlEvent = new SQLEvent();
 					sqlEvent.setAppId(appId);
+					sqlEvent.setAppName(appName);
 					sqlEvent.setHost(host);
 					sqlEvent.setHostname(hostname);
 					sqlEvent.setDate(sqlTimestamp);
@@ -104,6 +105,10 @@ public class SQLLayer {
 	 * @throws IOException
 	 */
 	public void sendSqltoElk(List<String> jsonEventsSql) throws IOException {
+		if (jsonEventsSql.isEmpty()) {
+			return;
+		}
+
 		StringBuilder sb = new StringBuilder();
 		for (String json : jsonEventsSql) {
 			sb.append(json);

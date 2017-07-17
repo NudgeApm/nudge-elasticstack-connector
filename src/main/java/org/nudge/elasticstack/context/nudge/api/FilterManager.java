@@ -1,9 +1,9 @@
-package org.nudge.elasticstack.context.nudge.filter;
+package org.nudge.elasticstack.context.nudge.api;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol;
 import org.apache.log4j.Logger;
-import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
-import org.nudge.elasticstack.context.nudge.filter.bean.Scope;
+import org.nudge.elasticstack.context.nudge.api.bean.Filter;
+import org.nudge.elasticstack.context.nudge.api.bean.Scope;
 
 import java.util.List;
 import java.util.regex.Matcher;

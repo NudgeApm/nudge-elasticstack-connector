@@ -12,10 +12,10 @@ import org.nudge.elasticstack.context.elasticsearch.builder.MBean;
 import org.nudge.elasticstack.context.elasticsearch.builder.SQLLayer;
 import org.nudge.elasticstack.context.elasticsearch.builder.TransactionSerializer;
 import org.nudge.elasticstack.context.elasticsearch.mapping.Mapping;
+import org.nudge.elasticstack.context.nudge.api.bean.Filter;
 import org.nudge.elasticstack.context.nudge.dto.DTOBuilder;
 import org.nudge.elasticstack.context.nudge.dto.MBeanDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
-import org.nudge.elasticstack.context.nudge.filter.bean.Filter;
 import org.nudge.elasticstack.exception.NudgeESConnectorException;
 import org.nudge.elasticstack.service.GeoLocationService;
 import org.nudge.elasticstack.service.NudgeAPIService;
@@ -72,7 +72,7 @@ public class Daemon {
 		private final Configuration config;
 		private final GeoLocationService geoLocationService;
 		private final ElasticConnection esCon;
-		private final NudgeApiConnection nudgeCon;
+		private final NudgeApiConnection nudgeApiCon;
 		private final NudgeAPIService nudgeAPIService;
 		// TODO Should be size limited => replace with a cache
 		private final Map<String, GeoLocation> geoLocationsMap;
@@ -85,8 +85,8 @@ public class Daemon {
 			geoLocationService = new GeoFreeGeoIpImpl();
 			geoLocationsMap = new HashMap<>();
 			// NudgeApiConnection and load configuration
-			nudgeCon = new NudgeApiConnection(config.getNudgeUrl(), config.getNudgeApiToken());
-			nudgeAPIService = new NudgeAPIServiceImpl(nudgeCon);
+			nudgeApiCon = new NudgeApiConnection(config.getNudgeUrl(), config.getNudgeApiToken());
+			nudgeAPIService = new NudgeAPIServiceImpl(nudgeApiCon);
 			try {
 				this.esCon = new ElasticConnection(config.getOutputElasticHosts());
 			} catch (Exception e) {
@@ -111,16 +111,17 @@ public class Daemon {
 				}
 
 				for (String appId : config.getAppIds()) {
-					List<String> rawdataList = nudgeCon.getRawdataList(appId, "-10m");
+					List<String> rawdataList = nudgeApiCon.getRawdataList(appId, "-10m");
 					// analyse files, comparaison and push
 					for (String rawdataFilename : rawdataList) {
 						if (!analyzedFilenames.contains(rawdataFilename)) {
-							RawData rawdata = nudgeCon.getRawdata(appId, rawdataFilename);
+							RawData rawdata = nudgeApiCon.getRawdata(appId, rawdataFilename);
 							String hostname = rawdata.getHostname();
 							String nudgeConfigHostname = nudgeAPIService.retrieveConfiguredHostName(appId, hostname);
+							String appName = nudgeAPIService.retrieveAppName(appId);
 
 							// Request Filters
-							List<Filter> filters = nudgeCon.requestFilters(appId);
+							List<Filter> filters = nudgeApiCon.requestFilters(appId);
 
 
 							// ==============================
@@ -129,8 +130,8 @@ public class Daemon {
 							List<Transaction> transactions = rawdata.getTransactionsList();
 							List<TransactionDTO> transactionDTOs = DTOBuilder.buildTransactions(transactions, filters);
 
-							List<TransactionEvent> events = transactionLayer.serialize(appId, hostname, nudgeConfigHostname, transactionDTOs);
-							for (TransactionEvent eventTrans : events) {
+							List<TransactionEvent> events = transactionLayer.serialize(appId, appName, hostname, nudgeConfigHostname, transactionDTOs);
+							for (TransactionEvent eventTrans : events) { // WTF
 								transactionLayer.nullLayer(eventTrans);
 							}
 							List<String> jsonEvents = transactionLayer.serialize(events);
@@ -153,7 +154,7 @@ public class Daemon {
 							// Type : SQL
 							// ===========================
 							SQLLayer s = new SQLLayer();
-							List<SQLEvent> sql = s.buildSQLEvents(appId, hostname, nudgeConfigHostname, transactionDTOs);
+							List<SQLEvent> sql = s.buildSQLEvents(appId, appName, hostname, nudgeConfigHostname, transactionDTOs);
 							List<String> jsonEventsSql = s.parseJsonSQL(sql);
 							s.sendSqltoElk(jsonEventsSql);
 

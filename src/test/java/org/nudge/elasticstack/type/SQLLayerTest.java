@@ -24,15 +24,24 @@ public class SQLLayerTest {
 
 	@Test
 	public void test_BuildSQLEvents() {
+		String appId = "1234q";
+		String appName = "app-name";
+		String host = "windows1234";
+		String hostname = "my-wonderful-pc";
 		String sqlReq = "SELECT * FROM users;";
 		long responseTime = 1500;
 		int count = 1;
 		Date date = new Date();
 
-		List<SQLEvent> sqlEvents = sqlLayer.buildSQLEvents("", "", "", Collections.singletonList(
+		List<SQLEvent> sqlEvents = sqlLayer.buildSQLEvents(appId, appName,host, hostname, Collections.singletonList(
 				buildTransactionDTO(sqlReq, responseTime, 1, date.getTime())));
 
 		for (SQLEvent sqlEvent : sqlEvents) {
+			Assert.assertEquals(appId, sqlEvent.getAppId());
+			Assert.assertEquals(appName, sqlEvent.getAppName());
+			Assert.assertEquals(host, sqlEvent.getHost());
+			Assert.assertEquals(hostname, sqlEvent.getHostname());
+
 			Assert.assertEquals(sqlReq, sqlEvent.getName());
 			Assert.assertEquals(responseTime, sqlEvent.getResponseTime());
 			Assert.assertEquals(count, sqlEvent.getCount());
