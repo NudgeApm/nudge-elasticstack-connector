@@ -52,4 +52,23 @@ For more information about this script, read the [related documentation page](ht
 
 ## Documentation
 
-Visit [www.nudge-apm.com](https://www.nudge-apm.com/integration) for the full documentation.
+Analysed fields that can be used in a Kibana search :
+
+| Field Name          | Type          | Description                                                                 |
+| ------------------- |:-------------:| --------------------------------------------------------------------------- |
+| appId               | String        | Id of an application, defined in the properties file of a Nudge APM Agent   |
+| appName             | String        | Name of an application configured in Nudge APM portal                       |
+| host                | String        | Host code detected by a Nudge APM Agent                                     |
+| hostname            | String        | Host name configured in Nudge APM portal                                    |
+| layer_jaws_name     | String        | Name of a JAX-WS webservice called in a transaction                         |
+| layer_jms_name      | String        | Name of a JMS queue or topic called in a transaction                        |
+| layer_sql_name      | String        | Code of a SQL query called in a transaction                                 |
+| mbean_attributename | String        | Name of a Java JMX MBean attribute                                          |
+| mbean_name          | String        | Name of a Java JMX MBean attribute                                          |
+| sql_code            | String        | SQL query code                                                              |
+| transaction_name    | String        | Name of a transaction configured in Nudge APM portal                        |
+| transactionId       | String        | Code of a transaction, used if the transaction_name is not configured       |
+| type                | String        | Type of a elasticsearch document : GEO_LOC, JAX-WS, MBEAN, SQL, TRANSACTION |
+
+
+Visit [www.nudge-apm.com](http://bit.ly/2u46AKu) for more information on Nudge APM Integrations.

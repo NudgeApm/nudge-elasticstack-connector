@@ -5,6 +5,8 @@ package org.nudge.elasticstack.context.elasticsearch.bean;
  */
 public enum EventType {
 
+	// TODO FMA add JAX-WS layer here
+
 	TRANSACTION("transaction"), MBEAN("mbean"), SQL("sql"), GEO_LOC("geolocation");
 
 	private final String type;

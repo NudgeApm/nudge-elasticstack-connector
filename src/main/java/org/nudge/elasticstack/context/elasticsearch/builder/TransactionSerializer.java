@@ -97,8 +97,10 @@ public class TransactionSerializer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
+
 	public void buildLayerEvents(List<LayerDTO> rawdataLayers, TransactionEvent eventTrans)
 			throws ParseException, JsonProcessingException {
+		// TODO FMA link the layerName with EventType
 		for (LayerDTO layer : rawdataLayers) {
 			if (layer.getLayerName().equals("SQL")) {
 				eventTrans.setResponseTimeLayerSql(layer.getTime());
