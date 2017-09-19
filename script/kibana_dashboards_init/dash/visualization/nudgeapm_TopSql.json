@@ -1,6 +1,6 @@
 {
       "title": "Top SQL",
-      "visState": "{\"title\":\"Top SQL\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"sql_responseTime\",\"customLabel\":\"Sql response time\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"sql_code.raw\",\"size\":10,\"order\":\"asc\",\"orderBy\":\"1\",\"customLabel\":\"Sql name\"}}],\"listeners\":{}}",
+      "visState": "{\"title\":\"Top SQL\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"sql_responseTime\",\"customLabel\":\"Sql response time\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"sql_code.keyword\",\"size\":10,\"order\":\"asc\",\"orderBy\":\"1\",\"customLabel\":\"Sql name\"}}],\"listeners\":{}}",
       "uiStateJSON": "{}",
       "description": "",
       "version": 1,

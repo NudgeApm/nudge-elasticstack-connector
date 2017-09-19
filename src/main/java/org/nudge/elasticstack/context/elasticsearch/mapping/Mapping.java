@@ -1,7 +1,7 @@
 package org.nudge.elasticstack.context.elasticsearch.mapping;
 
-import org.nudge.elasticstack.exception.NudgeESConnectorException;
 import org.nudge.elasticstack.connection.ElasticConnection;
+import org.nudge.elasticstack.exception.NudgeESConnectorException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -21,7 +21,7 @@ public class Mapping {
 		esCommandPrefix = esHost + esIndex;
 	}
 
-	public void pushMappings() throws NudgeESConnectorException {
+	public void pushMappingsV2() throws NudgeESConnectorException {
 		// Transaction update org.nudge.elasticstack.context.elasticsearch.mapping
 		esCon.put("transaction/_mapping", "{\"properties\":{\"transaction_name\":{\"type\":\"multi_field\",\"fields\":{\"raw\":{\"type\":\"string\",\"index\":\"not_analyzed\"},"
 				+ "\"transaction_name\":{\"type\":\"string\",\"index\":\"analyzed\"}}}}}");
@@ -35,6 +35,79 @@ public class Mapping {
 				+ "\"mbean_name\":{\"type\":\"string\",\"index\":\"analyzed\"}}}}}");
 		// GeoLocation org.nudge.elasticstack.context.elasticsearch.mapping
 		esCon.put("location/_mapping", "{\"properties\":{\"geoPoint\":{\"type\":\"geo_point\",\"geohash\":true,\"geohash_prefix\":true,\"geohash_precision\":7}}}");
+	}
+
+	public void pushMappings() throws NudgeESConnectorException {
+		// Transaction update org.nudge.elasticstack.context.elasticsearch.mapping
+		esCon.put("transaction/_mapping",
+				"{" +
+						"  \"properties\": {" +
+						"    \"transaction_name\": {" +
+						"      \"type\": \"text\"," +
+						"      \"fields\": {" +
+						"        \"keyword\": {" +
+						"          \"type\": \"keyword\"" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  }" +
+						"}");
+
+
+		// Sql update org.nudge.elasticstack.context.elasticsearch.mapping
+		esCon.put("sql/_mapping",
+				"{" +
+						"  \"properties\": {" +
+						"    \"sql_code\": {" +
+						"      \"type\": \"text\"," +
+						"      \"fields\": {" +
+						"        \"keyword\": {" +
+						"          \"type\": \"keyword\"" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  }" +
+						"}");
+
+
+
+		// MBean update org.nudge.elasticstack.context.elasticsearch.mapping
+		esCon.put("mbean/_mapping",
+				"{" +
+						"  \"properties\": {" +
+						"    \"mbean_attributename\": {" +
+						"      \"type\": \"text\"," +
+						"      \"fields\": {" +
+						"        \"keyword\": {" +
+						"          \"type\": \"keyword\"" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  }" +
+						"}");
+		esCon.put("mbean/_mapping",
+				"{" +
+						"  \"properties\": {" +
+						"    \"mbean_name\": {" +
+						"      \"type\": \"text\"," +
+						"      \"fields\": {" +
+						"        \"keyword\": {" +
+						"          \"type\": \"keyword\"" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  }" +
+						"}");
+
+		// GeoLocation org.nudge.elasticstack.context.elasticsearch.mapping
+		esCon.put("location/_mapping",
+				"{" +
+						"  \"properties\": {" +
+						"    \"geoPoint\": {" +
+						"      \"type\": \"geo_point\"" +
+						"    }" +
+						"  }" +
+						"}");
 	}
 
 	public void initIndex() throws IOException {
