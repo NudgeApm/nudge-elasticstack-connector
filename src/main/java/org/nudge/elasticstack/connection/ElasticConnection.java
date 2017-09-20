@@ -1,18 +1,13 @@
 package org.nudge.elasticstack.connection;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.exception.NudgeESConnectorException;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class ElasticConnection {
 
@@ -61,6 +56,9 @@ public class ElasticConnection {
 			connection.setRequestMethod("PUT");
 			if (body != null) {
 				try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream())) {
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Body : " + body);
+					}
 					out.write(body);
 					out.close();
 				}
