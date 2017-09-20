@@ -1,9 +1,11 @@
 package org.nudge.elasticstack.connection;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
+import org.nudge.elasticstack.context.elasticsearch.ESVersion;
 import org.nudge.elasticstack.exception.NudgeESConnectorException;
+import org.nudge.elasticstack.exception.UnsupportedElasticStackException;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -15,23 +17,37 @@ public class ElasticConnection {
 
 	private final String elasticHost;
 	private final Metadata metadata;
-	private final int esVersion;
-	private String esCommandPrefix;
+	private final ESVersion esVersion;
+	private String esHostIndexURL;
 
-	public ElasticConnection(String host) throws Exception {
-		this.elasticHost = host;
+	public ElasticConnection(String hostUrl) throws Exception {
+		this.elasticHost = hostUrl;
 		String jsonMetadata = get();
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		this.metadata = mapper.readValue(jsonMetadata, Metadata.class);
-		this.esVersion = Integer.parseInt(this.metadata.version.number.split("\\.")[0]);
+		this.esVersion = determineESVersion(this.metadata);
+	}
+
+	private String get() throws Exception {
+		URL url = new URL(elasticHost);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("GET " + url);
+		}
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.connect();
+		String message = readHttpResponse(connection);
+		if (connection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+			return message;
+		} else {
+			throw new NudgeESConnectorException("Failed ES command with message: " + message);
+		}
 	}
 
 	public String get(String resource) throws NudgeESConnectorException {
+		checkAndLog(HttpMethod.GET, resource, null);
 		try {
-			URL url = new URL(esCommandPrefix + resource);
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("GET " + url);
-			}
+			URL url = new URL(esHostIndexURL + resource);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
 			String message = readHttpResponse(connection);
@@ -46,19 +62,15 @@ public class ElasticConnection {
 	}
 
 	public void put(String resource, String body) throws NudgeESConnectorException {
+		checkAndLog(HttpMethod.PUT, resource, body);
 		try {
-			URL url = new URL(esCommandPrefix + resource);
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("PUT " + url);
-			}
+			URL url = new URL(esHostIndexURL + resource);
+
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setDoOutput(true);
-			connection.setRequestMethod("PUT");
+			connection.setRequestMethod(HttpMethod.PUT.toString());
 			if (body != null) {
 				try (OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream())) {
-					if (LOG.isDebugEnabled()) {
-						LOG.debug("Body : " + body);
-					}
 					out.write(body);
 					out.close();
 				}
@@ -72,18 +84,46 @@ public class ElasticConnection {
 		}
 	}
 
-	private String get() throws Exception {
-		URL url = new URL(elasticHost);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Request to : " + url);
+	private void checkAndLog(HttpMethod httpMethod, String resource, String body) {
+		if (httpMethod == null || resource == null) {
+			throw new IllegalArgumentException("Cannot request elasticsearch, HttpMethod and resource URL must be provided");
 		}
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.connect();
-		String message = readHttpResponse(connection);
-		if (connection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
-			return message;
-		} else {
-			throw new NudgeESConnectorException("Failed ES command with message: " + message);
+
+		if (!LOG.isDebugEnabled()) {
+			return;
+		}
+
+		String requestLog = httpMethod.toString() + " " + resource;
+		if (body != null) {
+			requestLog = requestLog + " with body : \n" + body;
+		}
+		LOG.debug(requestLog);
+	}
+
+
+	public void createAndUseIndex(String esIndex) {
+		esHostIndexURL = elasticHost + esIndex + "/";
+		try {
+			put("", null);
+		} catch (NudgeESConnectorException e) {
+			LOG.info("Index \"" + esIndex + "\" already exists");
+		}
+	}
+
+	public ESVersion getEsVersion() {
+		return esVersion;
+	}
+
+	private ESVersion determineESVersion(Metadata metadata) throws UnsupportedElasticStackException {
+		int numberVersion = Integer.parseInt(this.metadata.getVersion().getNumber().split("\\.")[0]);
+		switch (numberVersion) {
+			case 2:
+				return ESVersion.ES2;
+			case 5:
+				return ESVersion.ES5;
+			default:
+				throw new UnsupportedElasticStackException(
+						"The nudge connector is not compatible with this version of elasticsearch used (" + numberVersion + ".x)");
 		}
 	}
 
@@ -100,74 +140,18 @@ public class ElasticConnection {
 		}
 	}
 
-	public void createAndUseIndex(String esIndex) {
-		esCommandPrefix = elasticHost + esIndex + "/";
-		try {
-			put("", null);
-		} catch (NudgeESConnectorException e) {
-			LOG.warn("Failed to create index (this error will be ignored, the index could already exists)", e);
-		}
-	}
-
-	public int getESVersion() {
-		return esVersion;
-	}
-
 	static public class Metadata {
-		private String name;
-		@JsonProperty("cluster_name")
-		private String clusterName;
-		@JsonProperty("cluster_uuid")
-		private String clusterUuid;
 		private Version version;
-		private String tagline;
-		
-		public String getName() {
-			return name;
-		}
-		public String getVlusterName() {
-			return clusterName;
-		}
-		public String getClusterUuid() {
-			return clusterUuid;
-		}
+
 		public Version getVersion() {
 			return version;
-		}
-		public String getTagline() {
-			return tagline;
 		}
 
 		static public class Version {
 			private String number;
-			@JsonProperty("build_hash")
-			private String buildHash;
-			@JsonProperty("build_timestamp")
-			private String buildTimestamp;
-			@JsonProperty("build_date")
-			private String buildDate;
-			@JsonProperty("build_snapshot")
-			private boolean buildSnapshot;
-			@JsonProperty("lucene_version")
-			private String luceneVersion;
-			
+
 			public String getNumber() {
 				return number;
-			}
-			public String getBuildHash() {
-				return buildHash;
-			}
-			public String getBuildTimestamp() {
-				return buildTimestamp;
-			}
-			public String getBuildDate() {
-				return buildDate;
-			}
-			public boolean getBuildSnapshot() {
-				return buildSnapshot;
-			}
-			public String getLuceneVersion() {
-				return luceneVersion;
 			}
 		}
 	}

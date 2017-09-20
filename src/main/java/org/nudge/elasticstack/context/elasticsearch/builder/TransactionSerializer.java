@@ -203,7 +203,7 @@ public class TransactionSerializer {
 			return;
 		}
 		long start = System.currentTimeMillis();
-		URL URL = new URL(config.getOutputElasticHosts() + "_bulk");
+		URL URL = new URL(config.getElasticHostURL() + "_bulk");
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
 		}

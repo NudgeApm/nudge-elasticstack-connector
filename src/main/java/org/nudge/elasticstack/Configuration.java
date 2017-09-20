@@ -40,7 +40,7 @@ public class Configuration {
 	private String nudgeApiToken;
 	private String[] apps;
 	private String elasticIndex;
-	private String outputElasticHosts;
+	private String elasticHostURL;
 	private boolean dryRun;
 	private String rawdataHistory;
 
@@ -114,10 +114,10 @@ public class Configuration {
 			nudgeUrl += "/";
 		nudgeApiToken = checkNotNull(NUDGE_API_TOKEN);
 		apps = split(checkNotNull(NUDGE_APP_IDS));
-		outputElasticHosts = getProperty(OUTUPUT_ELASTIC_HOSTS, "http://localhost:9200/");
+		elasticHostURL = getProperty(OUTUPUT_ELASTIC_HOSTS, "http://localhost:9200/");
 		rawdataHistory = getProperty(RAWDATA_HISTORY, "-10m");
-		if (!outputElasticHosts.endsWith("/"))
-			outputElasticHosts += "/";
+		if (!elasticHostURL.endsWith("/"))
+			elasticHostURL += "/";
 		elasticIndex = getProperty(ELASTIC_INDEX, "nudge");
 		dryRun = Boolean.valueOf(getProperty(DRY_RUN, "false"));
 	}
@@ -171,8 +171,8 @@ public class Configuration {
 		return elasticIndex;
 	}
 
-	public String getOutputElasticHosts() {
-		return outputElasticHosts;
+	public String getElasticHostURL() {
+		return elasticHostURL;
 	}
 
 	public boolean getDryRun() {

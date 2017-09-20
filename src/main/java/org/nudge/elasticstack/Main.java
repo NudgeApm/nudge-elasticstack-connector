@@ -1,5 +1,7 @@
 package org.nudge.elasticstack;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Sarah Bourgeois
  * @author Frederic Massart
@@ -7,6 +9,8 @@ package org.nudge.elasticstack;
  * Entry point for NudgeApm - ElasticStack connector
  */
 public class Main {
+
+	private static final Logger LOG = Logger.getLogger(Main.class);
 
 	public static void main(String[] args) {
 
@@ -22,7 +26,7 @@ public class Main {
 				Configuration conf = Configuration.getInstance();
 				Daemon.start(conf);
 			} catch (IllegalStateException ise) {
-				System.err.println("Failed to start daemon: " + ise.getMessage());
+				LOG.error("Failed to start daemon", ise);
 			}
 			return;
 		}

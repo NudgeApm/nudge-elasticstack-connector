@@ -24,7 +24,7 @@ public class ConfigurationTest {
 
         // when
         String confNudge = configuration.getNudgeUrl();
-        String confElastic = configuration.getOutputElasticHosts();
+        String confElastic = configuration.getElasticHostURL();
         String confRawdata = configuration.getRawdataHistory();
 
         // then

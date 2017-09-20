@@ -2,10 +2,7 @@ package org.nudge.elasticstack.context.elasticsearch.mapping;
 
 import org.nudge.elasticstack.connection.ElasticConnection;
 import org.nudge.elasticstack.exception.NudgeESConnectorException;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import org.nudge.elasticstack.exception.UnsupportedElasticStackException;
 
 /**
  * @author : Sarah Bourgeois
@@ -13,15 +10,25 @@ import java.net.URL;
  *
  */
 public class Mapping {
-	private final String esCommandPrefix;
+
 	private final ElasticConnection esCon;
 
-	public Mapping(ElasticConnection esCon, String esHost, String esIndex) {
+	public Mapping(ElasticConnection esCon) {
 		this.esCon = esCon;
-		esCommandPrefix = esHost + esIndex;
 	}
 
-	public void pushMappingsV2() throws NudgeESConnectorException {
+	public void pushMappings() throws NudgeESConnectorException, UnsupportedElasticStackException {
+		switch (esCon.getEsVersion()) {
+			case ES2:
+				pushMappingsES2();
+				break;
+			case ES5:
+				pushMappingsES5();
+				break;
+		}
+	}
+
+	private void pushMappingsES2() throws NudgeESConnectorException {
 		// Transaction update org.nudge.elasticstack.context.elasticsearch.mapping
 		esCon.put("transaction/_mapping", "{\"properties\":{\"transaction_name\":{\"type\":\"multi_field\",\"fields\":{\"raw\":{\"type\":\"string\",\"index\":\"not_analyzed\"},"
 				+ "\"transaction_name\":{\"type\":\"string\",\"index\":\"analyzed\"}}}}}");
@@ -37,7 +44,7 @@ public class Mapping {
 		esCon.put("location/_mapping", "{\"properties\":{\"geoPoint\":{\"type\":\"geo_point\",\"geohash\":true,\"geohash_prefix\":true,\"geohash_precision\":7}}}");
 	}
 
-	public void pushMappings() throws NudgeESConnectorException {
+	private void pushMappingsES5() throws NudgeESConnectorException {
 		// Transaction update org.nudge.elasticstack.context.elasticsearch.mapping
 		esCon.put("transaction/_mapping",
 				"{" +
@@ -52,8 +59,6 @@ public class Mapping {
 						"    }" +
 						"  }" +
 						"}");
-
-
 		// Sql update org.nudge.elasticstack.context.elasticsearch.mapping
 		esCon.put("sql/_mapping",
 				"{" +
@@ -68,9 +73,6 @@ public class Mapping {
 						"    }" +
 						"  }" +
 						"}");
-
-
-
 		// MBean update org.nudge.elasticstack.context.elasticsearch.mapping
 		esCon.put("mbean/_mapping",
 				"{" +
@@ -98,7 +100,6 @@ public class Mapping {
 						"    }" +
 						"  }" +
 						"}");
-
 		// GeoLocation org.nudge.elasticstack.context.elasticsearch.mapping
 		esCon.put("location/_mapping",
 				"{" +
@@ -108,13 +109,5 @@ public class Mapping {
 						"    }" +
 						"  }" +
 						"}");
-	}
-
-	public void initIndex() throws IOException {
-		URL url = new URL(esCommandPrefix);
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setDoOutput(true);
-		con.setRequestMethod("PUT");
-		con.getResponseCode();
 	}
 }

@@ -38,8 +38,9 @@ import java.util.concurrent.TimeUnit;
  * @author Frederic Massart
  * @author Thomas Arnaud
  */
-public class Daemon {
-	private static final Logger LOG = Logger.getLogger("Connector : ");
+class Daemon {
+
+	private static final Logger LOG = Logger.getLogger(Daemon.class);
 	private static ScheduledExecutorService scheduler;
 	private static List<String> analyzedFilenames = new ArrayList<>();
 
@@ -48,7 +49,7 @@ public class Daemon {
 	 *
 	 * @param config
 	 */
-	public static void start(Configuration config) {
+	static void start(Configuration config) {
 		scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
 			public Thread newThread(Runnable runnable) {
 				Thread thread = new Thread(runnable);
@@ -60,12 +61,12 @@ public class Daemon {
 		scheduleDaemon(scheduler, config);
 	}
 
-	private static void scheduleDaemon(ScheduledExecutorService scheduler, Configuration config) {
-		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
+	static void stop() {
+		scheduler.shutdown();
 	}
 
-	public static void stop() {
-		scheduler.shutdown();
+	private static void scheduleDaemon(ScheduledExecutorService scheduler, Configuration config) {
+		scheduler.scheduleAtFixedRate(new DaemonTask(config), 0L, 1L, TimeUnit.MINUTES);
 	}
 
 	protected static class DaemonTask implements Runnable {
@@ -88,9 +89,9 @@ public class Daemon {
 			nudgeApiCon = new NudgeApiConnection(config.getNudgeUrl(), config.getNudgeApiToken());
 			nudgeAPIService = new NudgeAPIServiceImpl(nudgeApiCon);
 			try {
-				this.esCon = new ElasticConnection(config.getOutputElasticHosts());
+				this.esCon = new ElasticConnection(config.getElasticHostURL());
 			} catch (Exception e) {
-				throw new IllegalStateException("Failed to init org.nudge.elasticstack.context.elasticsearch.mapping", e);
+				throw new IllegalStateException("An error occurs during the first connection to elasticsearch", e);
 			}
 			transactionLayer = new TransactionSerializer();
 		}
@@ -105,7 +106,7 @@ public class Daemon {
 				if (!esIndex.equals(currentIndex)) {
 					esCon.createAndUseIndex(esIndex);
 					// Mapping
-					Mapping mapping = new Mapping(esCon, config.getOutputElasticHosts(), esIndex);
+					Mapping mapping = new Mapping(esCon);
 					mapping.pushMappings();
 					currentIndex = esIndex;
 				}
