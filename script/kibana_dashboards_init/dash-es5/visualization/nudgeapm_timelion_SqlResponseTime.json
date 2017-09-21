@@ -1,0 +1,10 @@
+{
+  "title": "SQL Response Time",
+  "visState": "{\"title\":\"Sql response time\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=nudge*, metric=avg:sql_responseTime).label('now').color(pink), .es(index=nudge*, metric=avg:sql_responseTime, offset=-1w).label('1 week ago').color(black)\",\"interval\":\"1h\"},\"aggs\":[],\"listeners\":{}}",
+  "uiStateJSON": "{}",
+  "description": "",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

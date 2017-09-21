@@ -1,0 +1,10 @@
+{
+  "title": "Dashboard",
+  "visState": "{\"title\":\"Dashboard\",\"type\":\"markdown\",\"params\":{\"markdown\":\"# Navigation #\\n---------------------------\\n\\n[Transaction Dashboard](http://bit.ly/2bucr4f)\\n\\n--------------------------\\n\\n[JVM Dashboard](http://bit.ly/2fDdr5U)\\n\\n--------------------------\\n\\n[Week by week comparison](http://bit.ly/2fDdGhu)\"},\"aggs\":[],\"listeners\":{}}",
+  "uiStateJSON": "{}",
+  "description": "",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

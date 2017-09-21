@@ -7,9 +7,8 @@ ELASTICSEARCH_HOST="http://localhost:9200"
 
 #Internal script command
 NAME_ELASTIC_INDEX=".kibana"
-DIR=dash
 NUDGE_INDEX_PATTERN="nudge-*"
-NUDGE_INDEX_PATTERN_FILE="$DIR/index-pattern/nudgeapm_indexPattern.json"
+NUDGE_INDEX_PATTERN_FILE="index-pattern/nudgeapm_indexPattern.json"
 
 printf "\n"
 echo "-------------------------------------------------"
@@ -26,6 +25,32 @@ help_command () {
   delete_visu           ==> delete visualization one by one
   delete_dash           ==> delete dashboard one by one"
   printf "\n"
+}
+
+# Determine from the ES version started, the directory files to use
+define_directory_files() {
+  local es_version="$(curl -s -XGET 'localhost:9200?filter_path=version.number&pretty=false' | awk -F'"' {'print $6'})"
+
+  if [ -z "$es_version" ]
+  then
+    echo 'Cannot determine the version of Elasticsearch. Is it up and running ?'
+    exit 1
+  else
+    printf "Version of Elasticsearch detected %s\n" $es_version
+  fi
+
+  local es_primary_number_version="$(echo ${es_version} | cut -d '.' -f1)"
+  if [ $es_primary_number_version == 5 ]
+  then
+    DIR=dash-es5
+  elif [ $es_primary_number_version == 2 ]
+  then
+    DIR=dash-es2
+  else
+    message="The version ${es_version} of Elasticsearch is not compatible with this script, ending."
+    echo ${message}
+    exit 1
+  fi
 }
 
 curl_delete() {
@@ -47,7 +72,7 @@ import_index_pattern() {
   echo "****************************"
   echo "*** Index-pattern import ***"
   echo "****************************"
-    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$NUDGE_INDEX_PATTERN?pretty -d @$NUDGE_INDEX_PATTERN_FILE
+    curl -XPUT $CURL_OPTS $ELASTICSEARCH_HOST/$NAME_ELASTIC_INDEX/index-pattern/$NUDGE_INDEX_PATTERN?pretty -d @$DIR/$NUDGE_INDEX_PATTERN_FILE
 }
 
 # Import Nudge visualizations, Nudge index-pattern and Nudge dasboards
@@ -135,6 +160,8 @@ delete_dash() {
 }
 
 #Arguments to use the Nudge script
+define_directory_files
+es_version=$?
 if [[ $1 = '' ]];
 then
   help_command
