@@ -1,6 +1,5 @@
  {
       "title": "Top transactions",
-      "visState": "{\"title\":\"Top transactions\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"transaction_responseTime\",\"customLabel\":\"Transaction response time\"}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"transaction_name.raw\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Transaction name\"}}],\"listeners\":{}}",
       "visState": "{\"title\":\"Top transactions\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"transaction_responseTime\",\"customLabel\":\"Transaction response time\"}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"transaction_name.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Transaction name\"}}],\"listeners\":{}}",
       "uiStateJSON": "{}",
       "description": "",
