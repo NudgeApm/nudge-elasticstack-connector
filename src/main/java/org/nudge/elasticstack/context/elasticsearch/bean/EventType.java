@@ -7,7 +7,13 @@ public enum EventType {
 
 	// TODO FMA add JAX-WS layer here
 
-	TRANSACTION("transaction"), MBEAN("mbean"), SQL("sql"), GEO_LOC("geolocation");
+	GEO_LOC("geolocation"),
+	JAVA("layer_java"),
+	JAX_WS("layer_jax-ws"),
+	JMS("layer_jms"),
+	MBEAN("mbean"),
+	SQL("layer_sql"),
+	TRANSACTION("transaction");
 
 	private final String type;
 

@@ -2,14 +2,15 @@ package org.nudge.elasticstack;
 
 import com.nudge.apm.buffer.probe.RawDataProtocol.Dictionary;
 import com.nudge.apm.buffer.probe.RawDataProtocol.RawData;
-import com.nudge.apm.buffer.probe.RawDataProtocol.Transaction;
 import org.apache.log4j.Logger;
 import org.nudge.elasticstack.connection.ElasticConnection;
 import org.nudge.elasticstack.connection.NudgeApiConnection;
-import org.nudge.elasticstack.context.elasticsearch.bean.*;
+import org.nudge.elasticstack.context.elasticsearch.bean.EventMBean;
+import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocation;
+import org.nudge.elasticstack.context.elasticsearch.bean.GeoLocationWriter;
+import org.nudge.elasticstack.context.elasticsearch.bean.NudgeEvent;
 import org.nudge.elasticstack.context.elasticsearch.builder.GeoLocationElasticPusher;
 import org.nudge.elasticstack.context.elasticsearch.builder.MBean;
-import org.nudge.elasticstack.context.elasticsearch.builder.SQLLayer;
 import org.nudge.elasticstack.context.elasticsearch.builder.TransactionSerializer;
 import org.nudge.elasticstack.context.elasticsearch.mapping.Mapping;
 import org.nudge.elasticstack.context.nudge.api.bean.Filter;
@@ -128,13 +129,12 @@ class Daemon {
 							// ==============================
 							// Type : Transaction and Layer
 							// ==============================
-							List<Transaction> transactions = rawdata.getTransactionsList();
-							List<TransactionDTO> transactionDTOs = DTOBuilder.buildTransactions(transactions, filters);
+							List<TransactionDTO> esTransactions = DTOBuilder.buildTransactions(rawdata.getTransactionsList(), filters);
 
-							List<TransactionEvent> events = transactionLayer.serialize(appId, appName, hostname, nudgeConfigHostname, transactionDTOs);
-							for (TransactionEvent eventTrans : events) { // WTF
-								transactionLayer.nullLayer(eventTrans);
-							}
+							List<NudgeEvent> events = transactionLayer.serialize(appId, appName, hostname, nudgeConfigHostname, esTransactions);
+//							for (TransactionEvent eventTrans : events) { // WTF
+//								transactionLayer.nullLayer(eventTrans);
+//							}
 							List<String> jsonEvents = transactionLayer.serialize(events);
 							transactionLayer.sendToElastic(jsonEvents);
 
@@ -154,10 +154,10 @@ class Daemon {
 							// ===========================
 							// Type : SQL
 							// ===========================
-							SQLLayer s = new SQLLayer();
-							List<SQLEvent> sql = s.buildSQLEvents(appId, appName, hostname, nudgeConfigHostname, transactionDTOs);
-							List<String> jsonEventsSql = s.parseJsonSQL(sql);
-							s.sendSqltoElk(jsonEventsSql);
+//							LayerTransformer s = new LayerTransformer();
+//							List<SQLEvent> sql = s.buildSQLEvents(appId, appName, hostname, nudgeConfigHostname, esTransactions);
+//							List<String> jsonEventsSql = s.parseJsonSQL(sql);
+//							s.sendSqltoElk(jsonEventsSql);
 
 							// ===========================
 							// GeoLocalation
@@ -165,7 +165,7 @@ class Daemon {
 							List<GeoLocation> geoLocations = new ArrayList<>();
 							GeoLocationElasticPusher gep = new GeoLocationElasticPusher();
 							try {
-								for (TransactionDTO transaction : transactionDTOs) {
+								for (TransactionDTO transaction : esTransactions) {
 									String userIp = transaction.getUserIp();
 									if (userIp != null && !"".equals(userIp)) {
 										GeoLocation geoLocation = geoLocationsMap.get(userIp);
@@ -180,7 +180,7 @@ class Daemon {
 							} catch (NudgeESConnectorException e) {
 								LOG.error("Failed to consider geolocation", e);
 							}
-							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, transactionDTOs);
+							List<GeoLocationWriter> location = gep.buildLocationEvents(geoLocations, esTransactions);
 							List<String> json = gep.parseJsonLocation(location);
 							gep.sendElk(json);
 						}

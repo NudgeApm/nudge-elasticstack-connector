@@ -7,8 +7,10 @@ import org.apache.log4j.Logger;
 import org.nudge.elasticstack.Configuration;
 import org.nudge.elasticstack.context.elasticsearch.bean.BulkFormat;
 import org.nudge.elasticstack.context.elasticsearch.bean.EventType;
+import org.nudge.elasticstack.context.elasticsearch.bean.LayerEvent;
 import org.nudge.elasticstack.context.elasticsearch.bean.NudgeEvent;
 import org.nudge.elasticstack.context.elasticsearch.bean.TransactionEvent;
+import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
 
@@ -38,12 +40,13 @@ public class TransactionSerializer {
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-	public List<TransactionEvent> serialize(String appId, String appName, String host, String hostname, List<TransactionDTO> transactionList)
+	public List<NudgeEvent> serialize(String appId, String appName, String host, String hostname, List<TransactionDTO> transactionList)
 			throws ParseException, JsonProcessingException {
-		List<TransactionEvent> events = new ArrayList<TransactionEvent>();
+		List<NudgeEvent> events = new ArrayList<>();
 		for (TransactionDTO trans : transactionList) {
 			TransactionEvent transactionEvent = new TransactionEvent();
 
+			// build the transaction JSON object
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 			String date = sdf.format(trans.getStartTime());
 			transactionEvent.setAppId(appId);
@@ -55,11 +58,10 @@ public class TransactionSerializer {
 			transactionEvent.setDate(date);
 			transactionEvent.setCount(1L);
 			transactionEvent.setTransactionId(trans.getId());
+			events.add(transactionEvent);
 
-			events.add(transactionEvent);
-			// handle layers
-			buildLayerEvents(trans.getLayers(), transactionEvent);
-			events.add(transactionEvent);
+			// handle layers - build for each layers a JSON object
+			events.addAll(buildLayerEvents(trans.getLayers(), transactionEvent));
 		}
 		return events;
 	}
@@ -89,54 +91,103 @@ public class TransactionSerializer {
 		return eventTrans;
 	}
 
+
+	protected LayerEvent createLayerEvent(EventType type, LayerCallDTO layerCallDTO, TransactionEvent transaction) {
+
+		SimpleDateFormat sdfr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
+		String sqlTimestamp = sdfr.format(layerCallDTO.getTimestamp());
+
+		LayerEvent layerEvent = new LayerEvent(type);
+		layerEvent.setAppId(transaction.getAppId());
+		layerEvent.setAppName(transaction.getAppName());
+		layerEvent.setHost(transaction.getHost());
+		layerEvent.setHostname(transaction.getHostname());
+		layerEvent.setDate(sqlTimestamp);
+		layerEvent.setName(layerCallDTO.getCode());
+		layerEvent.setCount(layerCallDTO.getCount());
+		layerEvent.setResponseTime(layerCallDTO.getResponseTime());
+		layerEvent.setTransactionId(transaction.getTransactionId());
+
+		return layerEvent;
+	}
+
+	protected LayerEvent createJavaLayerEvent(TransactionEvent transaction, long responseTime) {
+		LayerEvent javaLayer = new LayerEvent(EventType.JAVA);
+		javaLayer.setAppId(transaction.getAppId());
+		javaLayer.setAppName(transaction.getAppName());
+		javaLayer.setHost(transaction.getHost());
+		javaLayer.setHostname(transaction.getHostname());
+		javaLayer.setDate(transaction.getDate());
+		javaLayer.setName(transaction.getName());
+		javaLayer.setCount(transaction.getCount());
+		javaLayer.setResponseTime(responseTime);
+		javaLayer.setTransactionId(transaction.getTransactionId());
+		return javaLayer;
+	}
+
 	/**
 	 * Build layer events
 	 *
 	 * @param rawdataLayers
-	 * @param eventTrans
+	 * @param transactionEvent
 	 * @throws ParseException
 	 * @throws JsonProcessingException
 	 */
-
-	public void buildLayerEvents(List<LayerDTO> rawdataLayers, TransactionEvent eventTrans)
+	public List<LayerEvent> buildLayerEvents(List<LayerDTO> rawdataLayers, TransactionEvent transactionEvent)
 			throws ParseException, JsonProcessingException {
-		// TODO FMA link the layerName with EventType
+
+		List<LayerEvent> layers = new ArrayList<>();
+
+		// TODO split transaction affectation and layers...
 		for (LayerDTO layer : rawdataLayers) {
 			if (layer.getLayerName().equals("SQL")) {
-				eventTrans.setResponseTimeLayerSql(layer.getTime());
-				eventTrans.setLayerCountSql(layer.getCount());
-				eventTrans.setLayerNameSql(layer.getLayerName());
+				transactionEvent.setResponseTimeLayerSql(layer.getTime());
+				transactionEvent.setLayerCountSql(layer.getCount());
+				transactionEvent.setLayerNameSql(layer.getLayerName());
+				for (LayerCallDTO layerCallDTO : layer.getCalls()) {
+					layers.add(createLayerEvent(EventType.SQL, layerCallDTO, transactionEvent));
+				}
 			}
 			if (layer.getLayerName().equals("JMS")) {
-				eventTrans.setResponseTimeLayerJms(layer.getTime());
-				eventTrans.setLayerCountJms(layer.getCount());
-				eventTrans.setLayerNameJms(layer.getLayerName());
+				transactionEvent.setResponseTimeLayerJms(layer.getTime());
+				transactionEvent.setLayerCountJms(layer.getCount());
+				transactionEvent.setLayerNameJms(layer.getLayerName());
+				for (LayerCallDTO layerCallDTO : layer.getCalls()) {
+					layers.add(createLayerEvent(EventType.JMS, layerCallDTO, transactionEvent));
+				}
 			}
 			if (layer.getLayerName().equals("JAX-WS")) {
-				eventTrans.setResponseTimeLayerJaxws(layer.getTime());
-				eventTrans.setLayerCountJaxws(layer.getCount());
-				eventTrans.setLayerNameJaxws(layer.getLayerName());
-
+				transactionEvent.setResponseTimeLayerJaxws(layer.getTime());
+				transactionEvent.setLayerCountJaxws(layer.getCount());
+				transactionEvent.setLayerNameJaxws(layer.getLayerName());
+				for (LayerCallDTO layerCallDTO : layer.getCalls()) {
+					layers.add(createLayerEvent(EventType.JAX_WS, layerCallDTO, transactionEvent));
+				}
 			}
 			if (layer.getLayerName().equals("JAVA")) {
-				eventTrans.setLayerCountJava(layer.getCount());
-				eventTrans.setLayerNameJava(layer.getLayerName());
+				transactionEvent.setLayerCountJava(layer.getCount());
+				transactionEvent.setLayerNameJava(layer.getLayerName());
+				for (LayerCallDTO layerCallDTO : layer.getCalls()) {
+					layers.add(createLayerEvent(EventType.JAVA, layerCallDTO, transactionEvent));
+				}
 			}
 		}
-		long respTimeJaxws = 0;
-		if (eventTrans.getResponseTimeLayerJaxws() != null) {
-			respTimeJaxws = eventTrans.getResponseTimeLayerJaxws();
+		// compute the java layer response time
+		long totalLayerTime = 0;
+		if (transactionEvent.getResponseTimeLayerJaxws() != null) {
+			totalLayerTime = totalLayerTime + transactionEvent.getResponseTimeLayerJaxws();
 		}
-		long respTimeJms = 0;
-		if (eventTrans.getResponseTimeLayerJms() != null) {
-			respTimeJms = eventTrans.getResponseTimeLayerJms();
+		if (transactionEvent.getResponseTimeLayerJms() != null) {
+			totalLayerTime = totalLayerTime + transactionEvent.getResponseTimeLayerJms();
 		}
-		long respTimeSql = 0;
-		if (eventTrans.getResponseTimeLayerSql() != null) {
-			respTimeSql = eventTrans.getResponseTimeLayerSql();
+		if (transactionEvent.getResponseTimeLayerSql() != null) {
+			totalLayerTime = totalLayerTime + transactionEvent.getResponseTimeLayerSql();
 		}
-		long responseTimeJava = eventTrans.getResponseTime() - (respTimeJaxws + respTimeJms + respTimeSql);
-		eventTrans.setResponseTimeLayerJava(responseTimeJava);
+		transactionEvent.setResponseTimeLayerJava(transactionEvent.getResponseTime() - totalLayerTime);
+		layers.add(createJavaLayerEvent(transactionEvent, transactionEvent.getResponseTimeLayerJava()));
+
+		return layers;
 	}
 
 	/**
@@ -146,7 +197,7 @@ public class TransactionSerializer {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<String> serialize(List<TransactionEvent> eventList) throws Exception {
+	public List<String> serialize(List<NudgeEvent> eventList) throws Exception {
 		List<String> jsonEvents = new ArrayList<String>();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 		if (config.getDryRun()) {
@@ -215,9 +266,8 @@ public class TransactionSerializer {
 		out.close();
 		long end = System.currentTimeMillis();
 		long totalTime = end - start;
-		LOG.info(" Flush " + jsonEvents.size() + " documents in BULK insert in " + (totalTime / 1000f) + "sec");
-		httpCon.getResponseCode();
-		httpCon.getResponseMessage();
+		LOG.info(" Flush " + jsonEvents.size() + " documents in BULK insert in " + (totalTime / 1000f) + "sec : "
+				+ httpCon.getResponseCode() + " - " + httpCon.getResponseMessage());
 	}
 
 }

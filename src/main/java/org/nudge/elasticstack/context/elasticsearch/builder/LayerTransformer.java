@@ -19,18 +19,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+public class LayerTransformer {
 
-public class SQLLayer {
-
-	private static final Logger LOG = Logger.getLogger(SQLLayer.class.getName());
+	private static final Logger LOG = Logger.getLogger(LayerTransformer.class.getName());
 	private static final String lineBreak = "\n";
-	private Configuration config = Configuration.getInstance();
 
 	/**
 	 * Extract SQL events from transactions.
 	 * @param appId 
 	 */
-	public List<SQLEvent> buildSQLEvents(String appId, String appName, String host, String hostname, List<TransactionDTO> transactions) {
+	static public List<SQLEvent> buildSQLEvents(String appId, String appName, String host, String hostname, List<TransactionDTO> transactions) {
 		List<SQLEvent> sqlEvents = new ArrayList<>();
 
 		for (TransactionDTO transaction : transactions) {
@@ -63,11 +61,11 @@ public class SQLLayer {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<String> parseJsonSQL(List<SQLEvent> sqlEvents) throws Exception {
+	static public List<String> parseJsonSQL(List<SQLEvent> sqlEvents) throws Exception {
 		List<String> jsonEventsSql = new ArrayList<String>();
 		ObjectMapper jsonSerializer = new ObjectMapper();
 
-		if (config.getDryRun()) {
+		if (Configuration.getInstance().getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
 		for (SQLEvent sqlEvent : sqlEvents) {
@@ -87,13 +85,13 @@ public class SQLLayer {
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	public String generateMetaDataSQL(String sql) throws JsonProcessingException {
+	static public String generateMetaDataSQL(String sql) throws JsonProcessingException {
 		ObjectMapper jsonSerializer = new ObjectMapper();
-		if (config.getDryRun()) {
+		if (Configuration.getInstance().getDryRun()) {
 			jsonSerializer.enable(SerializationFeature.INDENT_OUTPUT);
 		}
 		BulkFormat elasticMetaData = new BulkFormat();
-		elasticMetaData.getIndexElement().setIndex(config.getElasticIndex());
+		elasticMetaData.getIndexElement().setIndex(Configuration.getInstance().getElasticIndex());
 		elasticMetaData.getIndexElement().setType("sql");
 		return jsonSerializer.writeValueAsString(elasticMetaData);
 	}
@@ -104,7 +102,7 @@ public class SQLLayer {
 	 * @param jsonEventsSql
 	 * @throws IOException
 	 */
-	public void sendSqltoElk(List<String> jsonEventsSql) throws IOException {
+	static public void sendSqltoElk(List<String> jsonEventsSql) throws IOException {
 		if (jsonEventsSql.isEmpty()) {
 			return;
 		}
@@ -113,12 +111,12 @@ public class SQLLayer {
 		for (String json : jsonEventsSql) {
 			sb.append(json);
 		}
-		if (config.getDryRun()) {
+		if (Configuration.getInstance().getDryRun()) {
 			LOG.debug("Dry run active, only log documents, don't push to elasticsearch.");
 			return;
 		}
 		long start = System.currentTimeMillis();
-		URL URL = new URL(config.getElasticHostURL() + "_bulk");
+		URL URL = new URL(Configuration.getInstance().getElasticHostURL() + "_bulk");
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Bulk request to : " + URL);
 		}
