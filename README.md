@@ -11,8 +11,8 @@ To view a live demo follow this link :
 
 ## Requirements
 1. A [Nudge APM](https://www.nudge-apm.com/) api token
-2. Elastic 2.3
-3. Kibana 4.5.0
+2. Elastic 2.3, 2.4 or 5.x
+3. Kibana 4.5.0 or Kibana 5.x
 4. Java >= 1.7 (Open JDK and Oracle JVM have been tested)
 
 ## Getting started
