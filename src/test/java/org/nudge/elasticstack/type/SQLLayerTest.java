@@ -3,7 +3,7 @@ package org.nudge.elasticstack.type;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nudge.elasticstack.context.elasticsearch.bean.SQLEvent;
-import org.nudge.elasticstack.context.elasticsearch.builder.SQLLayer;
+import org.nudge.elasticstack.context.elasticsearch.builder.LayerTransformer;
 import org.nudge.elasticstack.context.nudge.dto.LayerCallDTO;
 import org.nudge.elasticstack.context.nudge.dto.LayerDTO;
 import org.nudge.elasticstack.context.nudge.dto.TransactionDTO;
@@ -14,13 +14,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Test class of {@link SQLLayer}
+ * Test class of {@link LayerTransformer}
  */
 public class SQLLayerTest {
 
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-	private SQLLayer sqlLayer = new SQLLayer();
+	private LayerTransformer layerTransformer = new LayerTransformer();
 
 	@Test
 	public void test_BuildSQLEvents() {
@@ -33,7 +33,7 @@ public class SQLLayerTest {
 		int count = 1;
 		Date date = new Date();
 
-		List<SQLEvent> sqlEvents = sqlLayer.buildSQLEvents(appId, appName,host, hostname, Collections.singletonList(
+		List<SQLEvent> sqlEvents = layerTransformer.buildSQLEvents(appId, appName,host, hostname, Collections.singletonList(
 				buildTransactionDTO(sqlReq, responseTime, 1, date.getTime())));
 
 		for (SQLEvent sqlEvent : sqlEvents) {
