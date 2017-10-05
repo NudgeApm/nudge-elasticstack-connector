@@ -19,8 +19,8 @@ To view a live demo follow this link :
 First download and unpack our archive.
 
 ```
-wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.4.0/nudge-elasticstack-plugin-1.4.0.zip
-unzip -d nudge-elasticstack-plugin nudge-elasticstack-plugin-1.4.0.zip 
+wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.5.0/nudge-elasticstack-plugin-1.5.0.zip
+unzip -d nudge-elasticstack-plugin nudge-elasticstack-plugin-1.5.0.zip 
 ```
 
 Then edit the properties file and set your own properties.
