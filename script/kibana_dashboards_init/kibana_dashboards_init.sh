@@ -29,7 +29,7 @@ help_command () {
 
 # Determine from the ES version started, the directory files to use
 define_directory_files() {
-  local es_version="$(curl -s -XGET 'localhost:9200?filter_path=version.number&pretty=false' | awk -F'"' {'print $6'})"
+  local es_version="$(curl -s -XGET $ELASTICSEARCH_HOST'?filter_path=version.number&pretty=false' | awk -F'"' {'print $6'})"
 
   if [ -z "$es_version" ]
   then
@@ -51,6 +51,8 @@ define_directory_files() {
     echo ${message}
     exit 1
   fi
+  message="The resources directory (dashboards, visualizations and index-pattern) used is ${DIR}."
+  echo ${message}
 }
 
 curl_delete() {
