@@ -7,7 +7,7 @@ The Nudge-ElasticStack Connector is a daemon that let you integrate your applica
 
 ## Live demo
 To view a live demo follow this link :
-[bit.ly/nudge-demo-elastic](http://bit.ly/2f1NbUz)</a>
+[bit.ly/2yZwxge](http://bit.ly/2yZwxge)</a>
 
 ## Requirements
 1. A [Nudge APM](https://www.nudge-apm.com/) api token
