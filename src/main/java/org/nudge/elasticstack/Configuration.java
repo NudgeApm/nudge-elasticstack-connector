@@ -141,7 +141,7 @@ public class Configuration {
 		}
 		value = properties.getProperty(key);
 		if (value != null) {
-			return value;
+			return value.trim();
 		}
 		return defaultValue;
 	}

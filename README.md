@@ -11,16 +11,16 @@ To view a live demo follow this link :
 
 ## Requirements
 1. A [Nudge APM](https://www.nudge-apm.com/) api token
-2. Elastic 2.3
-3. Kibana 4.5.0
+2. Elastic 2.3, 2.4 or 5.x
+3. Kibana 4.5.0 or Kibana 5.x
 4. Java >= 1.7 (Open JDK and Oracle JVM have been tested)
 
 ## Getting started
 First download and unpack our archive.
 
 ```
-wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.4.0/nudge-elasticstack-plugin-1.4.0.zip
-unzip -d nudge-elasticstack-plugin nudge-elasticstack-plugin-1.4.0.zip 
+wget https://github.com/NudgeApm/nudge-elasticstack-connector/releases/download/v1.5.0/nudge-elasticstack-plugin-1.5.0.zip
+unzip -d nudge-elasticstack-plugin nudge-elasticstack-plugin-1.5.0.zip 
 ```
 
 Then edit the properties file and set your own properties.
